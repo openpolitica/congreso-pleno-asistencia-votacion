@@ -12,7 +12,7 @@ public record Pleno(
     LocalDate fecha,
     int quorum
 ) {
-    String id() {
-        return fecha.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + "-" + titulo;
-    }
+  String id() {
+    return fecha.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + "-" + titulo;
+  }
 }
