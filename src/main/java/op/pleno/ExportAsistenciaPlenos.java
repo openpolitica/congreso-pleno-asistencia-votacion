@@ -144,7 +144,7 @@ public class ExportAsistenciaPlenos implements Consumer<AsistenciaPlenos> {
       ps.setString(6, r.hora().format(DateTimeFormatter.ofPattern(HH_MM)));
       ps.setString(7, r.pleno().titulo());
 
-      ps.setInt(8, r.resultados().presentes());
+      ps.setInt(8, r.pleno().quorum());
       ps.setInt(9, r.resultados().presentes());
       ps.setInt(10, r.resultados().ausentes());
       ps.setInt(11, r.resultados().licencias());
