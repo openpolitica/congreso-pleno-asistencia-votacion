@@ -1,0 +1,5 @@
+etiqueta,valor,valores_validos,descripcion
+proyectos_ley,,,
+tipo_votacion,custion_orden,"texto_substitutorio_proyectos_ley, cuestion_orden",
+reglamento_congreso_articulos,12,lista,
+cuestion_order_planteado_por,LUQUE IBARRA RUTH,texto,nombre de congresista
