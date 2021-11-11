@@ -7,7 +7,6 @@ public record ResultadoVotacion(
     int ausentes,
     int licencias,
     int otros,
-    int total,
-    int quorum
+    int total
 ) {
 }
