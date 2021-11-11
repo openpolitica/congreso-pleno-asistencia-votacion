@@ -64,7 +64,7 @@ jobs:
         with:
           script: |
             github.rest.pulls.createReviewComment({
-              pull_number: context.pull_request.number,
+              pull_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: "Vercel deployment: ${{steps.deploy.outputs.result}}"
