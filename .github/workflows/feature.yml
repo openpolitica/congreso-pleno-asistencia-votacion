@@ -69,7 +69,6 @@ jobs:
             github.rest.pulls.createReviewComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              pull_number: context.payload.pull_request.number,
               body: "Vercel deployment: ${{steps.deploy.outputs.result}}"
             })
 #      - name: Add comment to PR
