@@ -1,0 +1,9 @@
+etiqueta,valor,valores_validos,descripcion
+tipo_votacion,cuestion_confianza,"texto_substitutorio, cuestion_orden, cuestion_confianza",Tipo de Votacion. 
+reglamento_congreso_articulos,,lista de numeros separados por coma,Articulos relacionados a la votacion.
+cuestion_order_planteado_por,,texto,nombre de congresista planteando la cuestion de orden. Seguir formato de APELLIDOS NOMBRES
+proyectos_ley,,lista de numeros separados por coma,Proyectos de ley afectados por la votacion.
+leyes,,lista de numeros separados por coma,Leyes afectadas por votacion.
+proyectos_resolucion_legislativa,,lista de numeros separados por coma,
+resoluciones_legislativas,,lista de numeros separados por coma,
+cuestion_confianza_planteada_por,"BELLIDO UGARTE, GUIDO",texto,nombre de presidente del consejo de ministros
