@@ -60,23 +60,23 @@ jobs:
             --install datasette-copyable \
             --install datasette-block-robots \
             --install datasette-pretty-json
-      - uses: actions/github-script@v5
-        with:
-          script: |
-            github.rest.pull_requests.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: "Vercel deployment: ${{steps.deploy.outputs.result}}"
-            })
-#      - name: Add comment to PR
-#        env:
-#          URL: ${{ github.event.pull_request.comments_url }}
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        run: |
-#          curl \
-#            -X POST \
-#            $URL \
-#            -H "Content-Type: application/json" \
-#            -H "Authorization: token $GITHUB_TOKEN" \
-#            --data '{ "body": "${{steps.deploy.outputs.result}}" }'
+#      - uses: actions/github-script@v5
+#        with:
+#          script: |
+#            github.rest.pull_requests.createComment({
+#              issue_number: context.issue.number,
+#              owner: context.repo.owner,
+#              repo: context.repo.repo,
+#              body: "Vercel deployment: ${{steps.deploy.outputs.result}}"
+#            })
+      - name: Add comment to PR
+        env:
+          URL: ${{ github.event.pull_request.comments_url }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          curl \
+            -X POST \
+            $URL \
+            -H "Content-Type: application/json" \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            --data '{ "body": "${{steps.deploy.outputs.result}}" }'
