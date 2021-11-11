@@ -63,8 +63,14 @@ jobs:
             --install datasette-copyable \
             --install datasette-block-robots \
             --install datasette-pretty-json
-      - uses: actions/github-script@v5
+      - name: View output attributes
+        uses: actions/github-script@v5
         with:
+          script: console.log(steps.deploy)
+      - name: Add comment to PR
+        uses: actions/github-script@v5
+        with:
+          result-encoding: string
           script: |
             github.rest.issues.createComment({
               owner: context.repo.owner,
