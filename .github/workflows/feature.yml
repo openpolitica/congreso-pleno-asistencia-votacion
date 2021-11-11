@@ -3,7 +3,7 @@ name: publish
 
 # Controls when the action will run.
 on:
-  push:
+  pull_request:
     branches:
       - '*'
   # Allows you to run this workflow manually from the Actions tab
@@ -45,9 +45,12 @@ jobs:
           sqlite-utils enable-fts *.db votacion_resultado asunto etiquetas
           sqlite-utils enable-fts *.db votacion_grupo_parlamentario asunto etiquetas
           sqlite-utils enable-fts *.db votacion_congresista asunto etiquetas
-
+      - name: View context attributes
+        uses: actions/github-script@v5
+        with:
+          script: console.log(context)
       - name: Deploy Datasette using Vercel
-        id: deploy
+        id: deploy-datasette
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: |-
@@ -60,14 +63,3 @@ jobs:
             --install datasette-copyable \
             --install datasette-block-robots \
             --install datasette-pretty-json
-      - name: Add comment to PR
-        env:
-          URL: ${{ github.event.issue.comments_url }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          curl \
-            -X POST \
-            $URL \
-            -H "Content-Type: application/json" \
-            -H "Authorization: token $GITHUB_TOKEN" \
-            --data '{ "body": "${{steps.deploy.outputs.result}}" }'
