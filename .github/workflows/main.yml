@@ -56,4 +56,5 @@ jobs:
             --install datasette-vega \
             --install datasette-export-notebook \
             --install datasette-copyable \
-            --install datasette-block-robots
+            --install datasette-block-robots \
+            --install datasette-pretty-json
