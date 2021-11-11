@@ -66,10 +66,10 @@ jobs:
       - uses: actions/github-script@v5
         with:
           script: |
-            github.rest.pulls.createComment({
+            github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              pull_number: context.payload.pull_request.number,
+              issue_number: context.payload.number,
               body: "Vercel deployment: ${{steps.deploy.outputs.result}}"
             })
 #      - name: Add comment to PR
