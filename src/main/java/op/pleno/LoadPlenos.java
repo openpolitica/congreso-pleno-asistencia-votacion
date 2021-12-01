@@ -29,7 +29,7 @@ public class LoadPlenos {
   }
 
   void load() throws IOException {
-    var periodos = Files.list(Path.of("data")).collect(Collectors.toList());
+    var periodos = Files.list(Path.of("data")).toList();
     for (var periodo : periodos) {
       var paths =
           paths(periodo)  // periodo anual
