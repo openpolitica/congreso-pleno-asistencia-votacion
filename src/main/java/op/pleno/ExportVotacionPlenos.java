@@ -147,8 +147,8 @@ public class ExportVotacionPlenos implements Consumer<VotacionPlenos> {
       ps.setString(5, r.pleno().fecha().format(DateTimeFormatter.ofPattern(YYYY_MM_DD)));
       ps.setString(6, r.hora().format(DateTimeFormatter.ofPattern(HH_MM)));
       ps.setString(7, r.pleno().titulo());
-      ps.setString(8, r.presidente());
-      ps.setString(9, r.asunto());
+      ps.setString(8, r.asunto());
+      ps.setString(9, r.presidente());
       ps.setString(10, jsonMapper.writeValueAsString(r.etiquetas()));
 
       ps.setInt(11, r.pleno().quorum());
@@ -227,8 +227,8 @@ public class ExportVotacionPlenos implements Consumer<VotacionPlenos> {
         ps.setString(5, r.pleno().fecha().format(DateTimeFormatter.ofPattern(YYYY_MM_DD)));
         ps.setString(6, r.hora().format(DateTimeFormatter.ofPattern(HH_MM)));
         ps.setString(7, r.pleno().titulo());
-        ps.setString(8, r.presidente());
-        ps.setString(9, r.asunto());
+        ps.setString(8, r.asunto());
+        ps.setString(9, r.presidente());
         ps.setString(10, jsonMapper.writeValueAsString(r.etiquetas()));
 
         ps.setString(11, a.getKey());
@@ -309,8 +309,8 @@ public class ExportVotacionPlenos implements Consumer<VotacionPlenos> {
         ps.setString(5, r.pleno().fecha().format(DateTimeFormatter.ofPattern(YYYY_MM_DD)));
         ps.setString(6, r.hora().format(DateTimeFormatter.ofPattern(HH_MM)));
         ps.setString(7, r.pleno().titulo());
-        ps.setString(8, r.presidente());
-        ps.setString(9, r.asunto());
+        ps.setString(8, r.asunto());
+        ps.setString(9, r.presidente());
         ps.setString(10, jsonMapper.writeValueAsString(r.etiquetas()));
 
         ps.setString(11, a.congresista());
