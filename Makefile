@@ -14,7 +14,11 @@ prepare:
 
 
 run:
-	./mvnw exec:java -Dexec.mainClass="op.pleno.LoadPlenos"
+	./mvnw exec:java -Dexec.mainClass="op.congreso.pleno.LoadPlenos"
 
 serve:
 	datasette *.db
+
+csvs-to-sqlite:
+	rm -f plenos.db
+	csvs-to-sqlite plenos.csv plenos.db

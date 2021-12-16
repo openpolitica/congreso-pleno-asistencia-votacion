@@ -1,4 +1,4 @@
-package op.pleno.asistencia;
+package op.congreso.pleno.asistencia;
 
 public record ResultadoAsistencia(
     int presentes,

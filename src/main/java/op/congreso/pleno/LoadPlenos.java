@@ -1,4 +1,4 @@
-package op.pleno;
+package op.congreso.pleno;
 
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,10 +16,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import op.pleno.asistencia.RegistroAsistencia;
-import op.pleno.asistencia.ResultadoAsistencia;
-import op.pleno.votacion.RegistroVotacion;
-import op.pleno.votacion.ResultadoVotacion;
+import op.congreso.pleno.asistencia.RegistroAsistencia;
+import op.congreso.pleno.votacion.RegistroVotacion;
+import op.congreso.pleno.votacion.ResultadoVotacion;
+import op.congreso.pleno.asistencia.ResultadoAsistencia;
 
 public class LoadPlenos {
   final ObjectMapper mapper = new CsvMapper();

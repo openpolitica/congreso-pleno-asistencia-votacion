@@ -1,4 +1,4 @@
-package op.pleno;
+package op.congreso.pleno;
 
 public record ResultadoCongresista(
     int numero,

@@ -1,4 +1,4 @@
-package op.pleno.votacion;
+package op.congreso.pleno.votacion;
 
 public record ResultadoVotacion(
     int si,

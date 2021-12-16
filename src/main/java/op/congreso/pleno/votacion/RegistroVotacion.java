@@ -1,12 +1,12 @@
-package op.pleno.votacion;
+package op.congreso.pleno.votacion;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import op.pleno.Pleno;
-import op.pleno.ResultadoCongresista;
+import op.congreso.pleno.Pleno;
+import op.congreso.pleno.ResultadoCongresista;
 
 public record RegistroVotacion(
     Pleno pleno,

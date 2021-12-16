@@ -1,7 +1,7 @@
-package op.pleno;
+package op.congreso.pleno;
 
 import java.util.Set;
-import op.pleno.asistencia.RegistroAsistencia;
+import op.congreso.pleno.asistencia.RegistroAsistencia;
 
 public record AsistenciaPlenos(
     String periodo,
