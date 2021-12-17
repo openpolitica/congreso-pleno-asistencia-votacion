@@ -26,7 +26,7 @@ jobs:
         run: mvn clean compile
 
       - name: Run extraction
-        run: mvn exec:java -D"exec.mainClass"="op.congreso.pleno.CargarPlenos"
+        run: mvn exec:java -D"exec.mainClass"="op.congreso.pleno.CargaPlenos"
 
       - name: Commit & Push changes
         uses: actions-js/push@master
