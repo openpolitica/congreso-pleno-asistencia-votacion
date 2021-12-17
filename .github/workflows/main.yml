@@ -28,7 +28,9 @@ jobs:
       - name: Build project with Maven
         run: mvn -B clean compile
 
-      - name: Run extraction
+      - name: Run Actualizar Plenos
+        run: mvn exec:java -D"exec.mainClass"="op.congreso.pleno.CargaPlenos"
+      - name: Run Preparar Plenos DB
         run: mvn -B exec:java -D"exec.mainClass"="op.congreso.pleno.LoadPlenos"
 
       - uses: actions/setup-python@v1
@@ -38,7 +40,11 @@ jobs:
           packages: |
             datasette
             sqlite-utils
+            csvs-to-sqlite
 
+      - name: Prepare Plenos DB
+        run: |
+          csvs-to-sqlite plenos.csv plenos.db
       - name: Install vercel plugin
         run: |
           datasette install datasette-publish-vercel

@@ -25,17 +25,11 @@ jobs:
       - name: Build project with Maven
         run: mvn clean compile
 
-      - name: Run extraction
+      - name: Run Actualizar Plenos
         run: mvn exec:java -D"exec.mainClass"="op.congreso.pleno.CargaPlenos"
+      - name: Run Preparar Plenos DB
+        run: mvn -B exec:java -D"exec.mainClass"="op.congreso.pleno.LoadPlenos"
 
-      - name: Commit & Push changes
-        uses: actions-js/push@master
-        with:
-          branch: main
-          message: 'workflow: datos actualizados'
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/setup-python@v1
       - name: publishes to datasette
         uses: BSFishy/pip-action@v1
@@ -45,20 +39,25 @@ jobs:
             sqlite-utils
             csvs-to-sqlite
 
-      - name: Install vercel plugin
+      - name: Prepare Plenos DB
         run: |
           csvs-to-sqlite plenos.csv plenos.db
       - name: Install vercel plugin
         run: |
           datasette install datasette-publish-vercel
+          sqlite-utils enable-fts *.db votacion_resultado asunto etiquetas
+          sqlite-utils enable-fts *.db votacion_grupo_parlamentario asunto etiquetas
+          sqlite-utils enable-fts *.db votacion_congresista asunto etiquetas
+
       - name: Deploy Datasette using Vercel
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: |-
-          datasette publish vercel plenos.db \
+          datasette publish vercel *.db \
             --token $VERCEL_TOKEN \
-            --project congreso-pleno \
+            --project congreso-pleno-asistencia-votacion \
             --install datasette-vega \
             --install datasette-export-notebook \
             --install datasette-copyable \
-            --install datasette-block-robots
+            --install datasette-block-robots \
+            --install datasette-pretty-json
