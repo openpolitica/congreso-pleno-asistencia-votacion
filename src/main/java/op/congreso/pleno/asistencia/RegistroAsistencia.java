@@ -1,11 +1,11 @@
-package op.pleno.asistencia;
+package op.congreso.pleno.asistencia;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
-import op.pleno.Pleno;
-import op.pleno.ResultadoCongresista;
+import op.congreso.pleno.Pleno;
+import op.congreso.pleno.ResultadoCongresista;
 
 public record RegistroAsistencia(
     Pleno pleno,

@@ -1,4 +1,4 @@
-package op.pleno;
+package op.congreso.pleno;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.sql.DriverManager;
@@ -6,7 +6,7 @@ import java.sql.PreparedStatement;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.function.Consumer;
-import op.pleno.votacion.RegistroVotacion;
+import op.congreso.pleno.votacion.RegistroVotacion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

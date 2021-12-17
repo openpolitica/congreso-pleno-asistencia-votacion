@@ -1,4 +1,4 @@
-package op.pleno;
+package op.congreso.pleno;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

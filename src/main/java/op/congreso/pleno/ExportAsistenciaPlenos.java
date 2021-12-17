@@ -1,4 +1,4 @@
-package op.pleno;
+package op.congreso.pleno;
 
 import java.io.IOException;
 import java.sql.DriverManager;
@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.function.Consumer;
-import op.pleno.asistencia.RegistroAsistencia;
+import op.congreso.pleno.asistencia.RegistroAsistencia;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
