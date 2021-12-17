@@ -41,11 +41,13 @@ public class CargaPlenos {
         var bytes = Files.readAllBytes(Path.of("plenos.json"));
         var existing = jsonMapper.readValue(bytes, new TypeReference<List<MetadataPleno>>() {
             })
-            .stream().collect(Collectors.toMap(MetadataPleno::id, p -> p));
+            .stream()
+            .collect(Collectors.toMap(MetadataPleno::id, p -> p));
 
         var updated = plenosList.stream().map(p -> existing.getOrDefault(p.id(), p))
             .map(p -> {
                 if (p.paginas() < 1) {
+                    System.out.printf("Descargando %s%n", p);
                     p.download();
                     return p.withPaginas();
                 } else {

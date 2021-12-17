@@ -44,7 +44,7 @@ record MetadataPleno(
     }
 
     String id() {
-        return "%s:%s:%s:%s:%s".formatted(periodoParlamentario, periodoAnual, legislatura, fecha, titulo);
+        return "%s:%s".formatted(fecha, titulo);
     }
 
     int countPages() {
@@ -61,7 +61,6 @@ record MetadataPleno(
         try {
             var dir = Path.of(directory());
             if (!Files.isDirectory(dir)) Files.createDirectories(dir);
-            System.out.println(dir);
             ReadableByteChannel readableByteChannel = Channels.newChannel(new URL(url()).openStream());
             FileOutputStream fileOutputStream = new FileOutputStream(path());
             fileOutputStream.getChannel().transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
