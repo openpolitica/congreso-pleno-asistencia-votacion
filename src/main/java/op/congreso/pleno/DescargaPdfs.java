@@ -11,11 +11,11 @@ public class DescargaPdfs {
     public static void main(String[] args) throws IOException {
         ObjectMapper jsonMapper = new ObjectMapper();
         var bytes = Files.readAllBytes(Path.of("plenos.json"));
-        var plenos = jsonMapper.readValue(bytes,  new TypeReference<List<MetadataPleno>>() {});
+        var plenos = jsonMapper.readValue(bytes,  new TypeReference<List<RegistroPleno>>() {});
 
         plenos.stream()
                 .parallel()
-                .forEach(MetadataPleno::download);
+                .forEach(RegistroPleno::download);
     }
 
 

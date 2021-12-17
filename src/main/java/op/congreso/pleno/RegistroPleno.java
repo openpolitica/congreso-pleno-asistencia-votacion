@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.jsoup.Jsoup;
 
-record MetadataPleno(
+record RegistroPleno(
         String periodoParlamentario, String periodoAnual, String legislatura,
         String fecha, String titulo, String url, String filename, int paginas) {
     static StringBuilder csvHeader() {
@@ -37,8 +37,8 @@ record MetadataPleno(
         return directory() + "/" + filename;
     }
 
-    MetadataPleno withPaginas() {
-        return new MetadataPleno(periodoParlamentario, periodoAnual, legislatura,
+    RegistroPleno withPaginas() {
+        return new RegistroPleno(periodoParlamentario, periodoAnual, legislatura,
                 fecha, titulo, url, filename,
                 countPages());
     }
@@ -97,8 +97,8 @@ record MetadataPleno(
 
     private static final Pattern p = Pattern.compile("javascript:openWindow\\('(.+)'\\)");
 
-    public static Map<String, MetadataPleno> collectPleno(String pp, String pa, String l, String url) throws IOException {
-        var root = new LinkedHashMap<String, MetadataPleno>();
+    public static Map<String, RegistroPleno> collectPleno(String pp, String pa, String l, String url) throws IOException {
+        var root = new LinkedHashMap<String, RegistroPleno>();
         {
             var jsoup = Jsoup.connect(BASE_URL + url);
             var doc = jsoup.get();
@@ -118,7 +118,7 @@ record MetadataPleno(
                     if (matcher.find()) {
                         var u = matcher.group(1);
                         var fullUrl = BASE_URL + "/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/" + u;
-                        root.put(titulo, new MetadataPleno(
+                        root.put(titulo, new RegistroPleno(
                                 pp, pa, l,
                                 date, titulo, fullUrl,
                                 fullUrl.split("/")[9],

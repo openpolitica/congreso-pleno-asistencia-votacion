@@ -10,24 +10,24 @@ import java.util.stream.Collectors;
 public class DescargaPlenos {
 
     public static void main(String[] args) throws IOException {
-        var root = MetadataPleno.collect("/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/new_asistenciavotacion", 5);
+        var root = RegistroPleno.collect("/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/new_asistenciavotacion", 5);
 
-        var content = MetadataPleno.csvHeader();
+        var content = RegistroPleno.csvHeader();
 
-        var plenosList = new LinkedList<MetadataPleno>();
+        var plenosList = new LinkedList<RegistroPleno>();
 
         for (var entry : root.entrySet()) {
             System.out.println(entry.getKey());
-            var year = MetadataPleno.collect(entry.getValue(), 4);
+            var year = RegistroPleno.collect(entry.getValue(), 4);
             for (var e2: year.entrySet()) {
                 System.out.println(e2.getKey());
-                var periodo = MetadataPleno.collect(e2.getValue(), 3);
+                var periodo = RegistroPleno.collect(e2.getValue(), 3);
                 for (var e3 : periodo.entrySet()) {
                     System.out.println(e3.getKey());
 
-                    var plenos = MetadataPleno.collectPleno(entry.getKey(), e2.getKey(), e3.getKey(), e3.getValue());
+                    var plenos = RegistroPleno.collectPleno(entry.getKey(), e2.getKey(), e3.getKey(), e3.getValue());
                     var csv = plenos.values().stream()
-                            .map(MetadataPleno::csvEntry)
+                            .map(RegistroPleno::csvEntry)
                             .collect(Collectors.joining());
                     content.append(csv);
                     plenosList.addAll(plenos.values());

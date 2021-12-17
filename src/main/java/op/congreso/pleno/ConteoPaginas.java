@@ -12,17 +12,17 @@ public class ConteoPaginas {
     public static void main(String[] args) throws IOException {
         ObjectMapper jsonMapper = new ObjectMapper();
         var bytes = Files.readAllBytes(Path.of("plenos.json"));
-        var plenos = jsonMapper.readValue(bytes, new TypeReference<List<MetadataPleno>>() {
+        var plenos = jsonMapper.readValue(bytes, new TypeReference<List<RegistroPleno>>() {
         });
 
         var plenosWithPaginas =
                 plenos.stream()
                         .filter(pleno -> pleno.paginas() < 1)
-                        .map(MetadataPleno::withPaginas)
+                        .map(RegistroPleno::withPaginas)
                         .collect(Collectors.toList());
         Files.writeString(Path.of("plenos.json"),
                 jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(plenosWithPaginas));
-        StringBuilder content = MetadataPleno.csvHeader();
+        StringBuilder content = RegistroPleno.csvHeader();
         plenosWithPaginas.forEach(pleno -> content.append(pleno.csvEntry()));
         Files.writeString(Path.of("plenos.csv"), content.toString());
     }

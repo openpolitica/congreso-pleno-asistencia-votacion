@@ -1,4 +1,4 @@
-all: clean build run prepare serve
+all: clean build run prepare run-plenos csvs-to-sqlite serve
 
 build:
 	./mvnw clean install
@@ -14,7 +14,10 @@ prepare:
 
 
 run:
-	./mvnw exec:java -Dexec.mainClass="op.congreso.pleno.LoadPlenos"
+	./mvnw exec:java -Dexec.mainClass="op.congreso.pleno.CargaPlenos"
+
+run-plenos:
+	./mvnw exec:java -Dexec.mainClass="op.congreso.pleno.CargaRegitroPlenos"
 
 serve:
 	datasette *.db
