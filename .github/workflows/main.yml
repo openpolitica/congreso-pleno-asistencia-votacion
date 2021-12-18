@@ -38,7 +38,7 @@ jobs:
       - name: Commit & Push changes
         uses: actions-js/push@master
         with:
-          branch: main
+          branch: registro-pleno
           message: 'workflow: registro de plenos actualizados'
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
