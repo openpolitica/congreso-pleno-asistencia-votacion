@@ -71,9 +71,12 @@ jobs:
             --install datasette-block-robots \
             --install datasette-pretty-json
 
-      - name: Commit & Push changes
-        uses: actions-js/push@master
-        with:
-          branch: registro-pleno
-          message: 'workflow: registro de plenos actualizados'
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+#      - name: Commit & Push changes
+#        uses: actions-js/push@master
+#        with:
+#          branch: registro-pleno
+#          message: 'workflow: registro de plenos actualizados'
+#          github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3
+
