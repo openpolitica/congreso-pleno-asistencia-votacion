@@ -25,7 +25,7 @@ public class CargaVotacionPlenos implements Consumer<VotacionPlenos> {
 
   @Override
   public void accept(VotacionPlenos votacionPlenos) {
-    var jdbcUrl = "jdbc:sqlite:%s-plenos.db".formatted(votacionPlenos.periodo());
+    var jdbcUrl = "jdbc:sqlite:%s-asistencias-votaciones.db".formatted(votacionPlenos.periodo());
     try (var connection = DriverManager.getConnection(jdbcUrl)) {
       var statement = connection.createStatement();
       statement.executeUpdate("pragma journal_mode = WAL");

@@ -25,7 +25,7 @@ public class CargaAsistenciaPlenos implements Consumer<AsistenciaPlenos> {
 
   @Override
   public void accept(AsistenciaPlenos asistenciaPlenos) {
-    var jdbcUrl = "jdbc:sqlite:%s-plenos.db".formatted(asistenciaPlenos.periodo());
+    var jdbcUrl = "jdbc:sqlite:%s-asistencias-votaciones.db".formatted(asistenciaPlenos.periodo());
     try (var connection = DriverManager.getConnection(jdbcUrl)) {
       var statement = connection.createStatement();
       statement.executeUpdate("pragma journal_mode = WAL");
