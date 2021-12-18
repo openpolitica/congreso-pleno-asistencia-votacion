@@ -1,5 +1,7 @@
 all: clean build run prepare run-plenos csvs-to-sqlite serve
 
+test-carga: clean build run prepare serve
+
 build:
 	./mvnw clean install
 
