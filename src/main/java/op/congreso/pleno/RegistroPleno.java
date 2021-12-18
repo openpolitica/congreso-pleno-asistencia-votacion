@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Pattern;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.jsoup.Jsoup;
@@ -67,6 +68,26 @@ record RegistroPleno(
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        RegistroPleno that = (RegistroPleno) o;
+        return Objects.equals(periodoParlamentario, that.periodoParlamentario) &&
+            Objects.equals(periodoAnual, that.periodoAnual) &&
+            Objects.equals(legislatura, that.legislatura) &&
+            Objects.equals(fecha, that.fecha) && Objects.equals(titulo, that.titulo);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(periodoParlamentario, periodoAnual, legislatura, fecha, titulo);
     }
 
     public static final String BASE_URL = "https://www2.congreso.gob.pe";

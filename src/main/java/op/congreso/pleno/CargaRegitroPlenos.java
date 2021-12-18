@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
-import java.util.LinkedList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,7 +16,7 @@ public class CargaRegitroPlenos {
     public static void main(String[] args) throws IOException {
         var root = collect("/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/new_asistenciavotacion", 5);
 
-        var plenosList = new LinkedList<RegistroPleno>();
+        var plenos = new HashSet<RegistroPleno>();
 
         for (var periodos : root.entrySet()) {
             System.out.println(periodos.getKey());
@@ -27,11 +27,11 @@ public class CargaRegitroPlenos {
                 for (var legislatura : periodo.entrySet()) {
                     System.out.println(legislatura.getKey());
 
-                    var plenos = collectPleno(
+                    var p = collectPleno(
                         periodos.getKey(), anual.getKey(),
                         legislatura.getKey(), legislatura.getValue()
                     );
-                    plenosList.addAll(plenos.values());
+                    plenos.addAll(p.values());
                 }
             }
         }
@@ -44,7 +44,7 @@ public class CargaRegitroPlenos {
             .stream()
             .collect(Collectors.toMap(RegistroPleno::id, p -> p));
 
-        var updated = plenosList.stream().map(p -> existing.getOrDefault(p.id(), p))
+        var updated = plenos.stream().map(p -> existing.getOrDefault(p.id(), p))
             .map(p -> {
                 if (p.paginas() < 1) {
                     System.out.printf("Descargando %s%n", p);
@@ -54,11 +54,15 @@ public class CargaRegitroPlenos {
                     return p;
                 }
             })
+            .collect(Collectors.toSet());
+        var registroPlenos = updated.stream()
             .sorted(Comparator.comparing(RegistroPleno::id).reversed())
-            .collect(Collectors.toList());
-        Files.writeString(Path.of("plenos.json"), jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(updated));
+            .toList();
+        //json
+        Files.writeString(Path.of("plenos.json"), jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(registroPlenos));
+        //csv
         StringBuilder content = RegistroPleno.csvHeader();
-        updated.forEach(pleno -> content.append(pleno.csvEntry()));
+        registroPlenos.forEach(pleno -> content.append(pleno.csvEntry()));
         Files.writeString(Path.of("plenos.csv"), content.toString());
     }
 }
