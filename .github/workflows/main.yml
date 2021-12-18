@@ -35,13 +35,6 @@ jobs:
       - name: Run Preparar Plenos DB
         run: mvn -B exec:java -D"exec.mainClass"="op.congreso.pleno.CargaPlenos"
 
-      - name: Commit & Push changes
-        uses: actions-js/push@master
-        with:
-          branch: registro-pleno
-          message: 'workflow: registro de plenos actualizados'
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-
       - uses: actions/setup-python@v1
       - name: publishes to datasette
         uses: BSFishy/pip-action@v1
@@ -77,3 +70,10 @@ jobs:
             --install datasette-copyable \
             --install datasette-block-robots \
             --install datasette-pretty-json
+
+      - name: Commit & Push changes
+        uses: actions-js/push@master
+        with:
+          branch: registro-pleno
+          message: 'workflow: registro de plenos actualizados'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
