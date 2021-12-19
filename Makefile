@@ -1,6 +1,6 @@
-all: clean build run prepare run-plenos csvs-to-sqlite serve
+all: clean build carga_plenos prepare registro_plenos prepare_registro_plenos serve
 
-test-carga: clean build run prepare serve
+test: clean build carga_plenos prepare serve
 
 build:
 	./mvnw clean install
@@ -15,15 +15,15 @@ prepare:
 	sqlite-utils enable-fts *.db votacion_congresista asunto etiquetas
 
 
-run:
+carga_plenos:
 	./mvnw exec:java -Dexec.mainClass="op.congreso.pleno.CargaPlenos"
 
-run-plenos:
+registro_plenos:
 	./mvnw exec:java -Dexec.mainClass="op.congreso.pleno.CargaRegitroPlenos"
 
 serve:
 	datasette *.db
 
-csvs-to-sqlite:
+prepare_registro_plenos:
 	rm -f plenos.db
 	csvs-to-sqlite plenos.csv plenos.db
