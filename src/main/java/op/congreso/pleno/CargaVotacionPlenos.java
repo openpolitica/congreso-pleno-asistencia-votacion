@@ -272,8 +272,8 @@ public class CargaVotacionPlenos implements Consumer<VotacionPlenos> {
             fecha text not null,
             hora text not null,
             pleno_titulo text not null,
-            presidente text not null,
             asunto text not null,
+            presidente text not null,
             etiquetas text not null,
             
             congresista text not null,
