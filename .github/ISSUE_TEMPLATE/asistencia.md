@@ -7,8 +7,6 @@ assignees: ''
 
 ---
 
-URL de PDF del Pleno: _<copiar URL del PDF del Pleno, por ejemplo desde este sitio: https://congreso-pleno-pi.vercel.app/plenos/plenos>_
-
 URL de Hoja de Cálculo (Google Drive): _<copiar URL de la hoja de calculo trabajada en Google Drive>_
 
 ## Tablas de Resultados
@@ -22,3 +20,7 @@ _<copiar tabla de resultados totales desde Hoja de calculo - Eliminar codigo CSS
 ### Resultados por partido
 
 _<copiar tabla de resultados por partido desde Hoja de calculo - Eliminar codigo CSS que se genere al copiar>_
+
+## Página del Pleno
+
+_Pegar copia del screenshot de la página del PDF del Pleno_
