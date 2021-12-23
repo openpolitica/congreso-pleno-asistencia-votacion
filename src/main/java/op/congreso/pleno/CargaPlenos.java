@@ -127,7 +127,7 @@ public class CargaPlenos {
           .withResultadosPorPartido(resultadosPorGrupo)
           .build();
     } catch (Exception e) {
-      throw new RuntimeException(e);
+      throw new RuntimeException("Error at %s".formatted(path), e);
     }
   }
 
