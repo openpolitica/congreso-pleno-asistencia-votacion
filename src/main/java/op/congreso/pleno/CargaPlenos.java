@@ -42,7 +42,6 @@ public class CargaPlenos {
               .filter(s -> s.toString().endsWith("-asistencia"))
               .peek(path -> System.out.println(path.getFileName().toString()))
               .map(this::loadAsistencia)
-              .peek(System.out::println)
               .collect(Collectors.toSet());
       var asistenciaPlenos = new AsistenciaPlenos(periodo.getFileName().toString(), asistencias);
       new CargaAsistenciaPlenos().accept(asistenciaPlenos);
@@ -51,7 +50,6 @@ public class CargaPlenos {
               .filter(s -> s.toString().endsWith("-votacion"))
               .peek(path -> System.out.println(path.getFileName().toString()))
               .map(this::loadVotacion)
-              .peek(System.out::println)
               .collect(Collectors.toSet());
       var votacionPlenos = new VotacionPlenos(periodo.getFileName().toString(), votaciones);
       new CargaVotacionPlenos().accept(votacionPlenos);
@@ -68,9 +66,7 @@ public class CargaPlenos {
 
   private RegistroVotacion loadVotacion(Path path) {
     try {
-      System.out.println(path);
       var version = Files.readString(path.resolve("version.csv"));
-      System.out.printf("version: %s%n", version);
       assert Files.list(path).count() == 9;
 
       var gruposParlamentarios =
@@ -82,9 +78,7 @@ public class CargaPlenos {
       var votaciones =
           loadVotacionLista(
               gruposParlamentarios, tiposAsistencia, path.resolve("votaciones.csv"));
-      votaciones.forEach(System.out::println);
       var resultados = loadVotacionResultado(path.resolve("resultados.csv"));
-      System.out.println(resultados);
       var resultadosPorGrupo =
           loadVotacionResultadoPorPartido(
               gruposParlamentarios, path.resolve("resultados_partido.csv"));
@@ -101,9 +95,7 @@ public class CargaPlenos {
 
   private RegistroAsistencia loadAsistencia(Path path) {
     try {
-      System.out.println(path);
       var version = Files.readString(path.resolve("version.csv"));
-      System.out.printf("version: %s%n", version);
       assert Files.list(path).count() == 8;
 
       var gruposParlamentarios =
@@ -114,9 +106,7 @@ public class CargaPlenos {
       var asistencias =
           loadAsistenciaLista(
               gruposParlamentarios, tiposAsistencia, path.resolve("asistencias.csv"));
-      asistencias.forEach(System.out::println);
       var resultados = loadAsistenciaResultado(path.resolve("resultados.csv"));
-      System.out.println(resultados);
       var resultadosPorGrupo =
           loadAsistenciaResultadoPorPartido(
               gruposParlamentarios, path.resolve("resultados_partido.csv"));
@@ -300,7 +290,6 @@ public class CargaPlenos {
                 Integer.parseInt(v.get("numero_legal"))));
       }
     }
-    System.out.println(data);
     return data;
   }
 
@@ -330,7 +319,6 @@ public class CargaPlenos {
                 Integer.parseInt(v.get("numero_legal"))));
       }
     }
-    System.out.println(data);
     return data;
   }
 
