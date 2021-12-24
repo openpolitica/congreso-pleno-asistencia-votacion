@@ -71,11 +71,10 @@ public class ExtraeCsvs {
   private static StringBuilder csvFromSheet(XSSFWorkbook workbook, String sheetName) {
     StringBuilder b = new StringBuilder();
     for (Row row : workbook.getSheet(sheetName)) {
-      // Loop through all rows and add ","
       Iterator<Cell> cellIterator = row.cellIterator();
-      StringBuilder stringBuffer = new StringBuilder();
+      StringBuilder builder = new StringBuilder();
       while (cellIterator.hasNext()) {
-        Cell cell = cellIterator.next();
+        var cell = cellIterator.next();
         String v;
         try {
           if (cell.getCellType().equals(CellType.FORMULA)) {
@@ -90,21 +89,21 @@ public class ExtraeCsvs {
           v = formatter.formatCellValue(cell).replace("\"", "");
         }
         if (v.contains(",")) {
-          if (stringBuffer.length() != 0) {
-            stringBuffer.append(",");
+          if (builder.length() != 0) {
+            builder.append(",");
           }
-          stringBuffer.append("\"").append(v).append("\"");
-        } else {
-          if (stringBuffer.length() != 0) {
-            stringBuffer.append(",");
+          builder.append("\"").append(v).append("\"");
+        } else if (!v.isBlank()) {
+          if (builder.length() != 0) {
+            builder.append(",");
           }
-          stringBuffer.append(v);
+          builder.append(v);
         }
       }
-      if (stringBuffer.isEmpty()) {
+      if (builder.isEmpty()) {
         break;
       } else {
-        b.append(stringBuffer).append("\n");
+        b.append(builder).append("\n");
       }
     }
     return b;
