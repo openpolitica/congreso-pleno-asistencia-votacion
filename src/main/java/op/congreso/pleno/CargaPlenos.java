@@ -66,7 +66,6 @@ public class CargaPlenos {
 
   private RegistroVotacion loadVotacion(Path path) {
     try {
-      var version = Files.readString(path.resolve("version.csv"));
       assert Files.list(path).count() == 9;
 
       var gruposParlamentarios =
@@ -95,7 +94,6 @@ public class CargaPlenos {
 
   private RegistroAsistencia loadAsistencia(Path path) {
     try {
-      var version = Files.readString(path.resolve("version.csv"));
       assert Files.list(path).count() == 8;
 
       var gruposParlamentarios =
@@ -130,7 +128,7 @@ public class CargaPlenos {
     var data = new LinkedHashMap<String, String>();
     while (it.hasNext()) {
       var m = it.next();
-      data.put(m.get("grupo_parlamentario"), m.get("descripcion"));
+      data.put(m.get("grupo_parlamentario").trim(), m.get("descripcion").trim());
     }
     return data;
   }
@@ -163,16 +161,16 @@ public class CargaPlenos {
     return RegistroVotacion.newBuilder()
         .withPleno(
             new Pleno(
-                f.get("periodo_parlamentario"),
-                f.get("periodo_anual"),
-                f.get("legislatura"),
-                f.get("sesion"),
-                f.get("url_pdf"),
+                f.get("periodo_parlamentario").trim(),
+                f.get("periodo_anual").trim(),
+                f.get("legislatura").trim(),
+                f.get("sesion").trim(),
+                f.get("url_pdf").trim(),
                 LocalDate.parse(f.get("dia"), DateTimeFormatter.ofPattern("yyyy-MM-dd")),
                 Integer.parseInt(f.get("quorum"))))
         .withHora(f.get("hora"))
-        .withAsunto(f.get("asunto"))
-        .withPresidente(f.get("presidente"));
+        .withAsunto(f.get("asunto").trim())
+        .withPresidente(f.get("presidente").trim());
   }
 
   private Map<String, String> loadVotacionEtiquetas(Path path) throws IOException {
@@ -204,11 +202,11 @@ public class CargaPlenos {
     return RegistroAsistencia.newBuilder()
         .withPleno(
             new Pleno(
-                f.get("periodo_parlamentario"),
-                f.get("periodo_anual"),
-                f.get("legislatura"),
-                f.get("sesion"),
-                f.get("url_pdf"),
+                f.get("periodo_parlamentario").trim(),
+                f.get("periodo_anual").trim(),
+                f.get("legislatura").trim(),
+                f.get("sesion").trim(),
+                f.get("url_pdf").trim(),
                 LocalDate.parse(f.get("dia"), DateTimeFormatter.ofPattern("yyyy-MM-dd")),
                 Integer.parseInt(f.get("quorum"))))
         .withHora(f.get("hora"));
@@ -226,14 +224,14 @@ public class CargaPlenos {
     var data = new ArrayList<ResultadoCongresista>();
     while (it.hasNext()) {
       var m = it.next();
-      var grupo_parlamentario = m.get("grupo_parlamentario");
-      var asistencia = m.get("asistencia");
+      var grupo_parlamentario = m.get("grupo_parlamentario").trim();
+      var asistencia = m.get("asistencia").trim();
       data.add(
           new ResultadoCongresista(
               Integer.parseInt(m.get("numero")),
               grupo_parlamentario,
               gruposParlamentarios.get(grupo_parlamentario),
-              m.get("congresista"),
+              m.get("congresista").trim(),
               asistencia,
               tiposAsistencia.get(asistencia)));
     }
@@ -252,14 +250,14 @@ public class CargaPlenos {
     var data = new ArrayList<ResultadoCongresista>();
     while (it.hasNext()) {
       var m = it.next();
-      var grupo_parlamentario = m.get("grupo_parlamentario");
-      var asistencia = m.get("votacion");
+      var grupo_parlamentario = m.get("grupo_parlamentario").trim();
+      var asistencia = m.get("votacion").trim();
       data.add(
           new ResultadoCongresista(
               Integer.parseInt(m.get("numero")),
               grupo_parlamentario,
               gruposParlamentarios.get(grupo_parlamentario),
-              m.get("congresista"),
+              m.get("congresista").trim(),
               asistencia,
               tiposVotacion.get(asistencia)));
     }
