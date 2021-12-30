@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Iterator;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DataFormatter;
@@ -59,11 +58,11 @@ public class ExtraeCsvs {
                 csvFromSheet(workBook, "datos_grupo_parlamentario"));
             Files.writeString(output.resolve("version.csv"), csvFromSheet(workBook, "version"));
           }
-        } catch (InvalidFormatException e) {
-          e.printStackTrace();
+        } catch (Exception e) {
+          throw new RuntimeException("Error at " + path, e);
         }
       } catch (Exception e) {
-        e.printStackTrace();
+        throw new RuntimeException("Error at " + path, e);
       }
     });
   }
