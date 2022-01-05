@@ -8,5 +8,5 @@ Guía para registro de asistencias/votaciones: [GUIA.md](./GUIA.md)
 
 ### 2021-2022 - Primera Legislatura Ordinaria
 
-- Votacion: https://docs.google.com/spreadsheets/d/1EsC2oJF6-Pt3qFNwIlk1GSlVTSZVrhUT/edit?usp=sharing&ouid=110424970801486611724&rtpof=true&sd=true
-- Asistencia: https://docs.google.com/spreadsheets/d/16kbB2FDFfTsR55ZSs57ce2yuOr4R2b4E/edit?usp=sharing&ouid=110424970801486611724&rtpof=true&sd=true
+- Asistencia: https://docs.google.com/spreadsheets/d/1EELAMd9lIysYBYe2D9EWEIay3q09ysq-jFMHFPJpDmo/edit#gid=1176805630
+- Votacion: https://docs.google.com/spreadsheets/d/1W9_YyLu2VE5PSDjubbksIcIEhdP9LvCXp_ENU2wlgYM/edit#gid=1177594900 

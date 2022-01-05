@@ -23,4 +23,6 @@ _<copiar tabla de resultados por partido desde Hoja de calculo - Eliminar codigo
 
 ## Página del Pleno
 
+Número de pagína: <1>
+
 _Pegar copia del screenshot de la página del PDF del Pleno_
