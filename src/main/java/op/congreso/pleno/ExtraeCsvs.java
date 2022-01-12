@@ -14,52 +14,56 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 public class ExtraeCsvs {
   public static void main(String[] args) throws IOException {
     var dir = Path.of(args[0]);
+    System.out.println("Directory: " + dir);
     Files.list(dir).forEach(path -> {
       try {
         if (!Files.isRegularFile(path) || !Files.isReadable(path)) {
           throw new IllegalArgumentException("Archivo no existe o no se puede leer " + path);
         }
-        var filename = path.getFileName().toString().replace(".xlsx", "");
-        var output = Path.of("target/" + filename);
-        Files.createDirectories(output);
-        // Open and existing XLSX file
-        try (var workBook = new XSSFWorkbook(path.toFile())) {
-          if (filename.endsWith("-asistencia")) {
-            Files.writeString(output.resolve("metadatos.csv"),
-                csvFromSheet(workBook, "metadatos"));
-            Files.writeString(output.resolve("asistencias.csv"),
-                csvFromSheet(workBook, "asistencias"));
-            Files.writeString(output.resolve("resultados.csv"),
-                csvFromSheet(workBook, "resultados"));
-            Files.writeString(output.resolve("resultados_partido.csv"),
-                csvFromSheet(workBook, "resultados_partido"));
-            Files.writeString(output.resolve("notas.csv"), csvFromSheet(workBook, "notas"));
-            Files.writeString(output.resolve("datos_tipo_asistencia.csv"),
-                csvFromSheet(workBook, "datos_tipo_asistencia"));
-            Files.writeString(output.resolve("datos_grupo_parlamentario.csv"),
-                csvFromSheet(workBook, "datos_grupo_parlamentario"));
-            Files.writeString(output.resolve("version.csv"), csvFromSheet(workBook, "version"));
+        if (path.toString().endsWith(".xlsx")) {
+          System.out.println("Processing XLSX file: " + path);
+          var filename = path.getFileName().toString().replace(".xlsx", "");
+          var output = Path.of("target/" + filename);
+          Files.createDirectories(output);
+          // Open and existing XLSX file
+          try (var workBook = new XSSFWorkbook(path.toFile())) {
+            if (filename.endsWith("-asistencia")) {
+              Files.writeString(output.resolve("metadatos.csv"),
+                  csvFromSheet(workBook, "metadatos"));
+              Files.writeString(output.resolve("asistencias.csv"),
+                  csvFromSheet(workBook, "asistencias"));
+              Files.writeString(output.resolve("resultados.csv"),
+                  csvFromSheet(workBook, "resultados"));
+              Files.writeString(output.resolve("resultados_partido.csv"),
+                  csvFromSheet(workBook, "resultados_partido"));
+              Files.writeString(output.resolve("notas.csv"), csvFromSheet(workBook, "notas"));
+              Files.writeString(output.resolve("datos_tipo_asistencia.csv"),
+                  csvFromSheet(workBook, "datos_tipo_asistencia"));
+              Files.writeString(output.resolve("datos_grupo_parlamentario.csv"),
+                  csvFromSheet(workBook, "datos_grupo_parlamentario"));
+              Files.writeString(output.resolve("version.csv"), csvFromSheet(workBook, "version"));
+            }
+            if (filename.endsWith("-votacion")) {
+              Files.writeString(output.resolve("metadatos.csv"),
+                  csvFromSheet(workBook, "metadatos"));
+              Files.writeString(output.resolve("etiquetas.csv"),
+                  csvFromSheet(workBook, "etiquetas"));
+              Files.writeString(output.resolve("votaciones.csv"),
+                  csvFromSheet(workBook, "votaciones"));
+              Files.writeString(output.resolve("resultados.csv"),
+                  csvFromSheet(workBook, "resultados"));
+              Files.writeString(output.resolve("resultados_partido.csv"),
+                  csvFromSheet(workBook, "resultados_partido"));
+              Files.writeString(output.resolve("notas.csv"), csvFromSheet(workBook, "notas"));
+              Files.writeString(output.resolve("datos_tipo_votacion.csv"),
+                  csvFromSheet(workBook, "datos_tipo_votacion"));
+              Files.writeString(output.resolve("datos_grupo_parlamentario.csv"),
+                  csvFromSheet(workBook, "datos_grupo_parlamentario"));
+              Files.writeString(output.resolve("version.csv"), csvFromSheet(workBook, "version"));
+            }
+          } catch (Exception e) {
+            throw new RuntimeException("Error at " + path, e);
           }
-          if (filename.endsWith("-votacion")) {
-            Files.writeString(output.resolve("metadatos.csv"),
-                csvFromSheet(workBook, "metadatos"));
-            Files.writeString(output.resolve("etiquetas.csv"),
-                csvFromSheet(workBook, "etiquetas"));
-            Files.writeString(output.resolve("votaciones.csv"),
-                csvFromSheet(workBook, "votaciones"));
-            Files.writeString(output.resolve("resultados.csv"),
-                csvFromSheet(workBook, "resultados"));
-            Files.writeString(output.resolve("resultados_partido.csv"),
-                csvFromSheet(workBook, "resultados_partido"));
-            Files.writeString(output.resolve("notas.csv"), csvFromSheet(workBook, "notas"));
-            Files.writeString(output.resolve("datos_tipo_votacion.csv"),
-                csvFromSheet(workBook, "datos_tipo_votacion"));
-            Files.writeString(output.resolve("datos_grupo_parlamentario.csv"),
-                csvFromSheet(workBook, "datos_grupo_parlamentario"));
-            Files.writeString(output.resolve("version.csv"), csvFromSheet(workBook, "version"));
-          }
-        } catch (Exception e) {
-          throw new RuntimeException("Error at " + path, e);
         }
       } catch (Exception e) {
         throw new RuntimeException("Error at " + path, e);
