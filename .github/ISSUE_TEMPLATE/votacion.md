@@ -26,3 +26,10 @@ _<copiar tabla de resultados por partido desde Hoja de calculo - Eliminar codigo
 Número de pagína: <1>
 
 _Pegar copia del screenshot de la página del PDF del Pleno_
+
+## Verificaciones
+
+- [ ] Validar que las siglas de grupos parlamentarios en el PDF coincidan con los ingresados en el PDF
+- [ ] Validar que el grupo parlamentario de cada congresista coincida con el grupo parlamentario que figura en el PDF
+- [ ] Validar que resultados generales de PDF y hojas de cálculo coinciden
+- [ ] Validar que resultados por grupo parlamentario de PDF y hojas de cálculo coinciden
