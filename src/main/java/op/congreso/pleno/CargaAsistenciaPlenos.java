@@ -56,8 +56,8 @@ public class CargaAsistenciaPlenos implements Consumer<AsistenciaPlenos> {
       }
       statement.executeUpdate("pragma vacuum;");
       statement.executeUpdate("pragma optimize;");
-    } catch (Exception throwables) {
-      throwables.printStackTrace();
+    } catch (Exception e) {
+      e.printStackTrace();
     }
   }
 
