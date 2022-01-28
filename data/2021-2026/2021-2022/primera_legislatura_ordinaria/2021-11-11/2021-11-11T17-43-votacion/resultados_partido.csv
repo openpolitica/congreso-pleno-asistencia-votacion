@@ -1,0 +1,12 @@
+por_partido,numero_legal,si,no,abstenciones,ausentes,licencias,sin_responder,otros
+PL,37,28,5,1,1,2,0,0
+FP,24,20,0,0,3,1,0,0
+AP,15,14,0,0,1,0,0,0
+APP,15,4,6,1,0,3,1,0
+RP,9,8,0,0,0,1,0,0
+AP-PIS,10,2,5,0,2,1,0,0
+PP,5,2,0,1,1,0,1,0
+JP,5,3,0,0,0,1,1,0
+SP-PM,9,4,3,0,1,1,0,0
+NA,1,1,0,0,0,0,0,0
+TOTAL,130,86,19,3,9,10,3,0
