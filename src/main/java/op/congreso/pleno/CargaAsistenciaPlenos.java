@@ -10,6 +10,7 @@ import java.util.function.Consumer;
 import op.congreso.pleno.asistencia.RegistroAsistencia;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sqlite.SQLiteException;
 
 public class CargaAsistenciaPlenos implements Consumer<AsistenciaPlenos> {
   static final Logger LOG = LoggerFactory.getLogger(CargaAsistenciaPlenos.class);
@@ -57,6 +58,9 @@ public class CargaAsistenciaPlenos implements Consumer<AsistenciaPlenos> {
       statement.executeUpdate("pragma vacuum;");
       statement.executeUpdate("pragma optimize;");
     } catch (Exception e) {
+      if (e instanceof SQLiteException) {
+        e.printStackTrace();
+      }
       e.printStackTrace();
     }
   }
@@ -174,6 +178,7 @@ public class CargaAsistenciaPlenos implements Consumer<AsistenciaPlenos> {
             pleno_titulo text not null,
             
             grupo_parlamentario text not null,
+            grupo_parlamentario_descripcion text not null,
             presentes integer not null,
             ausentes integer not null,
             licencias integer not null,
@@ -198,7 +203,7 @@ public class CargaAsistenciaPlenos implements Consumer<AsistenciaPlenos> {
       return """
           insert into %s values (
             ?, ?, ?, ?, ?, ?, ?,
-            ?, ?, ?, ?, ?, ?
+            ?, ?, ?, ?, ?, ?, ?
           )
           """.formatted(tableName);
     }
@@ -214,12 +219,13 @@ public class CargaAsistenciaPlenos implements Consumer<AsistenciaPlenos> {
         ps.setString(6, r.hora().format(DateTimeFormatter.ofPattern(HH_MM)));
         ps.setString(7, r.pleno().titulo());
 
-        ps.setString(8, a.getKey());
-        ps.setInt(9, a.getValue().presentes());
-        ps.setInt(10, a.getValue().ausentes());
-        ps.setInt(11, a.getValue().licencias());
-        ps.setInt(12, a.getValue().otros());
-        ps.setInt(13, a.getValue().total());
+        ps.setString(8, a.getKey().nombre());
+        ps.setString(9, a.getKey().descripcion());
+        ps.setInt(10, a.getValue().presentes());
+        ps.setInt(11, a.getValue().ausentes());
+        ps.setInt(12, a.getValue().licencias());
+        ps.setInt(13, a.getValue().otros());
+        ps.setInt(14, a.getValue().total());
 
         ps.addBatch();
       }
@@ -291,6 +297,9 @@ public class CargaAsistenciaPlenos implements Consumer<AsistenciaPlenos> {
 
         ps.setString(8, a.congresista());
         ps.setString(9, a.grupoParlamentario());
+        if (a.grupoParlamentarioDescripcion() == null) {
+          throw new IllegalArgumentException("a.grupoParlamentarioDescripcion == null");
+        }
         ps.setString(10, a.grupoParlamentarioDescripcion());
         ps.setString(11, a.resultado());
         ps.setString(12, a.resultadoDescripcion());

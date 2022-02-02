@@ -4,6 +4,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
+import op.congreso.pleno.GrupoParlamentario;
 import op.congreso.pleno.Pleno;
 import op.congreso.pleno.ResultadoCongresista;
 
@@ -11,7 +12,7 @@ public record RegistroAsistencia(
     Pleno pleno,
     LocalTime hora,
     List<ResultadoCongresista> asistencias,
-    Map<String, ResultadoAsistencia> resultadosPorGrupo,
+    Map<GrupoParlamentario, ResultadoAsistencia> resultadosPorGrupo,
     ResultadoAsistencia resultados
 ) {
   public static Builder newBuilder() {
@@ -22,7 +23,7 @@ public record RegistroAsistencia(
     Pleno pleno;
     LocalTime hora;
     List<ResultadoCongresista> asistencias;
-    Map<String, ResultadoAsistencia> resultadosPorGrupo;
+    Map<GrupoParlamentario, ResultadoAsistencia> resultadosPorGrupo;
     ResultadoAsistencia resultados;
 
     public Builder withPleno(Pleno pleno) {
@@ -45,7 +46,7 @@ public record RegistroAsistencia(
       return this;
     }
 
-    public Builder withResultadosPorPartido(Map<String, ResultadoAsistencia> resultadosPorPartido) {
+    public Builder withResultadosPorPartido(Map<GrupoParlamentario, ResultadoAsistencia> resultadosPorPartido) {
       this.resultadosPorGrupo = resultadosPorPartido;
       return this;
     }

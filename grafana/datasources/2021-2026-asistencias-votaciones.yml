@@ -1,0 +1,17 @@
+# config file version
+apiVersion: 1
+
+deleteDatasources:
+  - name: 2021-2026-asistencias-votaciones
+    orgId: 1
+
+datasources:
+  - name: 2021-2026-asistencias-votaciones
+    type: frser-sqlite-datasource
+    access: proxy
+    isDefault: false
+    editable: true
+    jsonData:
+      path: /app/2021-2026-asistencias-votaciones.db
+    orgId: 1
+
