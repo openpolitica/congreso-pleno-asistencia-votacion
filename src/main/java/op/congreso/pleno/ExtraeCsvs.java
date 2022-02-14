@@ -18,7 +18,7 @@ public class ExtraeCsvs {
     Files.list(dir).forEach(path -> {
       try {
         if (!Files.isRegularFile(path) || !Files.isReadable(path)) {
-          throw new IllegalArgumentException("Archivo no existe o no se puede leer " + path);
+          System.out.println("Archivo no existe o no se puede leer " + path);
         }
         if (path.toString().endsWith(".xlsx")) {
           System.out.println("Processing XLSX file: " + path);
