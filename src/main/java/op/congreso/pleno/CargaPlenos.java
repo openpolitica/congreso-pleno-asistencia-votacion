@@ -33,7 +33,7 @@ public class CargaPlenos {
     for (var periodo : periodos) {
       var paths =
           paths(periodo)  // periodo anual
-              .flatMap(this::paths) // legislatura
+              .flatMap(this::paths) // mes
               .flatMap(this::paths) // fecha
               .flatMap(this::paths) // asistencia/votacion
               .collect(Collectors.toSet());
