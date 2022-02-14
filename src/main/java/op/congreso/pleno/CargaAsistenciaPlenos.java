@@ -302,6 +302,9 @@ public class CargaAsistenciaPlenos implements Consumer<AsistenciaPlenos> {
         }
         ps.setString(10, a.grupoParlamentarioDescripcion());
         ps.setString(11, a.resultado());
+        if (a.resultadoDescripcion() == null) {
+          throw new IllegalArgumentException("a.resultadoDescripcion == null");
+        }
         ps.setString(12, a.resultadoDescripcion());
 
         ps.addBatch();

@@ -225,7 +225,7 @@ public class CargaPlenos {
     while (it.hasNext()) {
       var m = it.next();
       var grupo_parlamentario = m.get("grupo_parlamentario").trim();
-      var asistencia = m.get("asistencia").trim();
+      var asistencia = m.get("asistencia").trim().toUpperCase();
       data.add(
           new ResultadoCongresista(
               Integer.parseInt(m.get("numero")),
