@@ -16,10 +16,10 @@ prepare:
 
 
 carga_plenos:
-	./mvnw exec:java -Dexec.mainClass="op.congreso.pleno.CargaPlenos"
+	./mvnw clean compile exec:java -Dexec.mainClass="op.congreso.pleno.CargaPlenos"
 
 extraer_csv:
-	./mvnw exec:java -Dexec.mainClass="op.congreso.pleno.ExtraeCsvs" -Dexec.args="${HOME}/Downloads/"
+	./mvnw clean compile exec:java -Dexec.mainClass="op.congreso.pleno.ExtraeCsvs" -Dexec.args="${HOME}/Downloads/"
 
 registro_plenos:
 	./mvnw exec:java -Dexec.mainClass="op.congreso.pleno.CargaRegitroPlenos"

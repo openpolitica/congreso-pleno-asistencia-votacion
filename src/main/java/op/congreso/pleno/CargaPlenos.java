@@ -40,7 +40,6 @@ public class CargaPlenos {
       var asistencias =
           paths.stream()
               .filter(s -> s.toString().endsWith("-asistencia"))
-              .peek(path -> System.out.println(path.getFileName().toString()))
               .map(this::loadAsistencia)
               .collect(Collectors.toSet());
       var asistenciaPlenos = new AsistenciaPlenos(periodo.getFileName().toString(), asistencias);
@@ -48,7 +47,6 @@ public class CargaPlenos {
       var votaciones =
           paths.stream()
               .filter(s -> s.toString().endsWith("-votacion"))
-              .peek(path -> System.out.println(path.getFileName().toString()))
               .map(this::loadVotacion)
               .collect(Collectors.toSet());
       var votacionPlenos = new VotacionPlenos(periodo.getFileName().toString(), votaciones);
