@@ -1,0 +1,4 @@
+etiqueta,valor,valores_validos,descripcion
+tipo_votacion,texto_substitutorio,"texto_substitutorio, cuestion_orden",Tipo de Votacion. 
+proyectos_ley,"5, 37, 48, 51, 55, 491"
+leyes,29158
