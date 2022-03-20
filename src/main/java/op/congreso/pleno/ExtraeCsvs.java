@@ -91,6 +91,8 @@ public class ExtraeCsvs {
           DataFormatter formatter = new DataFormatter();
           v = formatter.formatCellValue(cell).replace("\"", "");
         }
+        // Escape quotes
+        v = v.replace("\"", "\\\"");
         if (v.contains(",")) {
           if (builder.length() != 0) {
             builder.append(",");
