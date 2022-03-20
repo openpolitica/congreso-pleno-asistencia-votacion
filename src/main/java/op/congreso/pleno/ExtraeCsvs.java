@@ -92,7 +92,7 @@ public class ExtraeCsvs {
           v = formatter.formatCellValue(cell).replace("\"", "");
         }
         // Escape quotes
-        v = v.replace("\"", "\\\"");
+        v = v.replace("\"", "'");
         if (v.contains(",")) {
           if (builder.length() != 0) {
             builder.append(",");
