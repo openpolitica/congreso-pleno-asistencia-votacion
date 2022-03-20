@@ -2,38 +2,56 @@
   "periodoParlamentario" : "Congreso de la República - Periodo Parlamentario 2021 - 2026",
   "periodoAnual" : "Período Anual de Sesiones 2021 - 2022",
   "legislatura" : "Segunda Legislatura Ordinaria",
-  "fecha" : "2022-03-10",
-  "titulo" : "Asistencias y votaciones PROVISIONALES de la sesión vespertina del 10-03-2022",
-  "url" : "https://www2.congreso.gob.pe/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/Apleno/AA8EC703939028E4052588020007E2A8/$FILE/Asis_vot_PROVISIONAL_Vespertina_10-03-22CInf.pdf",
-  "filename" : "Asis_vot_PROVISIONAL_Vespertina_10-03-22CInf.pdf",
-  "paginas" : 18
+  "fecha" : "2022-03-16",
+  "titulo" : "Asistencias y votaciones PROVISIONAL de la sesión vespertina del 16-03-2022",
+  "url" : "https://www2.congreso.gob.pe/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/Apleno/F2F7A5E692A6C48E05258808001ABFD1/$FILE/Asis_PROVISIONAL_Vespertina_16-03-22_CInf..pdf",
+  "filename" : "Asis_PROVISIONAL_Vespertina_16-03-22_CInf..pdf",
+  "paginas" : 35
+}, {
+  "periodoParlamentario" : "Congreso de la República - Periodo Parlamentario 2021 - 2026",
+  "periodoAnual" : "Período Anual de Sesiones 2021 - 2022",
+  "legislatura" : "Segunda Legislatura Ordinaria",
+  "fecha" : "2022-03-16",
+  "titulo" : "Asistencia PROVISIONAL de la sesión matinal del 16-03-2022",
+  "url" : "https://www2.congreso.gob.pe/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/Apleno/4BB346C4DC116300052588070064C884/$FILE/Asis_PROVISIONAL_16-03-22.pdf",
+  "filename" : "Asis_PROVISIONAL_16-03-22.pdf",
+  "paginas" : 1
+}, {
+  "periodoParlamentario" : "Congreso de la República - Periodo Parlamentario 2021 - 2026",
+  "periodoAnual" : "Período Anual de Sesiones 2021 - 2022",
+  "legislatura" : "Segunda Legislatura Ordinaria",
+  "fecha" : "2022-03-15",
+  "titulo" : "Asistencia de la sesión del 15-03-2022",
+  "url" : "https://www2.congreso.gob.pe/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/Apleno/310698C104C79CEB05258807007B19D9/$FILE/Asis_OFICIAL_15-03-22.pdf",
+  "filename" : "Asis_OFICIAL_15-03-22.pdf",
+  "paginas" : 1
+}, {
+  "periodoParlamentario" : "Congreso de la República - Periodo Parlamentario 2021 - 2026",
+  "periodoAnual" : "Período Anual de Sesiones 2021 - 2022",
+  "legislatura" : "Segunda Legislatura Ordinaria",
+  "fecha" : "2022-03-14",
+  "titulo" : "Asistencias y votaciones de la sesión del 14-03-2022",
+  "url" : "https://www2.congreso.gob.pe/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/Apleno/5E3E2BF0705E9EB405258807007B2969/$FILE/Asis_vot_OFICIAL_14-03-22.pdf",
+  "filename" : "Asis_vot_OFICIAL_14-03-22.pdf",
+  "paginas" : 7
 }, {
   "periodoParlamentario" : "Congreso de la República - Periodo Parlamentario 2021 - 2026",
   "periodoAnual" : "Período Anual de Sesiones 2021 - 2022",
   "legislatura" : "Segunda Legislatura Ordinaria",
   "fecha" : "2022-03-10",
-  "titulo" : "Asistencias y votaciones PROVISIONALES de la sesión matinal del 10-03-2022",
-  "url" : "https://www2.congreso.gob.pe/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/Apleno/8E784D1A9D8FB036052588010068A135/$FILE/Asis_vot_PROVISIONAL_Mat_10-03-22CInf.pdf",
-  "filename" : "Asis_vot_PROVISIONAL_Mat_10-03-22CInf.pdf",
-  "paginas" : 15
+  "titulo" : "Asistencias y votaciones de la sesión del 10-03-2022",
+  "url" : "https://www2.congreso.gob.pe/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/Apleno/70594223943131300525880600718C06/$FILE/Asis_vot_OFICIAL_10-03-22.pdf",
+  "filename" : "Asis_vot_OFICIAL_10-03-22.pdf",
+  "paginas" : 33
 }, {
   "periodoParlamentario" : "Congreso de la República - Periodo Parlamentario 2021 - 2026",
   "periodoAnual" : "Período Anual de Sesiones 2021 - 2022",
   "legislatura" : "Segunda Legislatura Ordinaria",
   "fecha" : "2022-03-08",
-  "titulo" : "Asistencias y votaciones PROVISIONALES de la sesión matinal del 08-03-2022",
-  "url" : "https://www2.congreso.gob.pe/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/Apleno/7A367D32A6C6489A052587FF006ADC54/$FILE/Asis_vot_PROVISIONAL_Matinal.pdf",
-  "filename" : "Asis_vot_PROVISIONAL_Matinal.pdf",
-  "paginas" : 11
-}, {
-  "periodoParlamentario" : "Congreso de la República - Periodo Parlamentario 2021 - 2026",
-  "periodoAnual" : "Período Anual de Sesiones 2021 - 2022",
-  "legislatura" : "Segunda Legislatura Ordinaria",
-  "fecha" : "2022-03-08",
-  "titulo" : "Asistencia y votación PROVISIONAL de la sesión vespertina del 08-03-2022",
-  "url" : "https://www2.congreso.gob.pe/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/Apleno/01DE5110AFAAD25C05258800000AA896/$FILE/Asis_vot_PROVISIONAL_Vespertina_08-03-22_CInf.pdf",
-  "filename" : "Asis_vot_PROVISIONAL_Vespertina_08-03-22_CInf.pdf",
-  "paginas" : 2
+  "titulo" : "Asistencias y votaciones de la sesión del 08-03-2022",
+  "url" : "https://www2.congreso.gob.pe/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/Apleno/83800189E262A00E05258806006F4B38/$FILE/Asis_vot_OFICIAL_08-03-22.pdf",
+  "filename" : "Asis_vot_OFICIAL_08-03-22.pdf",
+  "paginas" : 13
 }, {
   "periodoParlamentario" : "Congreso de la República - Periodo Parlamentario 2021 - 2026",
   "periodoAnual" : "Período Anual de Sesiones 2021 - 2022",
