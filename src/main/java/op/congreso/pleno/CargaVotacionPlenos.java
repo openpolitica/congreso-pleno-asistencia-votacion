@@ -317,6 +317,9 @@ public class CargaVotacionPlenos implements Consumer<VotacionPlenos> {
         ps.setString(12, a.grupoParlamentario());
         ps.setString(13, a.grupoParlamentarioDescripcion());
         ps.setString(14, a.resultado());
+        if (a.resultadoDescripcion() == null) {
+          throw new IllegalArgumentException("a.resultadoDescripcion == null");
+        }
         ps.setString(15, a.resultadoDescripcion());
 
         ps.addBatch();
