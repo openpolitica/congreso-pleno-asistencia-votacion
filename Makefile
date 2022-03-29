@@ -1,5 +1,7 @@
 all: clean build carga_plenos prepare registro_plenos prepare_registro_plenos serve
 
+generate: clean build carga_plenos registro_plenos prepare_registro_plenos
+
 test: clean build carga_plenos prepare serve
 
 build:
@@ -9,11 +11,9 @@ clean:
 	rm -f *.db*
 
 prepare:
-	datasette install datasette-publish-vercel
 	sqlite-utils enable-fts *.db votacion_resultado asunto etiquetas
 	sqlite-utils enable-fts *.db votacion_grupo_parlamentario asunto etiquetas
 	sqlite-utils enable-fts *.db votacion_congresista asunto etiquetas
-
 
 carga_plenos:
 	./mvnw clean compile exec:java -Dexec.mainClass="op.congreso.pleno.CargaPlenos"
@@ -25,6 +25,7 @@ registro_plenos:
 	./mvnw exec:java -Dexec.mainClass="op.congreso.pleno.CargaRegitroPlenos"
 
 serve:
+	datasette install datasette-publish-vercel
 	datasette *.db
 
 prepare_registro_plenos:
