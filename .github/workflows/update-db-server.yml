@@ -1,0 +1,27 @@
+name: 'Update database in server'
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: 'Deployment devops action'
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash
+        working-directory: .
+    
+    env:
+      DEPLOY_ACTION: update-attendance-voting-repository.yml
+
+    steps:
+    - name: Dispatch trigger on development
+      run: |
+        curl -X POST -H "Authorization: token ${{ secrets.DEPLOY_TOKEN }}" -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/openpolitica/open-tracker-devops/actions/workflows/${{ env.DEPLOY_ACTION }}/dispatches -d '{"ref":"main", "inputs": {"env_type": "staging"}}'
