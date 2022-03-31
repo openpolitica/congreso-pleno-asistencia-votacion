@@ -186,6 +186,7 @@ public class CargaVotacionPlenos implements Consumer<VotacionPlenos> {
             etiquetas text not null,
             
             grupo_parlamentario text not null,
+            grupo_parlamentario_descripcion text not null,
             si integer not null,
             no integer not null,
             abstenciones integer not null,
@@ -211,7 +212,7 @@ public class CargaVotacionPlenos implements Consumer<VotacionPlenos> {
     String prepareStatement() {
       return """
           insert into %s values (
-            ?, ?, ?, ?, ?, ?, ?, ?, ?,
+            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
             ?, ?, ?, ?, ?, ?, ?, ?, ?
           )
           """.formatted(tableName);
@@ -231,14 +232,15 @@ public class CargaVotacionPlenos implements Consumer<VotacionPlenos> {
         ps.setString(9, r.presidente());
         ps.setString(10, jsonMapper.writeValueAsString(r.etiquetas()));
 
-        ps.setString(11, a.getKey());
-        ps.setInt(12, a.getValue().si());
-        ps.setInt(13, a.getValue().no());
-        ps.setInt(14, a.getValue().abstenciones());
-        ps.setInt(15, a.getValue().ausentes());
-        ps.setInt(16, a.getValue().licencias());
-        ps.setInt(17, a.getValue().otros());
-        ps.setInt(18, a.getValue().total());
+        ps.setString(11, a.getKey().nombre());
+        ps.setString(12, a.getKey().descripcion());
+        ps.setInt(13, a.getValue().si());
+        ps.setInt(14, a.getValue().no());
+        ps.setInt(15, a.getValue().abstenciones());
+        ps.setInt(16, a.getValue().ausentes());
+        ps.setInt(17, a.getValue().licencias());
+        ps.setInt(18, a.getValue().otros());
+        ps.setInt(19, a.getValue().total());
 
         ps.addBatch();
       }

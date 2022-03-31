@@ -78,7 +78,7 @@ public class CargaPlenos {
       var resultados = loadVotacionResultado(path.resolve("resultados.csv"));
       var resultadosPorGrupo =
           loadVotacionResultadoPorPartido(
-              gruposParlamentarios, path.resolve("resultados_partido.csv"));
+              gruposParlamentarios, path.resolve("resultados_partido.csv"), gruposParlamentarios);
 
       return builder
           .withVotaciones(votaciones)
@@ -289,22 +289,22 @@ public class CargaPlenos {
     return data;
   }
 
-  private Map<String, ResultadoVotacion> loadVotacionResultadoPorPartido(
-      Map<String, String> grupos, Path path) throws IOException {
+  private Map<GrupoParlamentario, ResultadoVotacion> loadVotacionResultadoPorPartido(
+      Map<String, String> grupos, Path path, Map<String, String> gruposParlamentarios) throws IOException {
     MappingIterator<Map<String, String>> it =
         mapper
             .readerFor(Map.class)
             .with(CsvSchema.emptySchema().withHeader())
             .readValues(path.toFile());
     // por_partido,numero_legal,presentes,ausentes,licencias,otros
-    var data = new HashMap<String, ResultadoVotacion>();
+    var data = new HashMap<GrupoParlamentario, ResultadoVotacion>();
     while (it.hasNext()) {
       var v = it.next();
       var partido = v.get("por_partido");
       if (!partido.isBlank() && !partido.equals("TOTAL")) {
         assert grupos.containsKey(partido);
         data.put(
-            partido,
+            new GrupoParlamentario(partido, gruposParlamentarios.get(partido)),
             new ResultadoVotacion(
                 Integer.parseInt(v.get("si")),
                 Integer.parseInt(v.get("no")),
