@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import op.congreso.pleno.GrupoParlamentario;
 import op.congreso.pleno.Pleno;
 import op.congreso.pleno.ResultadoCongresista;
 
@@ -15,7 +16,7 @@ public record RegistroVotacion(
     String asunto,
     Map<String, String> etiquetas,
     List<ResultadoCongresista> votaciones,
-    Map<String, ResultadoVotacion> resultadosPorGrupo,
+    Map<GrupoParlamentario, ResultadoVotacion> resultadosPorGrupo,
     ResultadoVotacion resultados
 ) {
   public static Builder newBuilder() {
@@ -33,7 +34,7 @@ public record RegistroVotacion(
     String presidente, asunto;
     Map<String, String> etiquetas = new HashMap<>();
     List<ResultadoCongresista> votaciones;
-    Map<String, ResultadoVotacion> resultadosPorGrupo;
+    Map<GrupoParlamentario, ResultadoVotacion> resultadosPorGrupo;
     ResultadoVotacion resultados;
 
     public Builder withPleno(Pleno pleno) {
@@ -70,7 +71,7 @@ public record RegistroVotacion(
       return this;
     }
 
-    public Builder withResultadosPorPartido(Map<String, ResultadoVotacion> resultadosPorPartido) {
+    public Builder withResultadosPorPartido(Map<GrupoParlamentario, ResultadoVotacion> resultadosPorPartido) {
       this.resultadosPorGrupo = resultadosPorPartido;
       return this;
     }
