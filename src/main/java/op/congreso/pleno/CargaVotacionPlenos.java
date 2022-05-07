@@ -320,6 +320,7 @@ public class CargaVotacionPlenos implements Consumer<VotacionPlenos> {
         ps.setString(13, a.grupoParlamentarioDescripcion());
         ps.setString(14, a.resultado());
         if (a.resultadoDescripcion() == null) {
+          LOG.error("Error ubicado en: \n\tPleno: {}\n\tHora: {}\n\tCongresista: {}\n\tResultado no identificado: {} ", r.pleno().id(), r.hora(), a.congresista(), a.resultado());
           throw new IllegalArgumentException("a.resultadoDescripcion == null");
         }
         ps.setString(15, a.resultadoDescripcion());
