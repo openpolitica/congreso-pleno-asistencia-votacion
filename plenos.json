@@ -2,19 +2,28 @@
   "periodoParlamentario" : "Congreso de la República - Periodo Parlamentario 2021 - 2026",
   "periodoAnual" : "Período Anual de Sesiones 2021 - 2022",
   "legislatura" : "Segunda Legislatura Ordinaria",
+  "fecha" : "2022-05-25",
+  "titulo" : "Asistencias y votaciones PROVISIONALES de la sesión del 25-05-2022",
+  "url" : "https://www2.congreso.gob.pe/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/Apleno/40C2722B139B060F0525884E0007FC26/$FILE/Asis_vot_PROVISIONAL_25-05-22_CInf.pdf",
+  "filename" : "Asis_vot_PROVISIONAL_25-05-22_CInf.pdf",
+  "paginas" : 9
+}, {
+  "periodoParlamentario" : "Congreso de la República - Periodo Parlamentario 2021 - 2026",
+  "periodoAnual" : "Período Anual de Sesiones 2021 - 2022",
+  "legislatura" : "Segunda Legislatura Ordinaria",
   "fecha" : "2022-05-12",
-  "titulo" : "Asistencias y votaciones PROVISIONALES de la sesión del 12-05-2022",
-  "url" : "https://www2.congreso.gob.pe/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/Apleno/561F680299115A3D05258841001AD17C/$FILE/Asis_vot_PROVISIONAL_12-05-22_CInf.pdf",
-  "filename" : "Asis_vot_PROVISIONAL_12-05-22_CInf.pdf",
+  "titulo" : "Asistencias y votaciones de la sesión del 12-05-2022",
+  "url" : "https://www2.congreso.gob.pe/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/Apleno/D440D45308F396F20525884400726192/$FILE/Asis_vot_OFICIAL_12-05-22.pdf",
+  "filename" : "Asis_vot_OFICIAL_12-05-22.pdf",
   "paginas" : 10
 }, {
   "periodoParlamentario" : "Congreso de la República - Periodo Parlamentario 2021 - 2026",
   "periodoAnual" : "Período Anual de Sesiones 2021 - 2022",
   "legislatura" : "Segunda Legislatura Ordinaria",
   "fecha" : "2022-05-11",
-  "titulo" : "Asistencias y votaciones PROVISIONALES de la sesión del 11-05-2022",
-  "url" : "https://www2.congreso.gob.pe/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/Apleno/1018F1DE4576993505258840000011B1/$FILE/Asis_vot_PROVISIONAL_11-05-22_CInf.pdf",
-  "filename" : "Asis_vot_PROVISIONAL_11-05-22_CInf.pdf",
+  "titulo" : "Asistencias y votaciones de la sesión del 11-05-2022",
+  "url" : "https://www2.congreso.gob.pe/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/Apleno/C2A60BCB0DEF41F405258844006AAA14/$FILE/Asis_vot_OFICIAL_11-05-22.pdf",
+  "filename" : "Asis_vot_OFICIAL_11-05-22.pdf",
   "paginas" : 5
 }, {
   "periodoParlamentario" : "Congreso de la República - Periodo Parlamentario 2021 - 2026",
@@ -30,19 +39,10 @@
   "periodoAnual" : "Período Anual de Sesiones 2021 - 2022",
   "legislatura" : "Segunda Legislatura Ordinaria",
   "fecha" : "2022-05-05",
-  "titulo" : "Asistencias y votaciones PROVISIONALES de la sesión vespertina del 05-05-2022",
-  "url" : "https://www2.congreso.gob.pe/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/Apleno/C777768A4681B0D10525883A00041EEA/$FILE/Asis_vot_PROVISIONAL_05-05-22_Vespertina_Cinf.pdf",
-  "filename" : "Asis_vot_PROVISIONAL_05-05-22_Vespertina_Cinf.pdf",
-  "paginas" : 25
-}, {
-  "periodoParlamentario" : "Congreso de la República - Periodo Parlamentario 2021 - 2026",
-  "periodoAnual" : "Período Anual de Sesiones 2021 - 2022",
-  "legislatura" : "Segunda Legislatura Ordinaria",
-  "fecha" : "2022-05-05",
-  "titulo" : "Asistencias y votaciones PROVISIONALES de la sesión matinal del 05-05-2022",
-  "url" : "https://www2.congreso.gob.pe/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/Apleno/EFF57BEC818F7D5E052588390069D98B/$FILE/Asis_vot_PROVISIONAL_05-05-22_Matinal_Cinf.pdf",
-  "filename" : "Asis_vot_PROVISIONAL_05-05-22_Matinal_Cinf.pdf",
-  "paginas" : 12
+  "titulo" : "Asistencias y votaciones de la sesión del 05-05-2022",
+  "url" : "https://www2.congreso.gob.pe/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/Apleno/6917D587EA90A3AD052588440072A258/$FILE/Asis_vot_OFICIAL_05-05-22.pdf",
+  "filename" : "Asis_vot_OFICIAL_05-05-22.pdf",
+  "paginas" : 37
 }, {
   "periodoParlamentario" : "Congreso de la República - Periodo Parlamentario 2021 - 2026",
   "periodoAnual" : "Período Anual de Sesiones 2021 - 2022",
