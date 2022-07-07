@@ -1,11 +1,8 @@
 package op.congreso.pleno;
 
-public record ResultadoCongresista(
-    int numero,
-    String grupoParlamentario,
-    String grupoParlamentarioDescripcion,
-    String congresista,
-    String resultado,
-    String resultadoDescripcion
-) {
-}
+public record ResultadoCongresista<T>(
+  String grupoParlamentario,
+  String grupoParlamentarioDescripcion,
+  String congresista,
+  T resultado
+) {}

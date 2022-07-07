@@ -9,20 +9,21 @@ import op.congreso.pleno.Pleno;
 import op.congreso.pleno.ResultadoCongresista;
 
 public record RegistroAsistencia(
-    Pleno pleno,
-    LocalTime hora,
-    List<ResultadoCongresista> asistencias,
-    Map<GrupoParlamentario, ResultadoAsistencia> resultadosPorGrupo,
-    ResultadoAsistencia resultados
+  Pleno pleno,
+  LocalTime hora,
+  List<ResultadoCongresista<Asistencia>> asistencias,
+  Map<GrupoParlamentario, ResultadoAsistencia> resultadosPorGrupo,
+  ResultadoAsistencia resultados
 ) {
   public static Builder newBuilder() {
     return new Builder();
   }
 
   public static class Builder {
+
     Pleno pleno;
     LocalTime hora;
-    List<ResultadoCongresista> asistencias;
+    List<ResultadoCongresista<Asistencia>> asistencias;
     Map<GrupoParlamentario, ResultadoAsistencia> resultadosPorGrupo;
     ResultadoAsistencia resultados;
 
@@ -36,7 +37,9 @@ public record RegistroAsistencia(
       return this;
     }
 
-    public Builder withAsistencias(List<ResultadoCongresista> asistencias) {
+    public Builder withAsistencias(
+      List<ResultadoCongresista<Asistencia>> asistencias
+    ) {
       this.asistencias = asistencias;
       return this;
     }
@@ -46,18 +49,21 @@ public record RegistroAsistencia(
       return this;
     }
 
-    public Builder withResultadosPorPartido(Map<GrupoParlamentario, ResultadoAsistencia> resultadosPorPartido) {
+    public Builder withResultadosPorPartido(
+      Map<GrupoParlamentario, ResultadoAsistencia> resultadosPorPartido
+    ) {
       this.resultadosPorGrupo = resultadosPorPartido;
       return this;
     }
 
     public RegistroAsistencia build() {
-      return new RegistroAsistencia(pleno, hora, asistencias, resultadosPorGrupo, resultados);
+      return new RegistroAsistencia(
+        pleno,
+        hora,
+        asistencias,
+        resultadosPorGrupo,
+        resultados
+      );
     }
-  }
-
-  String id() {
-    return pleno.fecha().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + "T" +
-        hora.format(DateTimeFormatter.ofPattern("HH:mm")) + "-asistencia";
   }
 }

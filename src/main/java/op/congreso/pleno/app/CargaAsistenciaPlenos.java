@@ -1,4 +1,4 @@
-package op.congreso.pleno;
+package op.congreso.pleno.app;
 
 import java.io.IOException;
 import java.sql.DriverManager;
@@ -7,26 +7,33 @@ import java.sql.SQLException;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.function.Consumer;
+import op.congreso.pleno.AsistenciaPlenos;
 import op.congreso.pleno.asistencia.RegistroAsistencia;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sqlite.SQLiteException;
 
 public class CargaAsistenciaPlenos implements Consumer<AsistenciaPlenos> {
-  static final Logger LOG = LoggerFactory.getLogger(CargaAsistenciaPlenos.class);
+
+  static final Logger LOG = LoggerFactory.getLogger(
+    CargaAsistenciaPlenos.class
+  );
 
   public static final String YYYY_MM_DD = "yyyy-MM-dd";
   public static final String HH_MM = "HH:mm";
 
   static List<TableLoad> tableLoadList = List.of(
-      new AsistenciaCongresistaLoad(),
-      new AsistenciaGrupoParlamentarioLoad(),
-      new AsistenciaResultadoLoad()
+    new AsistenciaCongresistaLoad(),
+    new AsistenciaGrupoParlamentarioLoad(),
+    new AsistenciaResultadoLoad()
   );
 
   @Override
   public void accept(AsistenciaPlenos asistenciaPlenos) {
-    var jdbcUrl = "jdbc:sqlite:%s-asistencias-votaciones.db".formatted(asistenciaPlenos.periodo());
+    var jdbcUrl =
+      "jdbc:sqlite:%s-asistencias-votaciones.db".formatted(
+          asistenciaPlenos.periodo()
+        );
     try (var connection = DriverManager.getConnection(jdbcUrl)) {
       var statement = connection.createStatement();
       statement.executeUpdate("pragma journal_mode = WAL");
@@ -66,6 +73,7 @@ public class CargaAsistenciaPlenos implements Consumer<AsistenciaPlenos> {
   }
 
   abstract static class TableLoad {
+
     final String tableName;
 
     public TableLoad(String tableName) {
@@ -81,14 +89,18 @@ public class CargaAsistenciaPlenos implements Consumer<AsistenciaPlenos> {
     abstract List<String> createIndexesStatement();
 
     String index(String field) {
-      return "CREATE INDEX %s_%s ON %s(\"%s\");\n"
-          .formatted(tableName, field, tableName, field);
+      return "CREATE INDEX %s_%s ON %s(\"%s\");\n".formatted(
+          tableName,
+          field,
+          tableName,
+          field
+        );
     }
 
     abstract String prepareStatement();
 
     abstract void addBatch(PreparedStatement ps, RegistroAsistencia pl)
-        throws SQLException, IOException;
+      throws SQLException, IOException;
   }
 
   static class AsistenciaResultadoLoad extends TableLoad {
@@ -116,15 +128,17 @@ public class CargaAsistenciaPlenos implements Consumer<AsistenciaPlenos> {
             otros integer not null,
             total integer not null
           )
-          """.formatted(tableName);
+          """.formatted(
+          tableName
+        );
     }
 
     @Override
     List<String> createIndexesStatement() {
       return List.of(
-          index("periodo_parlamentario"),
-          index("periodo_anual"),
-          index("legislatura")
+        index("periodo_parlamentario"),
+        index("periodo_anual"),
+        index("legislatura")
       );
     }
 
@@ -135,16 +149,22 @@ public class CargaAsistenciaPlenos implements Consumer<AsistenciaPlenos> {
             ?, ?, ?, ?, ?, ?, ?,
             ?, ?, ?, ?, ?, ?
           )
-          """.formatted(tableName);
+          """.formatted(
+          tableName
+        );
     }
 
     @Override
-    void addBatch(PreparedStatement ps, RegistroAsistencia r) throws SQLException {
+    void addBatch(PreparedStatement ps, RegistroAsistencia r)
+      throws SQLException {
       ps.setString(1, r.pleno().id());
       ps.setString(2, r.pleno().periodoParlamentario());
       ps.setString(3, r.pleno().periodoAnual());
       ps.setString(4, r.pleno().legislatura());
-      ps.setString(5, r.pleno().fecha().format(DateTimeFormatter.ofPattern(YYYY_MM_DD)));
+      ps.setString(
+        5,
+        r.pleno().fecha().format(DateTimeFormatter.ofPattern(YYYY_MM_DD))
+      );
       ps.setString(6, r.hora().format(DateTimeFormatter.ofPattern(HH_MM)));
       ps.setString(7, r.pleno().titulo());
 
@@ -185,16 +205,18 @@ public class CargaAsistenciaPlenos implements Consumer<AsistenciaPlenos> {
             otros integer not null,
             total integer not null
           )
-          """.formatted(tableName);
+          """.formatted(
+          tableName
+        );
     }
 
     @Override
     List<String> createIndexesStatement() {
       return List.of(
-          index("periodo_parlamentario"),
-          index("periodo_anual"),
-          index("legislatura"),
-          index("grupo_parlamentario")
+        index("periodo_parlamentario"),
+        index("periodo_anual"),
+        index("legislatura"),
+        index("grupo_parlamentario")
       );
     }
 
@@ -205,17 +227,23 @@ public class CargaAsistenciaPlenos implements Consumer<AsistenciaPlenos> {
             ?, ?, ?, ?, ?, ?, ?,
             ?, ?, ?, ?, ?, ?, ?
           )
-          """.formatted(tableName);
+          """.formatted(
+          tableName
+        );
     }
 
     @Override
-    void addBatch(PreparedStatement ps, RegistroAsistencia r) throws SQLException {
+    void addBatch(PreparedStatement ps, RegistroAsistencia r)
+      throws SQLException {
       for (var a : r.resultadosPorGrupo().entrySet()) {
         ps.setString(1, r.pleno().id());
         ps.setString(2, r.pleno().periodoParlamentario());
         ps.setString(3, r.pleno().periodoAnual());
         ps.setString(4, r.pleno().legislatura());
-        ps.setString(5, r.pleno().fecha().format(DateTimeFormatter.ofPattern(YYYY_MM_DD)));
+        ps.setString(
+          5,
+          r.pleno().fecha().format(DateTimeFormatter.ofPattern(YYYY_MM_DD))
+        );
         ps.setString(6, r.hora().format(DateTimeFormatter.ofPattern(HH_MM)));
         ps.setString(7, r.pleno().titulo());
 
@@ -245,7 +273,9 @@ public class CargaAsistenciaPlenos implements Consumer<AsistenciaPlenos> {
             ?, ?, ?, ?, ?, ?,
             ?, ?, ?, ?, ?, ?
           )
-          """.formatted(tableName);
+          """.formatted(
+          tableName
+        );
     }
 
     @Override
@@ -266,46 +296,53 @@ public class CargaAsistenciaPlenos implements Consumer<AsistenciaPlenos> {
             resultado text not null,
             resultado_descripcion text not null
           )
-          """.formatted(tableName);
+          """.formatted(
+          tableName
+        );
     }
 
     @Override
     List<String> createIndexesStatement() {
       return List.of(
-          index("periodo_parlamentario"),
-          index("periodo_anual"),
-          index("legislatura"),
-          index("congresista"),
-          index("grupo_parlamentario"),
-          index("grupo_parlamentario_descripcion"),
-          index("resultado"),
-          index("resultado_descripcion")
+        index("periodo_parlamentario"),
+        index("periodo_anual"),
+        index("legislatura"),
+        index("congresista"),
+        index("grupo_parlamentario"),
+        index("grupo_parlamentario_descripcion"),
+        index("resultado"),
+        index("resultado_descripcion")
       );
     }
 
     @Override
     void addBatch(PreparedStatement ps, RegistroAsistencia r)
-        throws SQLException {
+      throws SQLException {
       for (var a : r.asistencias()) {
         ps.setString(1, r.pleno().id());
         ps.setString(2, r.pleno().periodoParlamentario());
         ps.setString(3, r.pleno().periodoAnual());
         ps.setString(4, r.pleno().legislatura());
-        ps.setString(5, r.pleno().fecha().format(DateTimeFormatter.ofPattern(YYYY_MM_DD)));
+        ps.setString(
+          5,
+          r.pleno().fecha().format(DateTimeFormatter.ofPattern(YYYY_MM_DD))
+        );
         ps.setString(6, r.hora().format(DateTimeFormatter.ofPattern(HH_MM)));
         ps.setString(7, r.pleno().titulo());
 
         ps.setString(8, a.congresista());
         ps.setString(9, a.grupoParlamentario());
         if (a.grupoParlamentarioDescripcion() == null) {
-          throw new IllegalArgumentException("a.grupoParlamentarioDescripcion == null");
+          throw new IllegalArgumentException(
+            "a.grupoParlamentarioDescripcion == null"
+          );
         }
         ps.setString(10, a.grupoParlamentarioDescripcion());
-        ps.setString(11, a.resultado());
-        if (a.resultadoDescripcion() == null) {
-          throw new IllegalArgumentException("a.resultadoDescripcion == null");
-        }
-        ps.setString(12, a.resultadoDescripcion());
+        if (a.resultado() == null) throw new RuntimeException(
+          "Error with " + a + " at " + r.pleno() + " @ " + r.hora()
+        );
+        ps.setString(11, a.resultado().codigo());
+        ps.setString(12, a.resultado().descripcion());
 
         ps.addBatch();
       }

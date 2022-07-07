@@ -31,9 +31,9 @@ jobs:
         run: mvn -B clean compile
 
       - name: Run Actualizar Plenos
-        run: mvn exec:java -D"exec.mainClass"="op.congreso.pleno.CargaRegitroPlenos"
+        run: mvn exec:java -D"exec.mainClass"="op.congreso.pleno.app.CargaRegitroPlenos"
       - name: Run Preparar Plenos DB
-        run: mvn -B exec:java -D"exec.mainClass"="op.congreso.pleno.CargaPlenos"
+        run: mvn -B exec:java -D"exec.mainClass"="op.congreso.pleno.app.CargaPlenos"
 
       - uses: actions/setup-python@v1
       - name: publishes to datasette

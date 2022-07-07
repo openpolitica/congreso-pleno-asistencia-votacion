@@ -1,4 +1,4 @@
-package op.congreso.pleno;
+package op.congreso.pleno.app;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.sql.DriverManager;
@@ -6,11 +6,13 @@ import java.sql.PreparedStatement;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.function.Consumer;
+import op.congreso.pleno.VotacionPlenos;
 import op.congreso.pleno.votacion.RegistroVotacion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class CargaVotacionPlenos implements Consumer<VotacionPlenos> {
+
   static final Logger LOG = LoggerFactory.getLogger(CargaVotacionPlenos.class);
   static final ObjectMapper jsonMapper = new ObjectMapper();
 
@@ -18,14 +20,17 @@ public class CargaVotacionPlenos implements Consumer<VotacionPlenos> {
   public static final String HH_MM = "HH:mm";
 
   static List<TableLoad> tableLoadList = List.of(
-      new VotacionCongresistaLoad(),
-      new VotacionGrupoParlamentarioLoad(),
-      new VotacionResultadoLoad()
+    new VotacionCongresistaLoad(),
+    new VotacionGrupoParlamentarioLoad(),
+    new VotacionResultadoLoad()
   );
 
   @Override
   public void accept(VotacionPlenos votacionPlenos) {
-    var jdbcUrl = "jdbc:sqlite:%s-asistencias-votaciones.db".formatted(votacionPlenos.periodo());
+    var jdbcUrl =
+      "jdbc:sqlite:%s-asistencias-votaciones.db".formatted(
+          votacionPlenos.periodo()
+        );
     try (var connection = DriverManager.getConnection(jdbcUrl)) {
       var statement = connection.createStatement();
       statement.executeUpdate("pragma journal_mode = WAL");
@@ -62,6 +67,7 @@ public class CargaVotacionPlenos implements Consumer<VotacionPlenos> {
   }
 
   abstract static class TableLoad {
+
     final String tableName;
 
     public TableLoad(String tableName) {
@@ -77,13 +83,18 @@ public class CargaVotacionPlenos implements Consumer<VotacionPlenos> {
     abstract List<String> createIndexesStatement();
 
     String index(String field) {
-      return "CREATE INDEX %s_%s ON %s(\"%s\");\n"
-          .formatted(tableName, field, tableName, field);
+      return "CREATE INDEX %s_%s ON %s(\"%s\");\n".formatted(
+          tableName,
+          field,
+          tableName,
+          field
+        );
     }
 
     abstract String prepareStatement();
 
-    abstract void addBatch(PreparedStatement ps, RegistroVotacion pl) throws Exception;
+    abstract void addBatch(PreparedStatement ps, RegistroVotacion pl)
+      throws Exception;
   }
 
   static class VotacionResultadoLoad extends TableLoad {
@@ -116,15 +127,17 @@ public class CargaVotacionPlenos implements Consumer<VotacionPlenos> {
             otros integer not null,
             total integer not null
           )
-          """.formatted(tableName);
+          """.formatted(
+          tableName
+        );
     }
 
     @Override
     List<String> createIndexesStatement() {
       return List.of(
-          index("periodo_parlamentario"),
-          index("periodo_anual"),
-          index("legislatura")
+        index("periodo_parlamentario"),
+        index("periodo_anual"),
+        index("legislatura")
       );
     }
 
@@ -135,7 +148,9 @@ public class CargaVotacionPlenos implements Consumer<VotacionPlenos> {
             ?, ?, ?, ?, ?, ?, ?, ?, ?,
             ?, ?, ?, ?, ?, ?, ?, ?, ?
           )
-          """.formatted(tableName);
+          """.formatted(
+          tableName
+        );
     }
 
     @Override
@@ -144,7 +159,10 @@ public class CargaVotacionPlenos implements Consumer<VotacionPlenos> {
       ps.setString(2, r.pleno().periodoParlamentario());
       ps.setString(3, r.pleno().periodoAnual());
       ps.setString(4, r.pleno().legislatura());
-      ps.setString(5, r.pleno().fecha().format(DateTimeFormatter.ofPattern(YYYY_MM_DD)));
+      ps.setString(
+        5,
+        r.pleno().fecha().format(DateTimeFormatter.ofPattern(YYYY_MM_DD))
+      );
       ps.setString(6, r.hora().format(DateTimeFormatter.ofPattern(HH_MM)));
       ps.setString(7, r.pleno().titulo());
       ps.setString(8, r.asunto());
@@ -195,16 +213,18 @@ public class CargaVotacionPlenos implements Consumer<VotacionPlenos> {
             otros integer not null,
             total integer not null
           )
-          """.formatted(tableName);
+          """.formatted(
+          tableName
+        );
     }
 
     @Override
     List<String> createIndexesStatement() {
       return List.of(
-          index("periodo_parlamentario"),
-          index("periodo_anual"),
-          index("legislatura"),
-          index("grupo_parlamentario")
+        index("periodo_parlamentario"),
+        index("periodo_anual"),
+        index("legislatura"),
+        index("grupo_parlamentario")
       );
     }
 
@@ -215,7 +235,9 @@ public class CargaVotacionPlenos implements Consumer<VotacionPlenos> {
             ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
             ?, ?, ?, ?, ?, ?, ?, ?, ?
           )
-          """.formatted(tableName);
+          """.formatted(
+          tableName
+        );
     }
 
     @Override
@@ -225,7 +247,10 @@ public class CargaVotacionPlenos implements Consumer<VotacionPlenos> {
         ps.setString(2, r.pleno().periodoParlamentario());
         ps.setString(3, r.pleno().periodoAnual());
         ps.setString(4, r.pleno().legislatura());
-        ps.setString(5, r.pleno().fecha().format(DateTimeFormatter.ofPattern(YYYY_MM_DD)));
+        ps.setString(
+          5,
+          r.pleno().fecha().format(DateTimeFormatter.ofPattern(YYYY_MM_DD))
+        );
         ps.setString(6, r.hora().format(DateTimeFormatter.ofPattern(HH_MM)));
         ps.setString(7, r.pleno().titulo());
         ps.setString(8, r.asunto());
@@ -260,7 +285,9 @@ public class CargaVotacionPlenos implements Consumer<VotacionPlenos> {
             ?, ?, ?, ?, ?, ?, ?, ?,
             ?, ?, ?, ?, ?, ?, ?
           )
-          """.formatted(tableName);
+          """.formatted(
+          tableName
+        );
     }
 
     @Override
@@ -284,20 +311,22 @@ public class CargaVotacionPlenos implements Consumer<VotacionPlenos> {
             resultado text not null,
             resultado_descripcion text not null
           )
-          """.formatted(tableName);
+          """.formatted(
+          tableName
+        );
     }
 
     @Override
     List<String> createIndexesStatement() {
       return List.of(
-          index("periodo_parlamentario"),
-          index("periodo_anual"),
-          index("legislatura"),
-          index("congresista"),
-          index("grupo_parlamentario"),
-          index("grupo_parlamentario_descripcion"),
-          index("resultado"),
-          index("resultado_descripcion")
+        index("periodo_parlamentario"),
+        index("periodo_anual"),
+        index("legislatura"),
+        index("congresista"),
+        index("grupo_parlamentario"),
+        index("grupo_parlamentario_descripcion"),
+        index("resultado"),
+        index("resultado_descripcion")
       );
     }
 
@@ -308,7 +337,10 @@ public class CargaVotacionPlenos implements Consumer<VotacionPlenos> {
         ps.setString(2, r.pleno().periodoParlamentario());
         ps.setString(3, r.pleno().periodoAnual());
         ps.setString(4, r.pleno().legislatura());
-        ps.setString(5, r.pleno().fecha().format(DateTimeFormatter.ofPattern(YYYY_MM_DD)));
+        ps.setString(
+          5,
+          r.pleno().fecha().format(DateTimeFormatter.ofPattern(YYYY_MM_DD))
+        );
         ps.setString(6, r.hora().format(DateTimeFormatter.ofPattern(HH_MM)));
         ps.setString(7, r.pleno().titulo());
         ps.setString(8, r.asunto());
@@ -318,12 +350,9 @@ public class CargaVotacionPlenos implements Consumer<VotacionPlenos> {
         ps.setString(11, a.congresista());
         ps.setString(12, a.grupoParlamentario());
         ps.setString(13, a.grupoParlamentarioDescripcion());
-        ps.setString(14, a.resultado());
-        if (a.resultadoDescripcion() == null) {
-          LOG.error("Error ubicado en: \n\tPleno: {}\n\tHora: {}\n\tCongresista: {}\n\tResultado no identificado: {} ", r.pleno().id(), r.hora(), a.congresista(), a.resultado());
-          throw new IllegalArgumentException("a.resultadoDescripcion == null");
-        }
-        ps.setString(15, a.resultadoDescripcion());
+
+        ps.setString(14, a.resultado().codigo());
+        ps.setString(15, a.resultado().descripcion());
 
         ps.addBatch();
       }

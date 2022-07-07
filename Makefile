@@ -16,13 +16,13 @@ prepare:
 	sqlite-utils enable-fts *.db votacion_congresista asunto etiquetas
 
 carga_plenos:
-	./mvnw clean compile exec:java -Dexec.mainClass="op.congreso.pleno.CargaPlenos" -T1C
+	./mvnw clean compile exec:java -Dexec.mainClass="op.congreso.pleno.app.CargaPlenos" -T1C
 
 extraer_csv:
-	./mvnw clean compile exec:java -Dexec.mainClass="op.congreso.pleno.ExtraeCsvs" -Dexec.args="${HOME}/Downloads/"
+	./mvnw clean compile exec:java -Dexec.mainClass="op.congreso.pleno.util.ExtraeCsvs" -Dexec.args="${HOME}/Downloads/"
 
 registro_plenos:
-	./mvnw exec:java -Dexec.mainClass="op.congreso.pleno.CargaRegitroPlenos"
+	./mvnw exec:java -Dexec.mainClass="op.congreso.pleno.app.CargaRegitroPlenos"
 
 serve:
 	datasette *.db
