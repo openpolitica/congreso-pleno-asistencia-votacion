@@ -2,20 +2,38 @@
   "periodoParlamentario" : "Congreso de la República - Periodo Parlamentario 2021 - 2026",
   "periodoAnual" : "Período Anual de Sesiones 2021 - 2022",
   "legislatura" : "Segunda Legislatura Ordinaria",
-  "fecha" : "2022-06-30",
-  "titulo" : "Asistencias y votaciones PROVISIONALES de la sesión vespertina del 30-06-2022",
-  "url" : "https://www2.congreso.gob.pe/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/Apleno/4297AEB3EA99C203052588720005C22C/$FILE/Asis_vot_PROVISIONAL_vespertina_30-06-22.pdf",
-  "filename" : "Asis_vot_PROVISIONAL_vespertina_30-06-22.pdf",
-  "paginas" : 11
+  "fecha" : "2022-07-07",
+  "titulo" : "Asistencias y votaciones PROVISIONALES de la sesión del 07-07-2022",
+  "url" : "https://www2.congreso.gob.pe/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/Apleno/9B867D82E0598D5D052588790013FF9A/$FILE/Asis_vot_PROVISIONAL_07-07-22.pdf",
+  "filename" : "Asis_vot_PROVISIONAL_07-07-22.pdf",
+  "paginas" : 23
+}, {
+  "periodoParlamentario" : "Congreso de la República - Periodo Parlamentario 2021 - 2026",
+  "periodoAnual" : "Período Anual de Sesiones 2021 - 2022",
+  "legislatura" : "Segunda Legislatura Ordinaria",
+  "fecha" : "2022-07-06",
+  "titulo" : "Asistencias y votaciones PROVISIONALES de la sesión vespertina del 06-07-2022",
+  "url" : "https://www2.congreso.gob.pe/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/Apleno/3352ADB01696133A052588780009D97E/$FILE/Asis_vot_PROVISIONAL_Vespertina_06-07-22.pdf",
+  "filename" : "Asis_vot_PROVISIONAL_Vespertina_06-07-22.pdf",
+  "paginas" : 16
+}, {
+  "periodoParlamentario" : "Congreso de la República - Periodo Parlamentario 2021 - 2026",
+  "periodoAnual" : "Período Anual de Sesiones 2021 - 2022",
+  "legislatura" : "Segunda Legislatura Ordinaria",
+  "fecha" : "2022-07-06",
+  "titulo" : "Asistencias y votaciones PROVISIONALES de la sesión matinal del 06-07-2022",
+  "url" : "https://www2.congreso.gob.pe/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/Apleno/0805837B848CEE85052588770069D984/$FILE/Asis_vot_PROVISIONAL_Matinal_06-07-22.pdf",
+  "filename" : "Asis_vot_PROVISIONAL_Matinal_06-07-22.pdf",
+  "paginas" : 7
 }, {
   "periodoParlamentario" : "Congreso de la República - Periodo Parlamentario 2021 - 2026",
   "periodoAnual" : "Período Anual de Sesiones 2021 - 2022",
   "legislatura" : "Segunda Legislatura Ordinaria",
   "fecha" : "2022-06-30",
-  "titulo" : "Asistencias y votaciones PROVISIONALES de la sesión matinal del 30-06-2022",
-  "url" : "https://www2.congreso.gob.pe/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/Apleno/242D4132A37AB45E0525887100682710/$FILE/Asis_vot_PROVISIONAL_Matinal_30-06-22_CInf.pdf",
-  "filename" : "Asis_vot_PROVISIONAL_Matinal_30-06-22_CInf.pdf",
-  "paginas" : 6
+  "titulo" : "Asistencias y votaciones de la sesión del 30-06-2022",
+  "url" : "https://www2.congreso.gob.pe/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/Apleno/CA6ADB62271F33DF0525887600526F62/$FILE/Asis_vot_OFICIAL_30-06-22.pdf",
+  "filename" : "Asis_vot_OFICIAL_30-06-22.pdf",
+  "paginas" : 17
 }, {
   "periodoParlamentario" : "Congreso de la República - Periodo Parlamentario 2021 - 2026",
   "periodoAnual" : "Período Anual de Sesiones 2021 - 2022",
