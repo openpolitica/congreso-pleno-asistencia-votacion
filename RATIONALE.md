@@ -4,6 +4,8 @@
 
 ### Organizacion de datos de asistencias/votaciones
 
+// TODO actualizar organizacion
+
 ```
 2021-2026/
   2021-2022/
@@ -28,3 +30,7 @@
           datos_grupo_parlamentario.csv
           
 ```
+
+// TODO definir manejo de grupos parlamentarios
+
+// TODO definir uso de aws textract
