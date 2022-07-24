@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 import op.congreso.pleno.GrupoParlamentario;
 import op.congreso.pleno.Pleno;
 import op.congreso.pleno.ResultadoCongresista;
@@ -38,13 +39,18 @@ public record RegistroVotacion(
       return this;
     }
 
+    public Builder withHora(LocalTime hora) {
+      this.hora = hora;
+      return this;
+    }
+
     public Builder withHora(String hora) {
       this.hora = LocalTime.parse(hora, DateTimeFormatter.ofPattern("HH:mm"));
       return this;
     }
 
     public Builder withPresidente(String presidente) {
-      this.presidente = presidente;
+      this.presidente = presidente.trim();
       return this;
     }
 

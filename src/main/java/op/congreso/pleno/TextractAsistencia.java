@@ -39,7 +39,7 @@ public class TextractAsistencia {
     "NA"
   );
   public static final String FECHA_PATTERN =
-    "'Fecha: 'd/MM/yyyy' Hora: 'kk:mm a";
+    "'Fecha: 'd/MM/yyyy' Hora: 'hh:mm a";
 
   public static final Pattern ASISTENCIA_GROUP = Pattern.compile("(\\w+)");
 
@@ -100,7 +100,7 @@ public class TextractAsistencia {
               }
             }
           } else if (resultados.size() < 130) {
-            if (VALID_GP.contains(text.trim())) { // Add GP and process next line
+//            if (VALID_GP.contains(text.trim())) { // Add GP and process next line
               i++;
               var congresista = blocks.get(i).text();
               if (
@@ -131,7 +131,7 @@ public class TextractAsistencia {
                   )
                 );
               }
-            }
+//            }
           } else {
             // Resultados de la ASISTENCIA
             // Grupo Parlamentario

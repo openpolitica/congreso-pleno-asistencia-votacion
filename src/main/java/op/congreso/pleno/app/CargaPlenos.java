@@ -360,8 +360,9 @@ public class CargaPlenos {
               Integer.parseInt(v.get("si")),
               Integer.parseInt(v.get("no")),
               Integer.parseInt(v.get("abstenciones")),
-              Integer.parseInt(v.get("ausentes")),
-              Integer.parseInt(v.get("licencias")),
+//FIXME
+//              Integer.parseInt(v.get("ausentes")),
+//              Integer.parseInt(v.get("licencias")),
               Integer.parseInt(v.get("otros")),
               Integer.parseInt(v.get("numero_legal"))
             )
@@ -414,8 +415,9 @@ public class CargaPlenos {
         t.get("si"),
         t.get("no"),
         t.get("abstenciones"),
-        t.get("ausentes"),
-        t.get("licencias"),
+//FIXME
+//        t.get("ausentes"),
+//        t.get("licencias"),
         t.get("otros"),
         t.get("numero_legal")
       );
