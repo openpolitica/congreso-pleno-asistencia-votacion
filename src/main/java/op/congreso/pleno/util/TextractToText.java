@@ -22,7 +22,7 @@ public class TextractToText {
         .credentialsProvider(ProfileCredentialsProvider.create())
         .build()
     ) {
-      final var path = Path.of("./out/pdf-1.png");
+      final var path = Path.of("./out/pdf-9.png");
 
       byte[] bytes = Files.readAllBytes(path);
       final var document = Document
@@ -47,7 +47,7 @@ public class TextractToText {
         i++;
       }
       Files.writeString(
-        Path.of("output.txt"),
+        Path.of("output-votacion.txt"),
         content.toString(),
         StandardOpenOption.CREATE_NEW
       );

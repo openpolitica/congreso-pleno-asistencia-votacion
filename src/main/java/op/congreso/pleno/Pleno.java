@@ -1,8 +1,8 @@
 package op.congreso.pleno;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.regex.Pattern;
 
 public record Pleno(
   String periodoParlamentario,
@@ -24,6 +24,7 @@ public record Pleno(
   }
 
   static class Builder {
+    static Pattern periodo = Pattern.compile("\\d\\d\\d\\d-\\d\\d\\d\\d$");
 
     String periodoParlamentario;
     String periodoAnual;
@@ -35,6 +36,8 @@ public record Pleno(
 
     void withLegislatura(String legislatura) {
       this.legislatura = legislatura;
+      var m = periodo.matcher(legislatura);
+      if (m.find()) this.periodoAnual = m.group();
     }
 
     void withTitulo(String titulo) {
@@ -52,7 +55,7 @@ public record Pleno(
     public Pleno build() {
       return new Pleno(
         "2021-2026",
-        "2021-2022",
+        periodoAnual,
         legislatura,
         titulo,
         "",
