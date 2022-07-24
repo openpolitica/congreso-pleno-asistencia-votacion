@@ -174,9 +174,9 @@ public class CargaVotacionPlenos implements Consumer<VotacionPlenos> {
       ps.setInt(13, r.resultados().no());
       ps.setInt(14, r.resultados().abstenciones());
       //FIXME
-//      ps.setInt(15, r.resultados().ausentes());
-//      ps.setInt(16, r.resultados().licencias());
-//      ps.setInt(17, r.resultados().otros());
+      //      ps.setInt(15, r.resultados().ausentes());
+      //      ps.setInt(16, r.resultados().licencias());
+      //      ps.setInt(17, r.resultados().otros());
       ps.setInt(18, r.resultados().total());
 
       ps.addBatch();
@@ -264,9 +264,9 @@ public class CargaVotacionPlenos implements Consumer<VotacionPlenos> {
         ps.setInt(14, a.getValue().no());
         ps.setInt(15, a.getValue().abstenciones());
         //FIXME
-//        ps.setInt(16, a.getValue().ausentes());
-//        ps.setInt(17, a.getValue().licencias());
-//        ps.setInt(18, a.getValue().otros());
+        //        ps.setInt(16, a.getValue().ausentes());
+        //        ps.setInt(17, a.getValue().licencias());
+        //        ps.setInt(18, a.getValue().otros());
         ps.setInt(19, a.getValue().total());
 
         ps.addBatch();
@@ -351,7 +351,7 @@ public class CargaVotacionPlenos implements Consumer<VotacionPlenos> {
 
         ps.setString(11, a.congresista());
         ps.setString(12, a.grupoParlamentario());
-        ps.setString(13, a.grupoParlamentarioDescripcion());
+        ps.setString(13, r.pleno().gruposParlamentarios().get(a.grupoParlamentario()));
 
         ps.setString(14, a.resultado().codigo());
         ps.setString(15, a.resultado().descripcion());

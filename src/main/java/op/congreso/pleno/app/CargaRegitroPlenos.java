@@ -45,7 +45,10 @@ public class CargaRegitroPlenos {
 
     var jsonMapper = new ObjectMapper();
 
-    var bytes = Files.readAllBytes(Path.of("plenos.json"));
+    var plenosJsonPath = Path.of("plenos.json");
+    var plenosCsvPath = Path.of("plenos.csv");
+
+    var bytes = Files.readAllBytes(plenosJsonPath);
     var existing = jsonMapper
       .readValue(bytes, new TypeReference<List<RegistroPleno>>() {})
       .stream()
@@ -70,14 +73,14 @@ public class CargaRegitroPlenos {
       .toList();
     //json
     Files.writeString(
-      Path.of("plenos.json"),
+      plenosJsonPath,
       jsonMapper
         .writerWithDefaultPrettyPrinter()
         .writeValueAsString(registroPlenos)
     );
     //csv
-    StringBuilder content = RegistroPleno.csvHeader();
+    var content = csvHeader();
     registroPlenos.forEach(pleno -> content.append(pleno.csvEntry()));
-    Files.writeString(Path.of("plenos.csv"), content.toString());
+    Files.writeString(plenosCsvPath, content.toString());
   }
 }
