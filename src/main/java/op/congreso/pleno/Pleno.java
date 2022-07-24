@@ -2,6 +2,7 @@ package op.congreso.pleno;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 public record Pleno(
@@ -11,7 +12,8 @@ public record Pleno(
   String titulo,
   String url,
   LocalDate fecha,
-  int quorum
+  int quorum,
+  Map<String, String> gruposParlamentarios
 ) {
   public String id() {
     return (
@@ -19,11 +21,12 @@ public record Pleno(
     );
   }
 
-  static Builder newBuilder() {
+  public static Builder newBuilder() {
     return new Builder();
   }
 
-  static class Builder {
+  public static class Builder {
+
     static Pattern periodo = Pattern.compile("\\d\\d\\d\\d-\\d\\d\\d\\d$");
 
     String periodoParlamentario;
@@ -33,14 +36,15 @@ public record Pleno(
     String url;
     LocalDate fecha;
     int quorum;
+    Map<String, String> gruposParlamentarios;
 
-    void withLegislatura(String legislatura) {
+    public void withLegislatura(String legislatura) {
       this.legislatura = legislatura;
       var m = periodo.matcher(legislatura);
       if (m.find()) this.periodoAnual = m.group();
     }
 
-    void withTitulo(String titulo) {
+    public void withTitulo(String titulo) {
       this.titulo = titulo;
     }
 
@@ -52,6 +56,11 @@ public record Pleno(
       this.quorum = quorum;
     }
 
+    public Builder withGruposParlamentarios(Map<String, String> grupos) {
+      this.gruposParlamentarios = grupos;
+      return this;
+    }
+
     public Pleno build() {
       return new Pleno(
         "2021-2026",
@@ -60,7 +69,8 @@ public record Pleno(
         titulo,
         "",
         fecha,
-        quorum
+        quorum,
+              gruposParlamentarios
       );
     }
   }

@@ -332,12 +332,12 @@ public class CargaAsistenciaPlenos implements Consumer<AsistenciaPlenos> {
 
         ps.setString(8, a.congresista());
         ps.setString(9, a.grupoParlamentario());
-        if (a.grupoParlamentarioDescripcion() == null) {
+        if (r.pleno().gruposParlamentarios().get(a.grupoParlamentario()) == null) {
           throw new IllegalArgumentException(
             "a.grupoParlamentarioDescripcion == null"
           );
         }
-        ps.setString(10, a.grupoParlamentarioDescripcion());
+        ps.setString(10, r.pleno().gruposParlamentarios().get(a.grupoParlamentario()));
         if (a.resultado() == null) throw new RuntimeException(
           "Error with " + a + " at " + r.pleno() + " @ " + r.hora()
         );

@@ -1,7 +1,6 @@
-package op.congreso.pleno.util;
+package op.congreso.pleno.textract;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -9,11 +8,11 @@ import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.apache.pdfbox.tools.imageio.ImageIOUtil;
 
-public class PdfToImage {
+public class PlenoPdfToImages {
 
-  private static void generateImageFromPDF(File pdf, String extension)
+  private static void generateImageFromPDF(Path pdfPath)
     throws IOException {
-    PDDocument document = PDDocument.load(pdf);
+    PDDocument document = PDDocument.load(pdfPath.toFile());
     PDFRenderer pdfRenderer = new PDFRenderer(document);
     for (int page = 0; page < document.getNumberOfPages(); ++page) {
       BufferedImage bim = pdfRenderer.renderImageWithDPI(
@@ -23,7 +22,7 @@ public class PdfToImage {
       );
       ImageIOUtil.writeImage(
         bim,
-        String.format("out/pdf-%d.%s", page + 1, extension),
+        String.format("./target/out/pdf-%d.%s", page + 1, "png"),
         300
       );
     }
@@ -32,6 +31,6 @@ public class PdfToImage {
 
   public static void main(String[] args) throws IOException {
     final var path = Path.of("./out/Asis_vot_OFICIAL_07-07-22.pdf");
-    generateImageFromPDF(path.toFile(), "png");
+    generateImageFromPDF(path);
   }
 }

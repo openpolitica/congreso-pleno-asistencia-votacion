@@ -33,7 +33,7 @@ jobs:
       - name: Run Actualizar Plenos
         run: mvn exec:java -D"exec.mainClass"="op.congreso.pleno.app.CargaRegitroPlenos"
       - name: Run Preparar Plenos DB
-        run: mvn -B exec:java -D"exec.mainClass"="op.congreso.pleno.app.CargaPlenos"
+        run: mvn -B exec:java -D"exec.mainClass"="op.congreso.pleno.app.CargaDetallePlenos"
 
       - uses: actions/setup-python@v1
       - name: publishes to datasette

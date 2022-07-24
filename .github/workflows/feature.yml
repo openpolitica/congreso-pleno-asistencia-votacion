@@ -29,7 +29,7 @@ jobs:
         run: mvn -B clean compile
 
       - name: Run extraction
-        run: mvn -B exec:java -D"exec.mainClass"="op.congreso.pleno.app.CargaPlenos"
+        run: mvn -B exec:java -D"exec.mainClass"="op.congreso.pleno.app.CargaDetallePlenos"
 
       - uses: actions/setup-python@v1
       - name: publishes to datasette
