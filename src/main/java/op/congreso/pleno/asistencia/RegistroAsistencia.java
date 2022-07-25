@@ -32,6 +32,10 @@ public record RegistroAsistencia(
       return this;
     }
 
+    public Builder withHora(LocalTime hora) {
+      this.hora = hora;
+      return this;
+    }
     public Builder withHora(String hora) {
       this.hora = LocalTime.parse(hora, DateTimeFormatter.ofPattern("HH:mm"));
       return this;

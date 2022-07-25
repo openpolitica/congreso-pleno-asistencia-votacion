@@ -1,10 +1,12 @@
 package op.congreso.pleno.textract;
 
+import static op.congreso.pleno.Constantes.FECHA_HORA_PATTERN;
+import static op.congreso.pleno.Constantes.VALID_GP;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,26 +20,6 @@ import op.congreso.pleno.asistencia.ResultadoAsistencia;
 
 public class TextractAsistencia {
 
-  public static final List<String> VALID_GP = List.of(
-    "FP",
-    "PL",
-    "AP",
-    "APP",
-    "BM",
-    "AP-PIS",
-    "RP",
-    "PD",
-    "SP",
-    "CD-JP",
-    "CD-JPP",
-    "PB",
-    "PD",
-    "PP",
-    "NA"
-  );
-  public static final String FECHA_PATTERN =
-    "'Fecha: 'd/MM/yyyy' Hora: 'hh:mm a";
-
   public static final Pattern ASISTENCIA_GROUP = Pattern.compile("(\\w+)");
 
   public static void main(String[] args) throws IOException {
@@ -48,11 +30,6 @@ public class TextractAsistencia {
       var registro = load(blocks);
 
       System.out.println(
-//        type +
-//        "=>" +
-//        errors +
-//        " headers = " +
-//        headersReady +
         " registry:\n" +
         registro
       );
@@ -62,26 +39,25 @@ public class TextractAsistencia {
   }
 
   static RegistroAsistencia load(List<String> lines) {
+    var registroBuilder = RegistroAsistencia.newBuilder();
     var plenoBuilder = Pleno.newBuilder();
     var resultadosBuilder = ResultadoAsistencia.newBuilder();
-    var resultados = new ArrayList<ResultadoCongresista<Asistencia>>();
+    var asistencias = new ArrayList<ResultadoCongresista<Asistencia>>();
     var grupos = new HashMap<String, String>();
     var resultadosGrupos = new HashMap<GrupoParlamentario, ResultadoAsistencia>();
 
     int i = 0;
     int errors = 0;
-    String type = null;
+    var titulo = "";
+    var type = "";
     LocalDateTime fechaHora = null;
     boolean headersReady = false;
 
     while (i < lines.size()) {
-      //        if (block.blockType().equals(BlockType.LINE)) {
       final var text = lines.get(i);
-      if (i < 5) {
+      if (i < 5) { // Process headers metadata
         switch (i) {
-          case 0 -> {
-            if (!text.equals("CONGRESO DE LA REPÚBLICA DEL PERÚ")) errors++;
-          }
+          case 0 -> titulo = text;
           case 1 -> plenoBuilder.withLegislatura(text);
           case 2 -> plenoBuilder.withTitulo(text);
           case 3 -> type = text;
@@ -89,34 +65,39 @@ public class TextractAsistencia {
             fechaHora =
                     LocalDateTime.parse(
                             text,
-                            DateTimeFormatter.ofPattern(FECHA_PATTERN)
+                            FECHA_HORA_PATTERN
                     );
+            registroBuilder.withHora(fechaHora.toLocalTime());
             plenoBuilder.withFecha(fechaHora.toLocalDate());
           }
         }
-      } else if (resultados.size() < 130) {
-        if (VALID_GP.contains(text.trim())) { // Add GP and process next line
+      } else if (asistencias.size() < 130) { // Process asistencia per congresistas
+        // Process GP + Congresista + Asistencia
+        if (VALID_GP.contains(text.trim())) { // GP found, process next line
           i++;
           var congresista = lines.get(i);
+          // Check Congresista text does not contain Asistencia
           if (
                   Asistencia.is(
                           congresista.substring(congresista.lastIndexOf(" ") + 1)
                   )
-          ) {
+          ) { // if it contains Asistencia
             var asistencia = congresista.substring(
                     congresista.lastIndexOf(" ")
-            );
-            resultados.add(
+            ); // get asistencia
+            // and build resultado
+            asistencias.add(
                     new ResultadoCongresista<>(
                             text.trim(),
                             congresista.substring(0, congresista.lastIndexOf(" ")),
                             Asistencia.of(asistencia)
                     )
             );
-          } else {
+          } else { // if it does not contain asistencia
             i++;
-            var asistencia = lines.get(i);
-            resultados.add(
+            var asistencia = lines.get(i); // get asistencia from next line
+            // and build resultado
+            asistencias.add(
                     new ResultadoCongresista<>(
                             text.trim(),
                             congresista,
@@ -124,28 +105,31 @@ public class TextractAsistencia {
                     )
             );
           }
-        } else {
-          var gp = text.substring(0, text.indexOf(" "));
+        } else { // else GP is in the same line as congresista
+          var gp = text.substring(0, text.indexOf(" ")); // get GP from first work
+          // Check Congresista text does not contain Asistencia
           var congresista = text.substring(text.indexOf(" ") + 1);
           if (
                   Asistencia.is(
                           congresista.substring(congresista.lastIndexOf(" ") + 1)
                   )
-          ) {
+          ) { // if it contains asistencia
             var asistencia = congresista.substring(
                     congresista.lastIndexOf(" ")
-            );
-            resultados.add(
+            ); // get asistencia
+            // and build resultado
+            asistencias.add(
                     new ResultadoCongresista<>(
                             gp,
                             congresista.substring(0, congresista.lastIndexOf(" ")),
                             Asistencia.of(asistencia)
                     )
             );
-          } else {
+          } else { // if it does not contain asistencia
             i++;
-            var asistencia = lines.get(i);
-            resultados.add(
+            var asistencia = lines.get(i); // get asistencia from next line
+            // and build resultado
+            asistencias.add(
                     new ResultadoCongresista<>(
                             gp,
                             congresista,
@@ -154,7 +138,8 @@ public class TextractAsistencia {
             );
           }
         }
-      } else {
+      } else { // Process resultados
+        // First: get resultado headers:
         // Resultados de la ASISTENCIA
         // Grupo Parlamentario
         // Presente Ausente Licencias Susp.
@@ -171,9 +156,9 @@ public class TextractAsistencia {
               if (lines.get(i).equals("Otros")) headersReady = true;
             }
           }
-        } else {
+        } else { // Then once headers ready:
           if (headersReady) {
-            if (Asistencia.isDescripcion(text)) {
+            if (Asistencia.isDescripcion(text)) { // Get Resultado per Asistencia type
               i++;
               var asistencia = lines.get(i);
               var matcher = ASISTENCIA_GROUP.matcher(asistencia);
@@ -186,7 +171,7 @@ public class TextractAsistencia {
                         Integer.parseInt(result)
                 );
               }
-            } else if (text.contains("(") && text.contains(")")) {
+            } else if (text.contains("(") && text.contains(")")) { // Or get Asistencia from within ()
               if (
                       Asistencia.isDescripcion(
                               text.substring(0, text.lastIndexOf("(") - 1)
@@ -205,7 +190,7 @@ public class TextractAsistencia {
                   );
                 }
               }
-            } else {
+            } else { // Or get resulados per GP
               if (VALID_GP.contains(text)) {
                 i++;
                 grupos.put(text, lines.get(i));
@@ -225,6 +210,7 @@ public class TextractAsistencia {
                                 presentes,
                                 ausentes,
                                 licencias,
+                                suspendidos,
                                 otros
                         )
                 );
@@ -248,10 +234,11 @@ public class TextractAsistencia {
                                   presentes,
                                   ausentes,
                                   licencias,
+                                  suspendidos,
                                   otros
                           )
                   );
-                } else if (text.equals("Asistencia para Quórum")) {
+                } else if (text.equals("Asistencia para Quórum")) { // Finally get quorum
                   i++;
                   plenoBuilder.withQuorum(Integer.parseInt(lines.get(i)));
                 }
@@ -259,19 +246,16 @@ public class TextractAsistencia {
             }
           }
         }
-        //          }
       }
       i++;
     }
 
     if (fechaHora == null) errors++;
 
-    return new RegistroAsistencia(
-            plenoBuilder.build(),
-            fechaHora != null ? fechaHora.toLocalTime() : null,
-            resultados,
-            resultadosGrupos,
-            resultadosBuilder.build()
-    );
+    return registroBuilder.withPleno(plenoBuilder.build())
+            .withAsistencias(asistencias)
+            .withResultadosPorPartido(resultadosGrupos)
+            .withResultados(resultadosBuilder.build())
+            .build();
   }
 }

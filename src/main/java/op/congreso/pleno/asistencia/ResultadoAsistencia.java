@@ -4,6 +4,7 @@ public record ResultadoAsistencia(
   int presentes,
   int ausentes,
   int licencias,
+  int suspendidos,
   int otros,
   int total
 ) {
@@ -15,14 +16,16 @@ public record ResultadoAsistencia(
     int presentes,
     int ausentes,
     int licencias,
+    int suspendidos,
     int otros
   ) {
     return new ResultadoAsistencia(
       presentes,
       ausentes,
       licencias,
+      suspendidos,
       otros,
-      presentes + ausentes + licencias + otros
+      presentes + ausentes + licencias + suspendidos + otros
     );
   }
 
@@ -31,6 +34,7 @@ public record ResultadoAsistencia(
     int presentes = 0;
     int ausentes = 0;
     int licencias = 0;
+    int suspendidos = 0;
     int otros = 0;
 
     public void with(Asistencia asistencia, int resultado) {
@@ -41,17 +45,18 @@ public record ResultadoAsistencia(
           LICENCIA_PERSONAL,
           LICENCIA_POR_ENFERMEDAD -> this.licencias =
           this.licencias + resultado;
+        case SUSPENDIDO -> this.suspendidos = resultado;
         default -> this.otros = resultado;
       }
     }
 
     public ResultadoAsistencia build() {
-      return new ResultadoAsistencia(
+      return ResultadoAsistencia.create(
         presentes,
         ausentes,
         licencias,
-        otros,
-        presentes + ausentes + licencias + otros
+        suspendidos,
+        otros
       );
     }
   }

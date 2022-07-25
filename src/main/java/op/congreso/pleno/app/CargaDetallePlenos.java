@@ -331,6 +331,7 @@ public class CargaDetallePlenos {
                                     Integer.parseInt(v.get("presentes")),
                                     Integer.parseInt(v.get("ausentes")),
                                     Integer.parseInt(v.get("licencias")),
+                                    Integer.parseInt(v.get("suspendidos")), //FIXME may be null
                                     Integer.parseInt(v.get("otros")),
                                     Integer.parseInt(v.get("numero_legal"))
                             )
@@ -396,6 +397,7 @@ public class CargaDetallePlenos {
                     t.get("presentes"),
                     t.get("ausentes"),
                     t.get("licencias"),
+                    t.get("suspendidos"), //FIXME may be null
                     t.get("otros"),
                     t.get("numero_legal")
             );
