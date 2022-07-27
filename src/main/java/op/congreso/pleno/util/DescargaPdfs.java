@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import op.congreso.pleno.RegistroPleno;
+import op.congreso.pleno.RegistroPlenoDocument;
 
 public class DescargaPdfs {
 
@@ -15,9 +15,9 @@ public class DescargaPdfs {
     var bytes = Files.readAllBytes(Path.of("plenos.json"));
     var plenos = jsonMapper.readValue(
       bytes,
-      new TypeReference<List<RegistroPleno>>() {}
+      new TypeReference<List<RegistroPlenoDocument>>() {}
     );
 
-    plenos.stream().parallel().forEach(RegistroPleno::download);
+    plenos.stream().parallel().forEach(RegistroPlenoDocument::download);
   }
 }

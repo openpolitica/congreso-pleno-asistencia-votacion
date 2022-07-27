@@ -1,6 +1,7 @@
 package op.congreso.pleno.asistencia;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import op.congreso.pleno.Resultado;
@@ -48,8 +49,8 @@ public enum Asistencia implements Resultado {
   }
 
   @Override
-  public String codigo() {
-    return codigo;
+  public List<String> codigos() {
+    return List.of(codigo);
   }
 
   @Override

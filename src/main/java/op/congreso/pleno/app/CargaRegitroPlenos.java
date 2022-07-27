@@ -1,6 +1,6 @@
 package op.congreso.pleno.app;
 
-import static op.congreso.pleno.RegistroPleno.*;
+import static op.congreso.pleno.RegistroPlenoDocument.*;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,7 +11,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
-import op.congreso.pleno.RegistroPleno;
+import op.congreso.pleno.RegistroPlenoDocument;
 
 public class CargaRegitroPlenos {
 
@@ -21,7 +21,7 @@ public class CargaRegitroPlenos {
       5
     );
 
-    var plenos = new HashSet<RegistroPleno>();
+    var plenos = new HashSet<RegistroPlenoDocument>();
 
     for (var periodos : root.entrySet()) {
       System.out.println(periodos.getKey());
@@ -50,9 +50,9 @@ public class CargaRegitroPlenos {
 
     var bytes = Files.readAllBytes(plenosJsonPath);
     var existing = jsonMapper
-      .readValue(bytes, new TypeReference<List<RegistroPleno>>() {})
+      .readValue(bytes, new TypeReference<List<RegistroPlenoDocument>>() {})
       .stream()
-      .collect(Collectors.toMap(RegistroPleno::id, p -> p));
+      .collect(Collectors.toMap(RegistroPlenoDocument::id, p -> p));
 
     var updated = plenos
       .stream()
@@ -69,7 +69,7 @@ public class CargaRegitroPlenos {
       .collect(Collectors.toSet());
     var registroPlenos = updated
       .stream()
-      .sorted(Comparator.comparing(RegistroPleno::id).reversed())
+      .sorted(Comparator.comparing(RegistroPlenoDocument::id).reversed())
       .toList();
     //json
     Files.writeString(

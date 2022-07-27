@@ -7,7 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
-import op.congreso.pleno.RegistroPleno;
+import op.congreso.pleno.RegistroPlenoDocument;
 
 public class ConteoPaginas {
 
@@ -18,13 +18,13 @@ public class ConteoPaginas {
     var bytes = Files.readAllBytes(plenosPath);
     var plenos = jsonMapper.readValue(
       bytes,
-      new TypeReference<List<RegistroPleno>>() {}
+      new TypeReference<List<RegistroPlenoDocument>>() {}
     );
 
     var plenosWithPaginas = plenos
       .stream()
       .filter(pleno -> pleno.paginas() < 1)
-      .map(RegistroPleno::withPaginas)
+      .map(RegistroPlenoDocument::withPaginas)
       .collect(Collectors.toList());
     Files.writeString(
       plenosPath,
@@ -33,7 +33,7 @@ public class ConteoPaginas {
         .writeValueAsString(plenosWithPaginas)
     );
 
-    var content = RegistroPleno.csvHeader();
+    var content = RegistroPlenoDocument.csvHeader();
     plenosWithPaginas.forEach(pleno -> content.append(pleno.csvEntry()));
     Files.writeString(Path.of("plenos.csv"), content.toString());
   }

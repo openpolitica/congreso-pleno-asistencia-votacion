@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
+import op.congreso.pleno.Constantes;
 import op.congreso.pleno.GrupoParlamentario;
 import op.congreso.pleno.Pleno;
 import op.congreso.pleno.ResultadoCongresista;
@@ -24,10 +26,9 @@ public class TextractAsistencia {
 
   public static void main(String[] args) throws IOException {
     try {
+      var lines = Files.readAllLines(Path.of("./out/Asis_vot_OFICIAL_07-07-22/page_8.txt"));
 
-      final var blocks = Files.readAllLines(Path.of("./output-asistencia.txt"));
-
-      var registro = load(blocks);
+      var registro = load(clean(lines));
 
       System.out.println(
         " registry:\n" +
@@ -52,23 +53,37 @@ public class TextractAsistencia {
     var type = "";
     LocalDateTime fechaHora = null;
     boolean headersReady = false;
+    var previous = "";
 
     while (i < lines.size()) {
       final var text = lines.get(i);
-      if (i < 5) { // Process headers metadata
+      if (i < 4) { // Process headers metadata
         switch (i) {
           case 0 -> titulo = text;
           case 1 -> plenoBuilder.withLegislatura(text);
           case 2 -> plenoBuilder.withTitulo(text);
-          case 3 -> type = text;
-          case 4 -> {
-            fechaHora =
-                    LocalDateTime.parse(
-                            text,
-                            FECHA_HORA_PATTERN
-                    );
-            registroBuilder.withHora(fechaHora.toLocalTime());
-            plenoBuilder.withFecha(fechaHora.toLocalDate());
+          case 3 -> {
+            if (text.equals(Constantes.ASISTENCIA)) {
+              type = text;
+              i++;
+              fechaHora =
+                      LocalDateTime.parse(
+                              lines.get(i),
+                              FECHA_HORA_PATTERN
+                      );
+              registroBuilder.withHora(fechaHora.toLocalTime());
+              plenoBuilder.withFecha(fechaHora.toLocalDate());
+            } else if (text.startsWith(Constantes.ASISTENCIA)) {
+              type = Constantes.ASISTENCIA;
+              var fechaText = text.substring(Constantes.ASISTENCIA.length() + 1);
+              fechaHora =
+                      LocalDateTime.parse(
+                              fechaText,
+                              FECHA_HORA_PATTERN
+                      );
+              registroBuilder.withHora(fechaHora.toLocalTime());
+              plenoBuilder.withFecha(fechaHora.toLocalDate());
+            }
           }
         }
       } else if (asistencias.size() < 130) { // Process asistencia per congresistas
@@ -166,9 +181,13 @@ public class TextractAsistencia {
                 var asis = matcher.group();
                 i++;
                 var result = lines.get(i);
+                if (result.contains(" ")) {
+                  previous = result.substring(result.indexOf(" ") + 1);
+                  result = result.substring(0, result.indexOf(" "));
+                }
                 resultadosBuilder.with(
                         Asistencia.of(asis),
-                        Integer.parseInt(result)
+                        Integer.parseInt(result.replace(".", ""))
                 );
               }
             } else if (text.contains("(") && text.contains(")")) { // Or get Asistencia from within ()
@@ -184,26 +203,55 @@ public class TextractAsistencia {
                   var asis = matcher.group();
                   i++;
                   var result = lines.get(i);
+                  if (result.contains(" ")) {
+                    previous = result.substring(result.indexOf(" ") + 1);
+                    result = result.substring(0, result.indexOf(" "));
+                  }
                   resultadosBuilder.with(
                           Asistencia.of(asis),
-                          Integer.parseInt(result)
+                          Integer.parseInt(result.replace(".", ""))
                   );
                 }
               }
             } else { // Or get resulados per GP
+              if (VALID_GP.contains(previous)) {
+//                i++;
+                grupos.put(previous, text);
+                i++;
+                var presentes = Integer.parseInt(lines.get(i).replace(".",""));
+                i++;
+                var ausentes = Integer.parseInt(lines.get(i).replace(".",""));
+                i++;
+                var licencias = Integer.parseInt(lines.get(i).replace(".",""));
+                i++;
+                var suspendidos = Integer.parseInt(lines.get(i).replace(".",""));
+                i++;
+                var otros = Integer.parseInt(lines.get(i).replace(".",""));
+                resultadosGrupos.put(
+                        new GrupoParlamentario(text, grupos.get(text)),
+                        ResultadoAsistencia.create(
+                                presentes,
+                                ausentes,
+                                licencias,
+                                suspendidos,
+                                otros
+                        )
+                );
+                previous = "";
+              } else
               if (VALID_GP.contains(text)) {
                 i++;
                 grupos.put(text, lines.get(i));
                 i++;
-                var presentes = Integer.parseInt(lines.get(i));
+                var presentes = Integer.parseInt(lines.get(i).replace(".",""));
                 i++;
-                var ausentes = Integer.parseInt(lines.get(i));
+                var ausentes = Integer.parseInt(lines.get(i).replace(".",""));
                 i++;
-                var licencias = Integer.parseInt(lines.get(i));
+                var licencias = Integer.parseInt(lines.get(i).replace(".",""));
                 i++;
-                var suspendidos = Integer.parseInt(lines.get(i));
+                var suspendidos = Integer.parseInt(lines.get(i).replace(".",""));
                 i++;
-                var otros = Integer.parseInt(lines.get(i));
+                var otros = Integer.parseInt(lines.get(i).replace(".",""));
                 resultadosGrupos.put(
                         new GrupoParlamentario(text, grupos.get(text)),
                         ResultadoAsistencia.create(
@@ -257,5 +305,27 @@ public class TextractAsistencia {
             .withResultadosPorPartido(resultadosGrupos)
             .withResultados(resultadosBuilder.build())
             .build();
+  }
+
+  static List<String> clean(List<String> list) {
+    return list
+            .stream()
+            .map(s ->
+                    s.replace("+++ ", "")
+                            .replace("+++", "")
+                            .replace(" +++", "")
+                            .replace("***", "")
+                            .replace("NO---", "NO")
+                            .replace("NO-", "NO")
+                            .trim()
+            )
+            .flatMap(s -> {
+              var ss = s.split(" ");
+              if (ss.length > 1 && Asistencia.is(ss[0])) {
+                return Stream.of(ss[0], s.substring(s.indexOf(" ") + 1));
+              } else return Stream.of(s);
+            })
+            .filter(s -> !s.isBlank())
+            .toList();
   }
 }

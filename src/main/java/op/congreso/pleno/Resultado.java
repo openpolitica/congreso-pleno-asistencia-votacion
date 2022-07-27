@@ -1,6 +1,8 @@
 package op.congreso.pleno;
 
+import java.util.List;
+
 public interface Resultado {
-  String codigo();
+  List<String> codigos();
   String descripcion();
 }
