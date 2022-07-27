@@ -341,7 +341,7 @@ public class CargaAsistenciaPlenos implements Consumer<AsistenciaPlenos> {
         if (a.resultado() == null) throw new RuntimeException(
           "Error with " + a + " at " + r.pleno() + " @ " + r.hora()
         );
-        ps.setString(11, a.resultado().codigo());
+        ps.setString(11, a.resultado().name());
         ps.setString(12, a.resultado().descripcion());
 
         ps.addBatch();

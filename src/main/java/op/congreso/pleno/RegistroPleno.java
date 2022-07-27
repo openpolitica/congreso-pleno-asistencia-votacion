@@ -1,185 +1,65 @@
 package op.congreso.pleno;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.regex.Pattern;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.jsoup.Jsoup;
+import java.util.ArrayList;
+import java.util.List;
+import op.congreso.pleno.asistencia.RegistroAsistencia;
+import op.congreso.pleno.votacion.RegistroVotacion;
 
 public record RegistroPleno(
-  String periodoParlamentario,
-  String periodoAnual,
-  String legislatura,
-  String fecha,
-  String titulo,
-  String url,
-  String filename,
-  int paginas
+        String periodoParlamentario,
+        String periodoAnual,
+        String legislatura,
+        LocalDate fecha,
+        String titulo,
+
+        List<RegistroAsistencia> asistencias,
+        List<RegistroVotacion> votaciones,
+        int potentialErrors,
+        List<String> comments
 ) {
-  public static StringBuilder csvHeader() {
-    return new StringBuilder(
-      "periodo_parlamentario,periodo_anual,legislatura," +
-      "fecha,titulo,url,filename,paginas\n"
-    );
-  }
-
-  public String csvEntry() {
-    return "%s,%s,%s,%s,\"%s\",%s,%s,%s%n".formatted(
-        periodoParlamentario,
-        periodoAnual,
-        legislatura,
-        fecha,
-        titulo,
-        url,
-        filename,
-        paginas
-      );
-  }
-  String directory() {
-    return (
-      "target/pdf/" +
-      periodoParlamentario +
-      "/" +
-      periodoAnual +
-      "/" +
-      legislatura
-    );
-  }
-
-  String path() {
-    return directory() + "/" + filename;
-  }
-
-  public RegistroPleno withPaginas() {
-    return new RegistroPleno(
-      periodoParlamentario,
-      periodoAnual,
-      legislatura,
-      fecha,
-      titulo,
-      url,
-      filename,
-      countPages()
-    );
-  }
-
-  public String id() {
-    return "%s:%s".formatted(fecha, titulo);
-  }
-
-  int countPages() {
-    try (PDDocument doc = PDDocument.load(Path.of(path()).toFile())) {
-      return doc.getNumberOfPages();
-    } catch (Exception | NoClassDefFoundError e) {
-      System.out.println("ERROR with path: " + path());
-      e.printStackTrace();
-      return -1;
+    public static Builder newBuilder(RegistroPlenoDocument document) {
+        return new Builder(document);
     }
-  }
 
-  public void download() {
-    try {
-      var dir = Path.of(directory());
-      if (!Files.isDirectory(dir)) Files.createDirectories(dir);
-      ReadableByteChannel readableByteChannel = Channels.newChannel(
-        new URL(url()).openStream()
-      );
-      try (var fileOutputStream = new FileOutputStream(path())) {
-        fileOutputStream
-          .getChannel()
-          .transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
-      }
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
+    public static class Builder {
+        final String periodoParlamentario;
+        final String periodoAnual;
+        final String legislatura;
+        final LocalDate fecha;
+        final String titulo;
+        List<RegistroAsistencia> asistencias = new ArrayList<>();
+        List<RegistroVotacion> votaciones = new ArrayList<>();
+        int potentialErrors = 0;
+        List<String> comments = new ArrayList<>();
 
-  public static final String BASE_URL = "https://www2.congreso.gob.pe";
-
-  public static Map<String, String> collect(String url, int colspan)
-    throws IOException {
-    var root = new LinkedHashMap<String, String>();
-    {
-      var jsoup = Jsoup.connect(BASE_URL + url);
-      var doc = jsoup.get();
-      var main = doc.body().select("table[cellpadding=2]").first();
-
-      assert main != null;
-      for (var td : main.select("td[colspan=%s]".formatted(colspan))) {
-        var table = td.child(0).selectFirst("table");
-        assert table != null;
-        var tds = table.select("td");
-        if (tds.size() == 2) {
-          var a = tds.get(0).selectFirst("a");
-          assert a != null;
-          var href = a.attr("href");
-          var periodo = tds.get(1).text();
-          root.put(periodo, href);
+        public Builder(RegistroPlenoDocument document) {
+            this.periodoParlamentario = document.periodoParlamentario();
+            this.periodoAnual = document.periodoAnual();
+            this.legislatura = document.legislatura();
+            this.titulo = document.titulo();
+            this.fecha = LocalDate.parse(document.fecha(), DateTimeFormatter.ISO_LOCAL_DATE);
         }
-      }
-      return root;
-    }
-  }
 
-  private static final Pattern p = Pattern.compile(
-    "javascript:openWindow\\('(.+)'\\)"
-  );
-
-  public static Map<String, RegistroPleno> collectPleno(
-    String pp,
-    String pa,
-    String l,
-    String url
-  ) throws IOException {
-    var root = new LinkedHashMap<String, RegistroPleno>();
-    {
-      var jsoup = Jsoup.connect(BASE_URL + url);
-      var doc = jsoup.get();
-      var main = doc.body().select("table[cellpadding=2]").first();
-      assert main != null;
-      var trs = main.select("tr[valign=top]");
-      for (var tr : trs) {
-        if (tr.children().size() == 6) {
-          var fonts = tr.select("font[size=4]");
-          var fecha = fonts.get(0).text();
-          var date = LocalDate
-            .parse(fecha, DateTimeFormatter.ofPattern("MM/dd/yyyy"))
-            .format(DateTimeFormatter.ISO_LOCAL_DATE);
-          var second = fonts.get(2).children().first();
-          assert second != null;
-          var titulo = second.text();
-          var href = fonts.get(2).select("a").attr("href");
-          var matcher = p.matcher(href);
-          if (matcher.find()) {
-            var u = matcher.group(1);
-            var fullUrl =
-              BASE_URL + "/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/" + u;
-            root.put(
-              titulo,
-              new RegistroPleno(
-                pp,
-                pa,
-                l,
-                date,
-                titulo,
-                fullUrl,
-                fullUrl.split("/")[9],
-                0
-              )
-            );
-          }
+        public Builder(String periodoParlamentario, String periodoAnual, String legislatura, LocalDate fecha, String titulo) {
+            this.periodoParlamentario = periodoParlamentario;
+            this.periodoAnual = periodoAnual;
+            this.legislatura = legislatura;
+            this.fecha = fecha;
+            this.titulo = titulo;
         }
-      }
-      return root;
+
+        public void addAsistencia(RegistroAsistencia asistencia) {
+            asistencias.add(asistencia);
+        }
+
+        public void addVotacion(RegistroVotacion votacion) {
+            votaciones.add(votacion);
+        }
+
+        public RegistroPleno build() {
+            return new RegistroPleno(periodoParlamentario, periodoAnual, legislatura, fecha, titulo, asistencias, votaciones, potentialErrors, comments);
+        }
     }
-  }
 }

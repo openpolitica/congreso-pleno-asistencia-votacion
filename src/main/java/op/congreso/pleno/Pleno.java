@@ -52,8 +52,9 @@ public record Pleno(
       this.fecha = fecha;
     }
 
-    public void withQuorum(int quorum) {
+    public Builder withQuorum(int quorum) {
       this.quorum = quorum;
+      return this;
     }
 
     public Builder withGruposParlamentarios(Map<String, String> grupos) {

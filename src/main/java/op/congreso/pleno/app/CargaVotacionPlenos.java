@@ -353,7 +353,7 @@ public class CargaVotacionPlenos implements Consumer<VotacionPlenos> {
         ps.setString(12, a.grupoParlamentario());
         ps.setString(13, r.pleno().gruposParlamentarios().get(a.grupoParlamentario()));
 
-        ps.setString(14, a.resultado().codigo());
+        ps.setString(14, a.resultado().name());
         ps.setString(15, a.resultado().descripcion());
 
         ps.addBatch();

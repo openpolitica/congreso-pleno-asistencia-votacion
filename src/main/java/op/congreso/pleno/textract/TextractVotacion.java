@@ -11,9 +11,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import op.congreso.pleno.GrupoParlamentario;
 import op.congreso.pleno.Pleno;
 import op.congreso.pleno.ResultadoCongresista;
+import op.congreso.pleno.asistencia.Asistencia;
 import op.congreso.pleno.votacion.RegistroVotacion;
 import op.congreso.pleno.votacion.ResultadoVotacion;
 import op.congreso.pleno.votacion.Votacion;
@@ -24,9 +26,9 @@ public class TextractVotacion {
 
     public static void main(String[] args) throws IOException {
         try {
-            var lines = Files.readAllLines(Path.of("output-votacion.txt"));
+            var lines = Files.readAllLines(Path.of("./out/Asis_vot_OFICIAL_07-07-22/page_16.txt"));
 
-            var registro = load(lines);
+            var registro = load(65, clean(lines));
 
             System.out.println(" registry:\n" + registro);
         } catch (IOException e) {
@@ -34,9 +36,14 @@ public class TextractVotacion {
         }
     }
 
-    static RegistroVotacion load(List<String> lines) {
+    static RegistroVotacion load(int quorum, List<String> lines) {
+        lines = lines.stream()
+                .map(s -> s.replace(" +++", ""))
+                .map(s -> s.replace("+++ ", ""))
+                .toList();
+
         var registroBuilder = RegistroVotacion.newBuilder();
-        var plenoBuilder = Pleno.newBuilder();
+        var plenoBuilder = Pleno.newBuilder().withQuorum(quorum);
         var resultadosBuilder = ResultadoVotacion.newBuilder();
         var resultados = new ArrayList<ResultadoCongresista<Votacion>>();
         var grupos = new HashMap<String, String>();
@@ -117,6 +124,13 @@ public class TextractVotacion {
                     var maybeVotacion = congresista.substring(
                             congresista.lastIndexOf(" ") + 1
                     ); // check if maybe contains votacion at the end
+                    if (maybeVotacion.equals("+++") || maybeVotacion.equals("-")) {
+                        congresista =
+                                congresista.substring(0, congresista.lastIndexOf(" ")); // get congresista
+                        maybeVotacion = congresista.substring(
+                                congresista.lastIndexOf(" ") + 1
+                        );
+                    }
                     if (Votacion.is(maybeVotacion)) { // if it does
                         congresista =
                                 congresista.substring(0, congresista.lastIndexOf(" ")); // get congresista
@@ -166,18 +180,26 @@ public class TextractVotacion {
                         }
                     }
                 } else if (VALID_GP.contains(lines.get(i).trim())) { // GP found, process next line
+                    var gp = lines.get(i).trim();
                     i++;
                     var congresista = lines.get(i); // get congresista
                     var maybeVotacion = congresista.substring(
                             congresista.lastIndexOf(" ") + 1
                     );
+                    if (maybeVotacion.equals("+++") || maybeVotacion.equals("-")) {
+                        congresista =
+                                congresista.substring(0, congresista.lastIndexOf(" ")); // get congresista
+                        maybeVotacion = congresista.substring(
+                                congresista.lastIndexOf(" ") + 1
+                        );
+                    }
                     if (Votacion.is(maybeVotacion)) { // if votacion included
                         congresista =
                                 congresista.substring(0, congresista.lastIndexOf(" ")); // extract congresista
                         // and add resultado
                         resultados.add(
                                 new ResultadoCongresista<>(
-                                        lines.get(i),
+                                        gp,
                                         congresista.substring(0, congresista.lastIndexOf(" ")),
                                         Votacion.of(maybeVotacion)
                                 )
@@ -200,7 +222,7 @@ public class TextractVotacion {
                             }
                             resultados.add(
                                     new ResultadoCongresista<>(
-                                            lines.get(i),
+                                            gp,
                                             congresista,
                                             Votacion.of(votacionWords[0])
                                     )
@@ -231,7 +253,7 @@ public class TextractVotacion {
                         resultados.add(
                                 new ResultadoCongresista<>(
                                         gp,
-                                        congresista.substring(0, congresista.lastIndexOf(" ")),
+                                        congresista,
                                         Votacion.of(maybeVotacion)
                                 )
                         );
@@ -253,7 +275,7 @@ public class TextractVotacion {
                             }
                             resultados.add(
                                     new ResultadoCongresista<>(
-                                            lines.get(i),
+                                            gp,
                                             congresista,
                                             Votacion.of(votacionWords[0])
                                     )
@@ -298,53 +320,65 @@ public class TextractVotacion {
                     }
                 } else {
                     if (headersReady) { // once resultado headers are ready
-                        if (Votacion.is(lines.get(i))) {
+                        var votacion = lines.get(i);
+                        if (Votacion.is(votacion)) {
                             i++;
-                            var asistencia = lines.get(i);
+                            var votacionTotal = lines.get(i);
                             resultadosBuilder.with(
-                                    Votacion.of(lines.get(i)),
-                                    Integer.parseInt(asistencia)
+                                    Votacion.of(votacion),
+                                    Integer.parseInt(votacionTotal)
                             );
                         } else if (
                                 lines.get(i).contains("(") && lines.get(i).contains(")")
                         ) {
-                            var matcher = VOTACION_GROUP.matcher(
-                                    lines.get(i).substring(lines.get(i).lastIndexOf("("))
-                            );
-                            if (matcher.find()) {
-                                var asis = matcher.group();
-                                i++;
-                                var result = lines.get(i);
-                                resultadosBuilder.with(
-                                        Votacion.of(asis),
-                                        Integer.parseInt(result)
+                            try {
+                                var matcher = VOTACION_GROUP.matcher(
+                                        lines.get(i).substring(lines.get(i).lastIndexOf("("))
                                 );
+                                if (matcher.find()) {
+                                    var asis = matcher.group();
+                                    i++;
+                                    var result = lines.get(i);
+                                    resultadosBuilder.with(
+                                            Votacion.of(asis),
+                                            Integer.parseInt(result)
+                                    );
+                                }
+                            } catch (Exception e) {
+                                System.out.println("Error processing total: " + lines.get(i));
+                                e.printStackTrace();
                             }
                         } else {
-                            if (VALID_GP.contains(lines.get(i))) {
+                            var gp = lines.get(i);
+                            if (VALID_GP.contains(gp)) {
                                 i++;
-                                grupos.put(lines.get(i), lines.get(i));
-                                i++;
-                                String s = lines.get(i);
+                                grupos.put(lines.get(i), gp);
                                 try {
-                                    Integer.parseInt(s);
-                                } catch (NumberFormatException e) {
                                     i++;
+                                    var s = lines.get(i);
+                                    try {
+                                        Integer.parseInt(s);
+                                    } catch (NumberFormatException e) {
+                                        i++;
+                                    }
+                                    var si = Integer.parseInt(lines.get(i));
+                                    i++;
+                                    var no = Integer.parseInt(lines.get(i));
+                                    i++;
+                                    var abst = Integer.parseInt(lines.get(i));
+                                    i++;
+                                    var sinResp = Integer.parseInt(lines.get(i));
+                                    resultadosGrupos.put(
+                                            new GrupoParlamentario(
+                                                    lines.get(i),
+                                                    grupos.get(lines.get(i))
+                                            ),
+                                            ResultadoVotacion.create(si, no, abst, sinResp)
+                                    );
+                                } catch (Exception e) {
+                                    System.out.println("Error processing group results: " + gp);
+                                    e.printStackTrace();
                                 }
-                                var si = Integer.parseInt(lines.get(i));
-                                i++;
-                                var no = Integer.parseInt(lines.get(i));
-                                i++;
-                                var abst = Integer.parseInt(lines.get(i));
-                                i++;
-                                var sinResp = Integer.parseInt(lines.get(i));
-                                resultadosGrupos.put(
-                                        new GrupoParlamentario(
-                                                lines.get(i),
-                                                grupos.get(lines.get(i))
-                                        ),
-                                        ResultadoVotacion.create(si, no, abst, sinResp)
-                                );
                             } else if (
                                     !lines.get(i).isBlank() && lines.get(i).contains(" ")
                             ) {
@@ -390,5 +424,27 @@ public class TextractVotacion {
                 .withResultadosPorPartido(resultadosGrupos)
                 .withResultados(resultadosBuilder.build())
                 .build();
+    }
+
+    static List<String> clean(List<String> list) {
+        return list
+                .stream()
+                .map(s ->
+                        s.replace("+++ ", "")
+                                .replace("+++", "")
+                                .replace(" +++", "")
+                                .replace("***", "")
+                                .replace("NO---", "NO")
+                                .replace("NO-", "NO")
+                                .trim()
+                )
+                .flatMap(s -> {
+                    var ss = s.split(" ");
+                    if (ss.length > 1 && Votacion.is(ss[0])) {
+                        return Stream.of(ss[0], s.substring(s.indexOf(" ") + 1));
+                    } else return Stream.of(s);
+                })
+                .filter(s -> !s.isBlank())
+                .toList();
     }
 }
