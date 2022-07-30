@@ -4,8 +4,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import op.congreso.pleno.GrupoParlamentario;
 import op.congreso.pleno.Pleno;
 import op.congreso.pleno.ResultadoCongresista;
@@ -20,6 +22,15 @@ public record RegistroAsistencia(
 ) {
   public static Builder newBuilder() {
     return new Builder();
+  }
+
+  public String printAsistenciasAsCsv() {
+    // ignore numero column
+    return "grupo_parlamentario,congresista,asistencia\n" +
+            asistencias.stream()
+                    .sorted(Comparator.comparing(ResultadoCongresista::congresista))
+                    .map(a -> a.grupoParlamentario() + ",\"" + a.congresista() + "\"," + a.resultado().name())
+                    .collect(Collectors.joining("\n"));
   }
 
   public static class Builder {

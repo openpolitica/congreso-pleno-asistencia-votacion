@@ -13,9 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sqlite.SQLiteException;
 
-public class CargaAsistenciaPlenos implements Consumer<AsistenciaPlenos> {
+public class LoadAsistenciaPlenos implements Consumer<AsistenciaPlenos> {
 
-  static final Logger LOG = LoggerFactory.getLogger(CargaAsistenciaPlenos.class);
+  static final Logger LOG = LoggerFactory.getLogger(LoadAsistenciaPlenos.class);
 
   public static final String YYYY_MM_DD = "yyyy-MM-dd";
   public static final String HH_MM = "HH:mm";
