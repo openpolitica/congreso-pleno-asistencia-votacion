@@ -4,9 +4,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import op.congreso.pleno.GrupoParlamentario;
 import op.congreso.pleno.Pleno;
 import op.congreso.pleno.ResultadoCongresista;
@@ -24,6 +26,53 @@ public record RegistroVotacion(
 ) {
   public static Builder newBuilder() {
     return new Builder();
+  }
+
+  public String printMetadatosAsCsv() {
+    //
+    //asunto,"MOCIÓN 1486, QUE PROPONE LA CENSURA AL MINISTRO DE EDUCACIÓN, SEÑOR CARLOS ALFONSO GALLARDO GÓMEZ."
+    //presidente,"ALVA PRIETO, MARÍA DEL CARMEN"
+    return "metadato,valor\n" +
+            "dia," + fechaHora.format(DateTimeFormatter.ISO_LOCAL_DATE) + "\n" +
+            "hora," + fechaHora.format(DateTimeFormatter.ofPattern("HH:mm")) + "\n" +
+            "asunto,\"" + asunto.replace("\"","'") + "\"\n" +
+            "presidente,\"" + presidente + "\"\n" +
+            "quorum," + quorum;
+  }
+
+  public String printVotacionesAsCsv() {
+    // ignore numero column
+    return "grupo_parlamentario,congresista,asistencia\n" +
+            votaciones.stream()
+                    .sorted(Comparator.comparing(ResultadoCongresista::congresista))
+                    .map(a -> a.grupoParlamentario() + ",\"" + a.congresista() + "\"," + a.resultado().name())
+                    .collect(Collectors.joining("\n"));
+  }
+
+  public String printResultadosPorGrupoAsCsv() {
+    return "por_partido,numero_legal,si,no,abstenciones,sin_responder\n" +
+            resultadosPorGrupo.keySet().stream()
+                    .map(k -> k + ","
+                            + resultadosPorGrupo.get(k).total() + ","
+                            + resultadosPorGrupo.get(k).si() + ","
+                            + resultadosPorGrupo.get(k).no() + ","
+                            + resultadosPorGrupo.get(k).abstenciones() + ","
+                            + resultadosPorGrupo.get(k).sinResponder() + "\n"
+                    )
+                    .collect(Collectors.joining("\n"));
+  }
+
+  public String printResultadosAsCsv() {
+    return "resultado,total\n" +
+            "numero_legal," + resultados.total() + "\n" +
+            "si," + resultados.si() + "\n" +
+            "no," + resultados.no() + "\n" +
+            "abstenciones," + resultados.abstenciones() + "\n" +
+            "sin_responder," + resultados.sinResponder() // + "\n" +
+//            "ausentes," + resultados.ausentes() + "\n" +
+//            "sin_responder," + resultados.sinResponder() + "\n" +
+//            "otros," + resultados.otros()
+            ;
   }
 
   public static class Builder {

@@ -44,6 +44,8 @@ public class LoadDetallePlenos {
           .flatMap(this::paths) // fecha
           .flatMap(this::paths) // asistencia/votacion
           .collect(Collectors.toSet());
+        //TODO load pleno
+        //TODO load grupos
         var asistencias = paths
           .stream()
           .filter(s -> s.toString().endsWith("-asistencia"))
@@ -355,7 +357,7 @@ public class LoadDetallePlenos {
       var t = new HashMap<String, Integer>();
       while (it.hasNext()) {
         var v = it.next();
-        t.put(v.get("asistencia"), Integer.parseInt(v.get("total")));
+        t.put(v.get("resultado"), Integer.parseInt(v.get("total")));
       }
       return new ResultadoAsistencia(
         t.get("presentes"),
@@ -379,7 +381,7 @@ public class LoadDetallePlenos {
       var t = new HashMap<String, Integer>();
       while (it.hasNext()) {
         var v = it.next();
-        t.put(v.get("asistencia"), Integer.parseInt(v.get("total")));
+        t.put(v.get("resultado"), Integer.parseInt(v.get("total")));
       }
       return new ResultadoVotacion(
         t.get("si"),
