@@ -8,7 +8,7 @@ import op.congreso.pleno.Resultado;
 public enum Votacion implements Resultado {
   SI(List.of("SI+++", "SI"), "SI"),
   NO(List.of("NO-", "NO"), "NO"),
-  ABSTENCION(List.of("ABST."), "ABSTENCION"),
+  ABSTENCION(List.of("ABST.", "ABST"), "ABSTENCION"),
   AUSENTE(List.of("AUS"), "AUSENTE"),
   LICENCIA_OFICIAL(List.of("LO"), "LICENCIA OFICIAL"),
   LICENCIA_POR_ENFERMEDAD(List.of("LE"), "LICENCIA POR ENFERMEDAD"),
@@ -41,7 +41,11 @@ public enum Votacion implements Resultado {
   }
 
   public static Votacion of(String asistencia) {
-    return map.get(asistencia.toUpperCase());
+    Votacion votacion = map.get(asistencia.toUpperCase());
+    if (votacion == null) {
+      System.out.println(asistencia + " is null");
+    }
+    return votacion;
   }
 
   public static boolean is(String text) {

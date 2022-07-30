@@ -34,18 +34,26 @@ public record Pleno(
     LocalDate fecha;
     Map<String, String> gruposParlamentarios;
 
-    public void withLegislatura(String legislatura) {
+    public Builder withLegislatura(String legislatura) {
       this.legislatura = legislatura;
       var m = periodo.matcher(legislatura);
       if (m.find()) this.periodoAnual = m.group();
+      return this;
     }
 
-    public void withTitulo(String titulo) {
+    public Builder withPeriodoAnual(String periodoAnual) {
+      this.periodoAnual = periodoAnual;
+      return this;
+    }
+
+    public Builder withTitulo(String titulo) {
       this.titulo = titulo;
+      return this;
     }
 
-    public void withFecha(LocalDate fecha) {
+    public Builder withFecha(LocalDate fecha) {
       this.fecha = fecha;
+      return this;
     }
 
     public Builder withGruposParlamentarios(Map<String, String> grupos) {
@@ -54,7 +62,17 @@ public record Pleno(
     }
 
     public Pleno build() {
-      return new Pleno("2021-2026", periodoAnual, legislatura, titulo, fecha, url, gruposParlamentarios);
+      return new Pleno(periodoParlamentario, periodoAnual, legislatura, titulo, fecha, url, gruposParlamentarios);
+    }
+
+    public Builder withPeriodoParlamentario(String periodoParlamentario) {
+      this.periodoParlamentario = periodoParlamentario;
+      return this;
+    }
+
+    public Builder withUrl(String url) {
+      this.url = url;
+      return this;
     }
   }
 }

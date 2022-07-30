@@ -1,34 +1,33 @@
 package op.congreso.pleno.app;
 
-import java.io.IOException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.function.Consumer;
-import op.congreso.pleno.AsistenciaPlenos;
-import op.congreso.pleno.asistencia.RegistroAsistencia;
+import op.congreso.pleno.VotacionPlenos;
+import op.congreso.pleno.votacion.RegistroVotacion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sqlite.SQLiteException;
 
-public class LoadAsistenciaPlenos implements Consumer<AsistenciaPlenos> {
+public class SaveVotacionPlenos implements Consumer<VotacionPlenos> {
 
-  static final Logger LOG = LoggerFactory.getLogger(LoadAsistenciaPlenos.class);
+  static final Logger LOG = LoggerFactory.getLogger(SaveVotacionPlenos.class);
+  static final ObjectMapper jsonMapper = new ObjectMapper();
 
   public static final String YYYY_MM_DD = "yyyy-MM-dd";
   public static final String HH_MM = "HH:mm";
 
   static List<TableLoad> tableLoadList = List.of(
-    new AsistenciaCongresistaLoad(),
-    new AsistenciaGrupoParlamentarioLoad(),
-    new AsistenciaResultadoLoad()
+    new VotacionCongresistaLoad(),
+    new VotacionGrupoParlamentarioLoad(),
+    new VotacionResultadoLoad()
   );
 
   @Override
-  public void accept(AsistenciaPlenos asistenciaPlenos) {
-    var jdbcUrl = "jdbc:sqlite:%s-asistencias-votaciones.db".formatted(asistenciaPlenos.periodo());
+  public void accept(VotacionPlenos votacionPlenos) {
+    var jdbcUrl = "jdbc:sqlite:%s-asistencias-votaciones.db".formatted(votacionPlenos.periodo());
     try (var connection = DriverManager.getConnection(jdbcUrl)) {
       var statement = connection.createStatement();
       statement.executeUpdate("pragma journal_mode = WAL");
@@ -39,7 +38,6 @@ public class LoadAsistenciaPlenos implements Consumer<AsistenciaPlenos> {
 
       for (var tableLoad : tableLoadList) {
         LOG.info("Loading {}", tableLoad.tableName);
-        statement.executeUpdate(tableLoad.dropTableStatement());
         statement.executeUpdate(tableLoad.createTableStatement());
         for (String s : tableLoad.createIndexesStatement()) {
           statement.executeUpdate(s);
@@ -49,7 +47,7 @@ public class LoadAsistenciaPlenos implements Consumer<AsistenciaPlenos> {
         var ps = connection.prepareStatement(tableLoad.prepareStatement());
         LOG.info("Statement for {} prepared", tableLoad.tableName);
 
-        for (var m : asistenciaPlenos.registros()) {
+        for (var m : votacionPlenos.registros()) {
           tableLoad.addBatch(ps, m);
         }
 
@@ -59,11 +57,8 @@ public class LoadAsistenciaPlenos implements Consumer<AsistenciaPlenos> {
       }
       statement.executeUpdate("pragma vacuum;");
       statement.executeUpdate("pragma optimize;");
-    } catch (Exception e) {
-      if (e instanceof SQLiteException) {
-        e.printStackTrace();
-      }
-      e.printStackTrace();
+    } catch (Exception throwables) {
+      throwables.printStackTrace();
     }
   }
 
@@ -75,46 +70,45 @@ public class LoadAsistenciaPlenos implements Consumer<AsistenciaPlenos> {
       this.tableName = tableName;
     }
 
-    String dropTableStatement() {
-      return "drop table if exists %s".formatted(tableName);
-    }
-
     abstract String createTableStatement();
 
     abstract List<String> createIndexesStatement();
 
     String index(String field) {
-      return "CREATE INDEX %s_%s ON %s(\"%s\");\n".formatted(tableName, field, tableName, field);
+      return "CREATE INDEX IF NOT EXISTS %s_%s ON %s(\"%s\");\n".formatted(tableName, field, tableName, field);
     }
 
     abstract String prepareStatement();
 
-    abstract void addBatch(PreparedStatement ps, RegistroAsistencia pl) throws SQLException, IOException;
+    abstract void addBatch(PreparedStatement ps, RegistroVotacion pl) throws Exception;
   }
 
-  static class AsistenciaResultadoLoad extends TableLoad {
+  static class VotacionResultadoLoad extends TableLoad {
 
-    public AsistenciaResultadoLoad() {
-      super("asistencia_resultado");
+    public VotacionResultadoLoad() {
+      super("votacion_resultado");
     }
 
     @Override
     String createTableStatement() {
       return """
-          create table %s (
+          create table if not exists %s (
             pleno_id text not null,
             periodo_parlamentario text not null,
             periodo_anual text not null,
             legislatura text not null,
             fecha text not null,
             hora text not null,
-            pleno_titulo text not null,
+            
+            asunto text not null,
+            presidente text not null,
+            etiquetas text not null,
             
             quorum integer not null,
-            presentes integer not null,
-            ausentes integer not null,
-            licencias integer not null,
-            otros integer not null,
+            si integer not null,
+            no integer not null,
+            abstenciones integer not null,
+            sin_responder integer not null,
             total integer not null
           )
           """.formatted(
@@ -131,8 +125,8 @@ public class LoadAsistenciaPlenos implements Consumer<AsistenciaPlenos> {
     String prepareStatement() {
       return """
           insert into %s values (
-            ?, ?, ?, ?, ?, ?, ?,
-            ?, ?, ?, ?, ?, ?
+            ?, ?, ?, ?, ?, ?, ?, ?,
+            ?, ?, ?, ?, ?, ?, ?
           )
           """.formatted(
           tableName
@@ -140,50 +134,56 @@ public class LoadAsistenciaPlenos implements Consumer<AsistenciaPlenos> {
     }
 
     @Override
-    void addBatch(PreparedStatement ps, RegistroAsistencia r) throws SQLException {
+    void addBatch(PreparedStatement ps, RegistroVotacion r) throws Exception {
       ps.setString(1, r.pleno().id());
       ps.setString(2, r.pleno().periodoParlamentario());
       ps.setString(3, r.pleno().periodoAnual());
       ps.setString(4, r.pleno().legislatura());
       ps.setString(5, r.pleno().fecha().format(DateTimeFormatter.ofPattern(YYYY_MM_DD)));
-      ps.setString(6, r.fechaHora().toLocalTime().format(DateTimeFormatter.ofPattern(HH_MM)));
-//      ps.setString(7, r.pleno().titulo()); //TODO
+      ps.setString(6, r.fechaHora().format(DateTimeFormatter.ofPattern(HH_MM)));
 
-      ps.setInt(8, r.quorum());
-      ps.setInt(9, r.resultados().presentes());
-      ps.setInt(10, r.resultados().ausentes());
-      ps.setInt(11, r.resultados().licencias());
-      ps.setInt(12, r.resultados().otros());
-      ps.setInt(13, r.resultados().total());
+      ps.setString(7, r.asunto());
+      ps.setString(8, r.presidente());
+      ps.setString(9, jsonMapper.writeValueAsString(r.etiquetas()));
+
+      ps.setInt(10, r.quorum());
+      ps.setInt(11, r.resultados().si());
+      ps.setInt(12, r.resultados().no());
+      ps.setInt(13, r.resultados().abstenciones());
+      ps.setInt(14, r.resultados().sinResponder());
+      ps.setInt(15, r.resultados().total());
 
       ps.addBatch();
     }
   }
 
-  static class AsistenciaGrupoParlamentarioLoad extends TableLoad {
+  static class VotacionGrupoParlamentarioLoad extends TableLoad {
 
-    public AsistenciaGrupoParlamentarioLoad() {
-      super("asistencia_grupo_parlamentario");
+    public VotacionGrupoParlamentarioLoad() {
+      super("votacion_grupo_parlamentario");
     }
 
     @Override
     String createTableStatement() {
       return """
-          create table %s (
+          create table if not exists %s (
             pleno_id text not null,
             periodo_parlamentario text not null,
             periodo_anual text not null,
             legislatura text not null,
             fecha text not null,
             hora text not null,
-            pleno_titulo text not null,
+            asunto text not null,
+            presidente text not null,
+            etiquetas text not null,
             
             grupo_parlamentario text not null,
             grupo_parlamentario_descripcion text not null,
-            presentes integer not null,
-            ausentes integer not null,
-            licencias integer not null,
-            otros integer not null,
+          
+            si integer not null,
+            no integer not null,
+            abstenciones integer not null,
+            sin_responder integer not null,
             total integer not null
           )
           """.formatted(
@@ -205,6 +205,51 @@ public class LoadAsistenciaPlenos implements Consumer<AsistenciaPlenos> {
     String prepareStatement() {
       return """
           insert into %s values (
+            ?, ?, ?, ?, ?, ?, ?, ?,
+            ?, ?, ?, ?, ?, ?, ?, ?
+          )
+          """.formatted(
+          tableName
+        );
+    }
+
+    @Override
+    void addBatch(PreparedStatement ps, RegistroVotacion r) throws Exception {
+      for (var a : r.resultadosPorGrupo().entrySet()) {
+        ps.setString(1, r.pleno().id());
+        ps.setString(2, r.pleno().periodoParlamentario());
+        ps.setString(3, r.pleno().periodoAnual());
+        ps.setString(4, r.pleno().legislatura());
+        ps.setString(5, r.pleno().fecha().format(DateTimeFormatter.ofPattern(YYYY_MM_DD)));
+        ps.setString(6, r.fechaHora().format(DateTimeFormatter.ofPattern(HH_MM)));
+        ps.setString(7, r.asunto());
+        ps.setString(8, r.presidente());
+        ps.setString(9, jsonMapper.writeValueAsString(r.etiquetas()));
+
+        ps.setString(10, a.getKey().nombre());
+        ps.setString(11, a.getKey().descripcion());
+
+        ps.setInt(12, a.getValue().si());
+        ps.setInt(13, a.getValue().no());
+        ps.setInt(14, a.getValue().abstenciones());
+        ps.setInt(15, a.getValue().sinResponder());
+        ps.setInt(16, a.getValue().total());
+
+        ps.addBatch();
+      }
+    }
+  }
+
+  static class VotacionCongresistaLoad extends TableLoad {
+
+    public VotacionCongresistaLoad() {
+      super("votacion_congresista");
+    }
+
+    @Override
+    String prepareStatement() {
+      return """
+          insert into %s values (
             ?, ?, ?, ?, ?, ?, ?,
             ?, ?, ?, ?, ?, ?, ?
           )
@@ -214,58 +259,18 @@ public class LoadAsistenciaPlenos implements Consumer<AsistenciaPlenos> {
     }
 
     @Override
-    void addBatch(PreparedStatement ps, RegistroAsistencia r) throws SQLException {
-      for (var a : r.resultadosPorGrupo().entrySet()) {
-        ps.setString(1, r.pleno().id());
-        ps.setString(2, r.pleno().periodoParlamentario());
-        ps.setString(3, r.pleno().periodoAnual());
-        ps.setString(4, r.pleno().legislatura());
-        ps.setString(5, r.pleno().fecha().format(DateTimeFormatter.ofPattern(YYYY_MM_DD)));
-        ps.setString(6, r.fechaHora().toLocalTime().format(DateTimeFormatter.ofPattern(HH_MM)));
-//        ps.setString(7, r.pleno().titulo()); //fixme
-
-        ps.setString(8, a.getKey().nombre());
-        ps.setString(9, a.getKey().descripcion());
-        ps.setInt(10, a.getValue().presentes());
-        ps.setInt(11, a.getValue().ausentes());
-        ps.setInt(12, a.getValue().licencias());
-        ps.setInt(13, a.getValue().otros());
-        ps.setInt(14, a.getValue().total());
-
-        ps.addBatch();
-      }
-    }
-  }
-
-  static class AsistenciaCongresistaLoad extends TableLoad {
-
-    public AsistenciaCongresistaLoad() {
-      super("asistencia_congresista");
-    }
-
-    @Override
-    String prepareStatement() {
-      return """
-          insert into %s values (
-            ?, ?, ?, ?, ?, ?,
-            ?, ?, ?, ?, ?, ?
-          )
-          """.formatted(
-          tableName
-        );
-    }
-
-    @Override
     String createTableStatement() {
       return """
-          create table %s (
+          create table if not exists %s (
             pleno_id text not null,
             periodo_parlamentario text not null,
             periodo_anual text not null,
             legislatura text not null,
             fecha text not null,
             hora text not null,
-            pleno_titulo text not null,
+            asunto text not null,
+            presidente text not null,
+            etiquetas text not null,
             
             congresista text not null,
             grupo_parlamentario text not null,
@@ -293,27 +298,24 @@ public class LoadAsistenciaPlenos implements Consumer<AsistenciaPlenos> {
     }
 
     @Override
-    void addBatch(PreparedStatement ps, RegistroAsistencia r) throws SQLException {
-      for (var a : r.asistencias()) {
+    void addBatch(PreparedStatement ps, RegistroVotacion r) throws Exception {
+      for (var v : r.votaciones()) {
         ps.setString(1, r.pleno().id());
         ps.setString(2, r.pleno().periodoParlamentario());
         ps.setString(3, r.pleno().periodoAnual());
         ps.setString(4, r.pleno().legislatura());
         ps.setString(5, r.pleno().fecha().format(DateTimeFormatter.ofPattern(YYYY_MM_DD)));
-        ps.setString(6, r.fechaHora().toLocalTime().format(DateTimeFormatter.ofPattern(HH_MM)));
-//        ps.setString(7, r.pleno().titulo()); //fixme
+        ps.setString(6, r.fechaHora().format(DateTimeFormatter.ofPattern(HH_MM)));
+        ps.setString(7, r.asunto());
+        ps.setString(8, r.presidente());
+        ps.setString(9, jsonMapper.writeValueAsString(r.etiquetas()));
 
-        ps.setString(8, a.congresista());
-        ps.setString(9, a.grupoParlamentario());
-        if (r.pleno().gruposParlamentarios().get(a.grupoParlamentario()) == null) {
-          throw new IllegalArgumentException("a.grupoParlamentarioDescripcion == null");
-        }
-        ps.setString(10, r.pleno().gruposParlamentarios().get(a.grupoParlamentario()));
-        if (a.resultado() == null) throw new RuntimeException(
-          "Error with " + a + " at " + r.pleno() + " @ " + r.fechaHora()
-        );
-        ps.setString(11, a.resultado().name());
-        ps.setString(12, a.resultado().descripcion());
+        ps.setString(10, v.congresista());
+        ps.setString(11, v.grupoParlamentario());
+        ps.setString(12, r.pleno().gruposParlamentarios().get(v.grupoParlamentario()));
+
+        ps.setString(13, v.resultado().name());
+        ps.setString(14, v.resultado().descripcion());
 
         ps.addBatch();
       }
