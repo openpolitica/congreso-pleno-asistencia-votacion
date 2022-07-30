@@ -75,8 +75,7 @@ public class TextractRegistroPleno {
       }
       pageNumber++;
     }
-    if (latestAsistencia != null)
-      builder.withGruposParlamentarios(latestAsistencia.pleno().gruposParlamentarios());
+    if (latestAsistencia != null) builder.withGruposParlamentarios(latestAsistencia.pleno().gruposParlamentarios());
     System.out.println(errors);
     return builder.build();
   }

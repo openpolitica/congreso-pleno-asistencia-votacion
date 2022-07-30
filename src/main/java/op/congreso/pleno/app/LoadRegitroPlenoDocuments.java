@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import op.congreso.pleno.RegistroPlenoDocument;
 
-public class LoadRegitroPlenos {
+public class LoadRegitroPlenoDocuments {
 
   public static void main(String[] args) throws IOException {
     var root = collect("/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/new_asistenciavotacion", 5);
