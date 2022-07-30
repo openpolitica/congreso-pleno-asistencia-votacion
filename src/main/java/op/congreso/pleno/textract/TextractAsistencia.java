@@ -222,7 +222,7 @@ public class TextractAsistencia {
                   );
                 } else if (text.equals("Asistencia para Quórum")) { // Finally get quorum
                   i++;
-                  plenoBuilder.withQuorum(Integer.parseInt(lines.get(i)));
+                  registroBuilder.withQuorum(Integer.parseInt(lines.get(i)));
                 }
               }
             }

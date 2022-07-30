@@ -13,7 +13,6 @@ import op.congreso.pleno.ResultadoCongresista;
 
 public record RegistroVotacion(
   Pleno pleno,
-  String titulo,
   int quorum,
   LocalDateTime fechaHora,
   String presidente,
@@ -30,7 +29,6 @@ public record RegistroVotacion(
   public static class Builder {
 
     Pleno pleno;
-    String titulo;
     int quorum;
     LocalDateTime fechaHora;
     String presidente, asunto;
@@ -92,7 +90,6 @@ public record RegistroVotacion(
     public RegistroVotacion build() {
       return new RegistroVotacion(
         pleno,
-        titulo,
         quorum,
         fechaHora,
         presidente,

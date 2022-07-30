@@ -38,8 +38,8 @@ public class TextractVotacion {
   static RegistroVotacion load(int quorum, List<String> lines) {
     lines = lines.stream().map(s -> s.replace(" +++", "")).map(s -> s.replace("+++ ", "")).toList();
 
-    var registroBuilder = RegistroVotacion.newBuilder();
-    var plenoBuilder = Pleno.newBuilder().withQuorum(quorum);
+    var registroBuilder = RegistroVotacion.newBuilder().withQuorum(quorum);
+    var plenoBuilder = Pleno.newBuilder();
     var resultadosBuilder = ResultadoVotacion.newBuilder();
     var resultados = new ArrayList<ResultadoCongresista<Votacion>>();
     var grupos = new HashMap<String, String>();
@@ -313,7 +313,7 @@ public class TextractVotacion {
                   );
                 } else if (lines.get(i).equals("Asistencia para Quórum")) {
                   i++;
-                  plenoBuilder.withQuorum(Integer.parseInt(lines.get(i)));
+                  registroBuilder.withQuorum(Integer.parseInt(lines.get(i)));
                 }
               }
             }

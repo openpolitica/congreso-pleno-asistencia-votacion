@@ -9,8 +9,9 @@ public record Pleno(
   String periodoParlamentario,
   String periodoAnual,
   String legislatura,
-  String url,
+  String titulo,
   LocalDate fecha,
+  String url,
   Map<String, String> gruposParlamentarios
 ) {
   public String id() {
@@ -31,7 +32,6 @@ public record Pleno(
     String titulo;
     String url;
     LocalDate fecha;
-    int quorum;
     Map<String, String> gruposParlamentarios;
 
     public void withLegislatura(String legislatura) {
@@ -48,18 +48,13 @@ public record Pleno(
       this.fecha = fecha;
     }
 
-    public Builder withQuorum(int quorum) {
-      this.quorum = quorum;
-      return this;
-    }
-
     public Builder withGruposParlamentarios(Map<String, String> grupos) {
       this.gruposParlamentarios = grupos;
       return this;
     }
 
     public Pleno build() {
-      return new Pleno("2021-2026", periodoAnual, legislatura, titulo, fecha, gruposParlamentarios);
+      return new Pleno("2021-2026", periodoAnual, legislatura, titulo, fecha, url, gruposParlamentarios);
     }
   }
 }
