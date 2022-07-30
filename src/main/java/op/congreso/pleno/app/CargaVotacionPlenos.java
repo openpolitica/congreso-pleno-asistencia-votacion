@@ -27,10 +27,7 @@ public class CargaVotacionPlenos implements Consumer<VotacionPlenos> {
 
   @Override
   public void accept(VotacionPlenos votacionPlenos) {
-    var jdbcUrl =
-      "jdbc:sqlite:%s-asistencias-votaciones.db".formatted(
-          votacionPlenos.periodo()
-        );
+    var jdbcUrl = "jdbc:sqlite:%s-asistencias-votaciones.db".formatted(votacionPlenos.periodo());
     try (var connection = DriverManager.getConnection(jdbcUrl)) {
       var statement = connection.createStatement();
       statement.executeUpdate("pragma journal_mode = WAL");
@@ -83,18 +80,12 @@ public class CargaVotacionPlenos implements Consumer<VotacionPlenos> {
     abstract List<String> createIndexesStatement();
 
     String index(String field) {
-      return "CREATE INDEX %s_%s ON %s(\"%s\");\n".formatted(
-          tableName,
-          field,
-          tableName,
-          field
-        );
+      return "CREATE INDEX %s_%s ON %s(\"%s\");\n".formatted(tableName, field, tableName, field);
     }
 
     abstract String prepareStatement();
 
-    abstract void addBatch(PreparedStatement ps, RegistroVotacion pl)
-      throws Exception;
+    abstract void addBatch(PreparedStatement ps, RegistroVotacion pl) throws Exception;
   }
 
   static class VotacionResultadoLoad extends TableLoad {
@@ -134,11 +125,7 @@ public class CargaVotacionPlenos implements Consumer<VotacionPlenos> {
 
     @Override
     List<String> createIndexesStatement() {
-      return List.of(
-        index("periodo_parlamentario"),
-        index("periodo_anual"),
-        index("legislatura")
-      );
+      return List.of(index("periodo_parlamentario"), index("periodo_anual"), index("legislatura"));
     }
 
     @Override
@@ -159,17 +146,14 @@ public class CargaVotacionPlenos implements Consumer<VotacionPlenos> {
       ps.setString(2, r.pleno().periodoParlamentario());
       ps.setString(3, r.pleno().periodoAnual());
       ps.setString(4, r.pleno().legislatura());
-      ps.setString(
-        5,
-        r.pleno().fecha().format(DateTimeFormatter.ofPattern(YYYY_MM_DD))
-      );
-      ps.setString(6, r.hora().format(DateTimeFormatter.ofPattern(HH_MM)));
-      ps.setString(7, r.pleno().titulo());
+      ps.setString(5, r.pleno().fecha().format(DateTimeFormatter.ofPattern(YYYY_MM_DD)));
+      ps.setString(6, r.fechaHora().format(DateTimeFormatter.ofPattern(HH_MM)));
+//      ps.setString(7, r.pleno().titulo()); //TODO
       ps.setString(8, r.asunto());
       ps.setString(9, r.presidente());
       ps.setString(10, jsonMapper.writeValueAsString(r.etiquetas()));
 
-      ps.setInt(11, r.pleno().quorum());
+      ps.setInt(11, r.quorum());
       ps.setInt(12, r.resultados().si());
       ps.setInt(13, r.resultados().no());
       ps.setInt(14, r.resultados().abstenciones());
@@ -248,12 +232,9 @@ public class CargaVotacionPlenos implements Consumer<VotacionPlenos> {
         ps.setString(2, r.pleno().periodoParlamentario());
         ps.setString(3, r.pleno().periodoAnual());
         ps.setString(4, r.pleno().legislatura());
-        ps.setString(
-          5,
-          r.pleno().fecha().format(DateTimeFormatter.ofPattern(YYYY_MM_DD))
-        );
-        ps.setString(6, r.hora().format(DateTimeFormatter.ofPattern(HH_MM)));
-        ps.setString(7, r.pleno().titulo());
+        ps.setString(5, r.pleno().fecha().format(DateTimeFormatter.ofPattern(YYYY_MM_DD)));
+        ps.setString(6, r.fechaHora().format(DateTimeFormatter.ofPattern(HH_MM)));
+//        ps.setString(7, r.pleno().titulo()); // TODO
         ps.setString(8, r.asunto());
         ps.setString(9, r.presidente());
         ps.setString(10, jsonMapper.writeValueAsString(r.etiquetas()));
@@ -339,12 +320,9 @@ public class CargaVotacionPlenos implements Consumer<VotacionPlenos> {
         ps.setString(2, r.pleno().periodoParlamentario());
         ps.setString(3, r.pleno().periodoAnual());
         ps.setString(4, r.pleno().legislatura());
-        ps.setString(
-          5,
-          r.pleno().fecha().format(DateTimeFormatter.ofPattern(YYYY_MM_DD))
-        );
-        ps.setString(6, r.hora().format(DateTimeFormatter.ofPattern(HH_MM)));
-        ps.setString(7, r.pleno().titulo());
+        ps.setString(5, r.pleno().fecha().format(DateTimeFormatter.ofPattern(YYYY_MM_DD)));
+        ps.setString(6, r.fechaHora().format(DateTimeFormatter.ofPattern(HH_MM)));
+//        ps.setString(7, r.pleno().titulo()); //TODO fixme
         ps.setString(8, r.asunto());
         ps.setString(9, r.presidente());
         ps.setString(10, jsonMapper.writeValueAsString(r.etiquetas()));

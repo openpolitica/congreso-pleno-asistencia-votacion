@@ -11,10 +11,7 @@ import op.congreso.pleno.RegistroPlenoDocument;
 public class DescargaPlenos {
 
   public static void main(String[] args) throws IOException {
-    var root = RegistroPlenoDocument.collect(
-      "/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/new_asistenciavotacion",
-      5
-    );
+    var root = RegistroPlenoDocument.collect("/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/new_asistenciavotacion", 5);
 
     var content = RegistroPlenoDocument.csvHeader();
 
@@ -29,17 +26,8 @@ public class DescargaPlenos {
         for (var e3 : periodo.entrySet()) {
           System.out.println(e3.getKey());
 
-          var plenos = RegistroPlenoDocument.collectPleno(
-            entry.getKey(),
-            e2.getKey(),
-            e3.getKey(),
-            e3.getValue()
-          );
-          var csv = plenos
-            .values()
-            .stream()
-            .map(RegistroPlenoDocument::csvEntry)
-            .collect(Collectors.joining());
+          var plenos = RegistroPlenoDocument.collectPleno(entry.getKey(), e2.getKey(), e3.getKey(), e3.getValue());
+          var csv = plenos.values().stream().map(RegistroPlenoDocument::csvEntry).collect(Collectors.joining());
           content.append(csv);
           plenosList.addAll(plenos.values());
         }
