@@ -1,18 +1,21 @@
 package op.congreso.pleno.votacion;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 import op.congreso.pleno.GrupoParlamentario;
 import op.congreso.pleno.Pleno;
 import op.congreso.pleno.ResultadoCongresista;
 
 public record RegistroVotacion(
   Pleno pleno,
-  LocalTime hora,
+  String titulo,
+  int quorum,
+  LocalDateTime fechaHora,
   String presidente,
   String asunto,
   Map<String, String> etiquetas,
@@ -27,25 +30,33 @@ public record RegistroVotacion(
   public static class Builder {
 
     Pleno pleno;
-    LocalTime hora;
+    String titulo;
+    int quorum;
+    LocalDateTime fechaHora;
     String presidente, asunto;
     Map<String, String> etiquetas = new HashMap<>();
     List<ResultadoCongresista<Votacion>> votaciones;
     Map<GrupoParlamentario, ResultadoVotacion> resultadosPorGrupo;
     ResultadoVotacion resultados;
 
+    public Builder withQuorum(int quorum) {
+      this.quorum = quorum;
+      return this;
+    }
+
     public Builder withPleno(Pleno pleno) {
       this.pleno = pleno;
       return this;
     }
 
-    public Builder withHora(LocalTime hora) {
-      this.hora = hora;
+    public Builder withFechaHora(LocalDateTime hora) {
+      this.fechaHora = hora;
       return this;
     }
 
-    public Builder withHora(String hora) {
-      this.hora = LocalTime.parse(hora, DateTimeFormatter.ofPattern("HH:mm"));
+    public Builder withFechaHora(LocalDate fecha, String hora) {
+      var horaTime = LocalTime.parse(hora, DateTimeFormatter.ofPattern("HH:mm"));
+      this.fechaHora = fecha.atTime(horaTime);
       return this;
     }
 
@@ -63,9 +74,7 @@ public record RegistroVotacion(
       return this;
     }
 
-    public Builder withVotaciones(
-      List<ResultadoCongresista<Votacion>> votaciones
-    ) {
+    public Builder withVotaciones(List<ResultadoCongresista<Votacion>> votaciones) {
       this.votaciones = votaciones;
       return this;
     }
@@ -75,9 +84,7 @@ public record RegistroVotacion(
       return this;
     }
 
-    public Builder withResultadosPorPartido(
-      Map<GrupoParlamentario, ResultadoVotacion> resultadosPorPartido
-    ) {
+    public Builder withResultadosPorPartido(Map<GrupoParlamentario, ResultadoVotacion> resultadosPorPartido) {
       this.resultadosPorGrupo = resultadosPorPartido;
       return this;
     }
@@ -85,7 +92,9 @@ public record RegistroVotacion(
     public RegistroVotacion build() {
       return new RegistroVotacion(
         pleno,
-        hora,
+        titulo,
+        quorum,
+        fechaHora,
         presidente,
         asunto,
         etiquetas,

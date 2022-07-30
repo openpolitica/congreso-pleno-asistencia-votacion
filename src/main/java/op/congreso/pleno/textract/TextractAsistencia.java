@@ -30,10 +30,7 @@ public class TextractAsistencia {
 
       var registro = load(clean(lines));
 
-      System.out.println(
-        " registry:\n" +
-        registro
-      );
+      System.out.println(" registry:\n" + registro);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -66,22 +63,14 @@ public class TextractAsistencia {
             if (text.equals(Constantes.ASISTENCIA)) {
               type = text;
               i++;
-              fechaHora =
-                      LocalDateTime.parse(
-                              lines.get(i),
-                              FECHA_HORA_PATTERN
-                      );
-              registroBuilder.withHora(fechaHora.toLocalTime());
+              fechaHora = LocalDateTime.parse(lines.get(i), FECHA_HORA_PATTERN);
+              registroBuilder.withFechaHora(fechaHora);
               plenoBuilder.withFecha(fechaHora.toLocalDate());
             } else if (text.startsWith(Constantes.ASISTENCIA)) {
               type = Constantes.ASISTENCIA;
               var fechaText = text.substring(Constantes.ASISTENCIA.length() + 1);
-              fechaHora =
-                      LocalDateTime.parse(
-                              fechaText,
-                              FECHA_HORA_PATTERN
-                      );
-              registroBuilder.withHora(fechaHora.toLocalTime());
+              fechaHora = LocalDateTime.parse(fechaText, FECHA_HORA_PATTERN);
+              registroBuilder.withFechaHora(fechaHora);
               plenoBuilder.withFecha(fechaHora.toLocalDate());
             }
           }
@@ -92,65 +81,41 @@ public class TextractAsistencia {
           i++;
           var congresista = lines.get(i);
           // Check Congresista text does not contain Asistencia
-          if (
-                  Asistencia.is(
-                          congresista.substring(congresista.lastIndexOf(" ") + 1)
-                  )
-          ) { // if it contains Asistencia
-            var asistencia = congresista.substring(
-                    congresista.lastIndexOf(" ")
-            ); // get asistencia
+          if (Asistencia.is(congresista.substring(congresista.lastIndexOf(" ") + 1))) { // if it contains Asistencia
+            var asistencia = congresista.substring(congresista.lastIndexOf(" ")); // get asistencia
             // and build resultado
             asistencias.add(
-                    new ResultadoCongresista<>(
-                            text.trim(),
-                            congresista.substring(0, congresista.lastIndexOf(" ")),
-                            Asistencia.of(asistencia)
-                    )
+              new ResultadoCongresista<>(
+                text.trim(),
+                congresista.substring(0, congresista.lastIndexOf(" ")),
+                Asistencia.of(asistencia)
+              )
             );
           } else { // if it does not contain asistencia
             i++;
             var asistencia = lines.get(i); // get asistencia from next line
             // and build resultado
-            asistencias.add(
-                    new ResultadoCongresista<>(
-                            text.trim(),
-                            congresista,
-                            Asistencia.of(asistencia)
-                    )
-            );
+            asistencias.add(new ResultadoCongresista<>(text.trim(), congresista, Asistencia.of(asistencia)));
           }
         } else { // else GP is in the same line as congresista
           var gp = text.substring(0, text.indexOf(" ")); // get GP from first work
           // Check Congresista text does not contain Asistencia
           var congresista = text.substring(text.indexOf(" ") + 1);
-          if (
-                  Asistencia.is(
-                          congresista.substring(congresista.lastIndexOf(" ") + 1)
-                  )
-          ) { // if it contains asistencia
-            var asistencia = congresista.substring(
-                    congresista.lastIndexOf(" ")
-            ); // get asistencia
+          if (Asistencia.is(congresista.substring(congresista.lastIndexOf(" ") + 1))) { // if it contains asistencia
+            var asistencia = congresista.substring(congresista.lastIndexOf(" ")); // get asistencia
             // and build resultado
             asistencias.add(
-                    new ResultadoCongresista<>(
-                            gp,
-                            congresista.substring(0, congresista.lastIndexOf(" ")),
-                            Asistencia.of(asistencia)
-                    )
+              new ResultadoCongresista<>(
+                gp,
+                congresista.substring(0, congresista.lastIndexOf(" ")),
+                Asistencia.of(asistencia)
+              )
             );
           } else { // if it does not contain asistencia
             i++;
             var asistencia = lines.get(i); // get asistencia from next line
             // and build resultado
-            asistencias.add(
-                    new ResultadoCongresista<>(
-                            gp,
-                            congresista,
-                            Asistencia.of(asistencia)
-                    )
-            );
+            asistencias.add(new ResultadoCongresista<>(gp, congresista, Asistencia.of(asistencia)));
           }
         }
       } else { // Process resultados
@@ -185,20 +150,11 @@ public class TextractAsistencia {
                   previous = result.substring(result.indexOf(" ") + 1);
                   result = result.substring(0, result.indexOf(" "));
                 }
-                resultadosBuilder.with(
-                        Asistencia.of(asis),
-                        Integer.parseInt(result.replace(".", ""))
-                );
+                resultadosBuilder.with(Asistencia.of(asis), Integer.parseInt(result.replace(".", "")));
               }
             } else if (text.contains("(") && text.contains(")")) { // Or get Asistencia from within ()
-              if (
-                      Asistencia.isDescripcion(
-                              text.substring(0, text.lastIndexOf("(") - 1)
-                      )
-              ) {
-                var matcher = ASISTENCIA_GROUP.matcher(
-                        text.substring(text.lastIndexOf("("))
-                );
+              if (Asistencia.isDescripcion(text.substring(0, text.lastIndexOf("(") - 1))) {
+                var matcher = ASISTENCIA_GROUP.matcher(text.substring(text.lastIndexOf("(")));
                 if (matcher.find()) {
                   var asis = matcher.group();
                   i++;
@@ -207,60 +163,44 @@ public class TextractAsistencia {
                     previous = result.substring(result.indexOf(" ") + 1);
                     result = result.substring(0, result.indexOf(" "));
                   }
-                  resultadosBuilder.with(
-                          Asistencia.of(asis),
-                          Integer.parseInt(result.replace(".", ""))
-                  );
+                  resultadosBuilder.with(Asistencia.of(asis), Integer.parseInt(result.replace(".", "")));
                 }
               }
             } else { // Or get resulados per GP
               if (VALID_GP.contains(previous)) {
-//                i++;
+                //                i++;
                 grupos.put(previous, text);
                 i++;
-                var presentes = Integer.parseInt(lines.get(i).replace(".",""));
+                var presentes = Integer.parseInt(lines.get(i).replace(".", ""));
                 i++;
-                var ausentes = Integer.parseInt(lines.get(i).replace(".",""));
+                var ausentes = Integer.parseInt(lines.get(i).replace(".", ""));
                 i++;
-                var licencias = Integer.parseInt(lines.get(i).replace(".",""));
+                var licencias = Integer.parseInt(lines.get(i).replace(".", ""));
                 i++;
-                var suspendidos = Integer.parseInt(lines.get(i).replace(".",""));
+                var suspendidos = Integer.parseInt(lines.get(i).replace(".", ""));
                 i++;
-                var otros = Integer.parseInt(lines.get(i).replace(".",""));
+                var otros = Integer.parseInt(lines.get(i).replace(".", ""));
                 resultadosGrupos.put(
-                        new GrupoParlamentario(text, grupos.get(text)),
-                        ResultadoAsistencia.create(
-                                presentes,
-                                ausentes,
-                                licencias,
-                                suspendidos,
-                                otros
-                        )
+                  new GrupoParlamentario(text, grupos.get(text)),
+                  ResultadoAsistencia.create(presentes, ausentes, licencias, suspendidos, otros)
                 );
                 previous = "";
-              } else
-              if (VALID_GP.contains(text)) {
+              } else if (VALID_GP.contains(text)) {
                 i++;
                 grupos.put(text, lines.get(i));
                 i++;
-                var presentes = Integer.parseInt(lines.get(i).replace(".",""));
+                var presentes = Integer.parseInt(lines.get(i).replace(".", ""));
                 i++;
-                var ausentes = Integer.parseInt(lines.get(i).replace(".",""));
+                var ausentes = Integer.parseInt(lines.get(i).replace(".", ""));
                 i++;
-                var licencias = Integer.parseInt(lines.get(i).replace(".",""));
+                var licencias = Integer.parseInt(lines.get(i).replace(".", ""));
                 i++;
-                var suspendidos = Integer.parseInt(lines.get(i).replace(".",""));
+                var suspendidos = Integer.parseInt(lines.get(i).replace(".", ""));
                 i++;
-                var otros = Integer.parseInt(lines.get(i).replace(".",""));
+                var otros = Integer.parseInt(lines.get(i).replace(".", ""));
                 resultadosGrupos.put(
-                        new GrupoParlamentario(text, grupos.get(text)),
-                        ResultadoAsistencia.create(
-                                presentes,
-                                ausentes,
-                                licencias,
-                                suspendidos,
-                                otros
-                        )
+                  new GrupoParlamentario(text, grupos.get(text)),
+                  ResultadoAsistencia.create(presentes, ausentes, licencias, suspendidos, otros)
                 );
               } else if (!text.isBlank() && text.contains(" ")) {
                 if (VALID_GP.contains(text.substring(0, text.indexOf(" ")))) {
@@ -277,14 +217,8 @@ public class TextractAsistencia {
                   i++;
                   var otros = Integer.parseInt(lines.get(i));
                   resultadosGrupos.put(
-                          new GrupoParlamentario(grupo, grupos.get(grupo)),
-                          ResultadoAsistencia.create(
-                                  presentes,
-                                  ausentes,
-                                  licencias,
-                                  suspendidos,
-                                  otros
-                          )
+                    new GrupoParlamentario(grupo, grupos.get(grupo)),
+                    ResultadoAsistencia.create(presentes, ausentes, licencias, suspendidos, otros)
                   );
                 } else if (text.equals("Asistencia para Quórum")) { // Finally get quorum
                   i++;
@@ -300,32 +234,34 @@ public class TextractAsistencia {
 
     if (fechaHora == null) errors++;
 
-    return registroBuilder.withPleno(plenoBuilder.build())
-            .withAsistencias(asistencias)
-            .withResultadosPorPartido(resultadosGrupos)
-            .withResultados(resultadosBuilder.build())
-            .build();
+    return registroBuilder
+      .withPleno(plenoBuilder.build())
+      .withAsistencias(asistencias)
+      .withResultadosPorPartido(resultadosGrupos)
+      .withResultados(resultadosBuilder.build())
+      .build();
   }
 
   static List<String> clean(List<String> list) {
     return list
-            .stream()
-            .map(s ->
-                    s.replace("+++ ", "")
-                            .replace("+++", "")
-                            .replace(" +++", "")
-                            .replace("***", "")
-                            .replace("NO---", "NO")
-                            .replace("NO-", "NO")
-                            .trim()
-            )
-            .flatMap(s -> {
-              var ss = s.split(" ");
-              if (ss.length > 1 && Asistencia.is(ss[0])) {
-                return Stream.of(ss[0], s.substring(s.indexOf(" ") + 1));
-              } else return Stream.of(s);
-            })
-            .filter(s -> !s.isBlank())
-            .toList();
+      .stream()
+      .map(s ->
+        s
+          .replace("+++ ", "")
+          .replace("+++", "")
+          .replace(" +++", "")
+          .replace("***", "")
+          .replace("NO---", "NO")
+          .replace("NO-", "NO")
+          .trim()
+      )
+      .flatMap(s -> {
+        var ss = s.split(" ");
+        if (ss.length > 1 && Asistencia.is(ss[0])) {
+          return Stream.of(ss[0], s.substring(s.indexOf(" ") + 1));
+        } else return Stream.of(s);
+      })
+      .filter(s -> !s.isBlank())
+      .toList();
   }
 }

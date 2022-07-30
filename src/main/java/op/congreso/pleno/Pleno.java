@@ -9,16 +9,12 @@ public record Pleno(
   String periodoParlamentario,
   String periodoAnual,
   String legislatura,
-  String titulo,
   String url,
   LocalDate fecha,
-  int quorum,
   Map<String, String> gruposParlamentarios
 ) {
   public String id() {
-    return (
-      fecha.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + "-" + titulo
-    );
+    return (periodoParlamentario + ":" + fecha.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
   }
 
   public static Builder newBuilder() {
@@ -63,16 +59,7 @@ public record Pleno(
     }
 
     public Pleno build() {
-      return new Pleno(
-        "2021-2026",
-        periodoAnual,
-        legislatura,
-        titulo,
-        "",
-        fecha,
-        quorum,
-              gruposParlamentarios
-      );
+      return new Pleno("2021-2026", periodoAnual, legislatura, titulo, fecha, gruposParlamentarios);
     }
   }
 }

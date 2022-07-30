@@ -16,10 +16,7 @@ import op.congreso.pleno.RegistroPlenoDocument;
 public class CargaRegitroPlenos {
 
   public static void main(String[] args) throws IOException {
-    var root = collect(
-      "/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/new_asistenciavotacion",
-      5
-    );
+    var root = collect("/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/new_asistenciavotacion", 5);
 
     var plenos = new HashSet<RegistroPlenoDocument>();
 
@@ -32,12 +29,7 @@ public class CargaRegitroPlenos {
         for (var legislatura : periodo.entrySet()) {
           System.out.println(legislatura.getKey());
 
-          var p = collectPleno(
-            periodos.getKey(),
-            anual.getKey(),
-            legislatura.getKey(),
-            legislatura.getValue()
-          );
+          var p = collectPleno(periodos.getKey(), anual.getKey(), legislatura.getKey(), legislatura.getValue());
           plenos.addAll(p.values());
         }
       }
@@ -67,17 +59,9 @@ public class CargaRegitroPlenos {
         }
       })
       .collect(Collectors.toSet());
-    var registroPlenos = updated
-      .stream()
-      .sorted(Comparator.comparing(RegistroPlenoDocument::id).reversed())
-      .toList();
+    var registroPlenos = updated.stream().sorted(Comparator.comparing(RegistroPlenoDocument::id).reversed()).toList();
     //json
-    Files.writeString(
-      plenosJsonPath,
-      jsonMapper
-        .writerWithDefaultPrettyPrinter()
-        .writeValueAsString(registroPlenos)
-    );
+    Files.writeString(plenosJsonPath, jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(registroPlenos));
     //csv
     var content = csvHeader();
     registroPlenos.forEach(pleno -> content.append(pleno.csvEntry()));

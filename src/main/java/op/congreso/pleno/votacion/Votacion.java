@@ -6,7 +6,7 @@ import java.util.Map;
 import op.congreso.pleno.Resultado;
 
 public enum Votacion implements Resultado {
-  SI(List.of("SI+++","SI"), "SI"),
+  SI(List.of("SI+++", "SI"), "SI"),
   NO(List.of("NO-", "NO"), "NO"),
   ABSTENCION(List.of("ABST."), "ABSTENCION"),
   AUSENTE(List.of("AUS"), "AUSENTE"),
