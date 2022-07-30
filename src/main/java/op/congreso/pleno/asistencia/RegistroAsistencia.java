@@ -12,7 +12,6 @@ import op.congreso.pleno.ResultadoCongresista;
 
 public record RegistroAsistencia(
   Pleno pleno,
-  String titulo,
   int quorum,
   LocalDateTime fechaHora,
   List<ResultadoCongresista<Asistencia>> asistencias,
@@ -26,7 +25,6 @@ public record RegistroAsistencia(
   public static class Builder {
 
     Pleno pleno;
-    String titulo;
     int quorum;
     LocalDateTime fechaHora;
     List<ResultadoCongresista<Asistencia>> asistencias;
@@ -70,7 +68,7 @@ public record RegistroAsistencia(
     }
 
     public RegistroAsistencia build() {
-      return new RegistroAsistencia(pleno, titulo, quorum, fechaHora, asistencias, resultadosPorGrupo, resultados);
+      return new RegistroAsistencia(pleno, quorum, fechaHora, asistencias, resultadosPorGrupo, resultados);
     }
   }
 }

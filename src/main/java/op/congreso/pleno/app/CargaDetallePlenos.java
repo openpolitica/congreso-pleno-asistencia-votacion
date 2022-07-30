@@ -158,8 +158,9 @@ public class CargaDetallePlenos {
             f.get("periodo_parlamentario").trim(),
             f.get("periodo_anual").trim(),
             f.get("legislatura").trim(),
-            f.get("url_pdf").trim(),
+                  f.get("sesion").trim(),
             fecha,
+                  f.get("url_pdf").trim(),
             gruposParlamentarios
           )
         )
@@ -207,8 +208,9 @@ public class CargaDetallePlenos {
             f.get("periodo_parlamentario").trim(),
             f.get("periodo_anual").trim(),
             f.get("legislatura").trim(),
-            f.get("url_pdf").trim(),
+                  f.get("sesion").trim(),
             fecha,
+                  f.get("url_pdf").trim(),
             gruposParlamentarios
           )
         )
