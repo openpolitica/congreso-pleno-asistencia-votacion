@@ -27,12 +27,12 @@ import op.congreso.pleno.votacion.RegistroVotacion;
 import op.congreso.pleno.votacion.ResultadoVotacion;
 import op.congreso.pleno.votacion.Votacion;
 
-public class CargaDetallePlenos {
+public class LoadDetallePlenos {
 
   final ObjectMapper mapper = new CsvMapper();
 
   public static void main(String[] args) throws IOException {
-    new CargaDetallePlenos().load();
+    new LoadDetallePlenos().load();
   }
 
   void load() throws IOException {
@@ -50,14 +50,14 @@ public class CargaDetallePlenos {
           .map(this::loadAsistencia)
           .collect(Collectors.toSet());
         var asistenciaPlenos = new AsistenciaPlenos(periodo.getFileName().toString(), asistencias);
-        new CargaAsistenciaPlenos().accept(asistenciaPlenos);
+        new LoadAsistenciaPlenos().accept(asistenciaPlenos);
         var votaciones = paths
           .stream()
           .filter(s -> s.toString().endsWith("-votacion"))
           .map(this::loadVotacion)
           .collect(Collectors.toSet());
         var votacionPlenos = new VotacionPlenos(periodo.getFileName().toString(), votaciones);
-        new CargaVotacionPlenos().accept(votacionPlenos);
+        new LoadVotacionPlenos().accept(votacionPlenos);
       }
     }
   }

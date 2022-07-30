@@ -8,6 +8,7 @@ import java.util.List;
 import op.congreso.pleno.Constantes;
 import op.congreso.pleno.RegistroPleno;
 import op.congreso.pleno.RegistroPlenoDocument;
+import op.congreso.pleno.app.SaveRegistroPleno;
 import op.congreso.pleno.asistencia.RegistroAsistencia;
 
 public class TextractRegistroPleno {
@@ -74,6 +75,8 @@ public class TextractRegistroPleno {
       }
       pageNumber++;
     }
+    if (latestAsistencia != null)
+      builder.withGruposParlamentarios(latestAsistencia.pleno().gruposParlamentarios());
     System.out.println(errors);
     return builder.build();
   }
@@ -96,5 +99,6 @@ public class TextractRegistroPleno {
       lines
     );
     System.out.println(pleno);
+    SaveRegistroPleno.save(pleno);
   }
 }

@@ -235,7 +235,7 @@ public class TextractAsistencia {
     if (fechaHora == null) errors++;
 
     return registroBuilder
-      .withPleno(plenoBuilder.build())
+      .withPleno(plenoBuilder.withGruposParlamentarios(grupos).build())
       .withAsistencias(asistencias)
       .withResultadosPorPartido(resultadosGrupos)
       .withResultados(resultadosBuilder.build())
