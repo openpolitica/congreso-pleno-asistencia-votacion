@@ -21,10 +21,22 @@ public class SaveRegistroPleno {
         Files.writeString(plenoDir.resolve("grupo_parlamentario.csv"), registroPleno.printGruposParlametariosAsCsv());
         // write asistencias
         for (var a : registroPleno.asistencias().values()) {
-            var asistenciaDir = plenoDir.resolve(a.fechaHora().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm")) + "-asistencia");
+            var asistenciaDir = plenoDir.resolve(a.fechaHora().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH-mm")) + "-asistencia");
             Files.createDirectories(asistenciaDir);
+            Files.writeString(asistenciaDir.resolve("metadatos.csv"), a.printMetadatosAsCsv());
             Files.writeString(asistenciaDir.resolve("asistencias.csv"), a.printAsistenciasAsCsv());
+            Files.writeString(asistenciaDir.resolve("resultados_partido.csv"), a.printResultadosPorGrupoAsCsv());
+            Files.writeString(asistenciaDir.resolve("resultados.csv"), a.printResultadosAsCsv());
         }
-        // TODO write votaciones
+        // write votaciones
+        for (var v : registroPleno.votaciones().values()) {
+            var votacionDir = plenoDir.resolve(v.fechaHora().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH-mm")) + "-votacion");
+            Files.createDirectories(votacionDir);
+            Files.writeString(votacionDir.resolve("metadatos.csv"), v.printMetadatosAsCsv());
+            Files.writeString(votacionDir.resolve("asistencias.csv"), v.printVotacionesAsCsv());
+            Files.writeString(votacionDir.resolve("resultados_partido.csv"), v.printResultadosPorGrupoAsCsv());
+            Files.writeString(votacionDir.resolve("resultados.csv"), v.printResultadosAsCsv());
+            Files.writeString(votacionDir.resolve("etiquetas.csv"), "etiqueta,valor");
+        }
     }
 }
