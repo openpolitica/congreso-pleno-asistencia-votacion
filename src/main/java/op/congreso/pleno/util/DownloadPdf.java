@@ -8,7 +8,7 @@ import java.nio.file.Path;
 import java.util.List;
 import op.congreso.pleno.RegistroPlenoDocument;
 
-public class DescargaPdfs {
+public class DownloadPdf {
 
   public static void main(String[] args) throws IOException {
     ObjectMapper jsonMapper = new ObjectMapper();

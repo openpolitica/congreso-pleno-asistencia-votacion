@@ -43,7 +43,6 @@ public class LoadDetallePlenosAndSave {
         var plenos = paths(periodo) // periodo anual
           .flatMap(this::paths) // mes
           .flatMap(this::paths) // fecha/pleno
-          .filter(p -> p.getFileName().toString().startsWith("2022-07-07"))
           .toList();
         for (var pleno : plenos) {
           var grupos = loadGruposParlamentarios(pleno.resolve("grupo_parlamentario.csv"));
@@ -106,10 +105,8 @@ public class LoadDetallePlenosAndSave {
   }
 
   private RegistroVotacion loadVotacion(Path path, Pleno pleno, Map<String, String> grupos) {
-    try (final var ls = Files.list(path)) {
-      assert ls.count() == 9;
-
-      var builder = loadVotacionMetadatos(path.resolve("metadatos.csv"), pleno, grupos);
+    try {
+      var builder = loadVotacionMetadatos(path.resolve("metadatos.csv"), pleno);
       loadVotacionEtiquetas(path.resolve("etiquetas.csv")).forEach(builder::addEtiqueta);
       var votaciones = loadVotacionLista(path.resolve("votaciones.csv"));
       var resultados = loadVotacionResultado(path.resolve("resultados.csv"));
@@ -126,10 +123,8 @@ public class LoadDetallePlenosAndSave {
   }
 
   private RegistroAsistencia loadAsistencia(Path path, Pleno pleno, Map<String, String> grupos) {
-    try (final var ls = Files.list(path)) {
-      assert ls.count() == 8;
-
-      var builder = loadAsistenciaMetadatos(path.resolve("metadatos.csv"), pleno, grupos);
+    try {
+      var builder = loadAsistenciaMetadatos(path.resolve("metadatos.csv"), pleno);
       var asistencias = loadAsistenciaLista(path.resolve("asistencias.csv"));
       var resultados = loadAsistenciaResultado(path.resolve("resultados.csv"));
       var resultadosPorGrupo = loadAsistenciaResultadoPorPartido(path.resolve("resultados_partido.csv"), grupos);
@@ -162,8 +157,7 @@ public class LoadDetallePlenosAndSave {
 
   private RegistroVotacion.Builder loadVotacionMetadatos(
     Path path,
-    Pleno pleno,
-    Map<String, String> gruposParlamentarios
+    Pleno pleno
   ) throws IOException {
     try (
       final var it = mapper
@@ -205,8 +199,7 @@ public class LoadDetallePlenosAndSave {
 
   private RegistroAsistencia.Builder loadAsistenciaMetadatos(
     Path path,
-    Pleno pleno,
-    Map<String, String> gruposParlamentarios
+    Pleno pleno
   ) throws IOException {
     try (
       final var it = mapper
