@@ -350,7 +350,22 @@ public class TextractVotacion {
           return Stream.of(ss[0], s.substring(s.indexOf(" ") + 1));
         } else return Stream.of(s);
       })
+      .flatMap(s -> {
+        var ss = s.split(" ");
+        if (ss.length > 1 && isInteger(ss[0])) {
+          return Stream.of(ss[0], s.substring(s.indexOf(" ") + 1));
+        } else return Stream.of(s);
+      })
       .filter(s -> !s.isBlank())
       .toList();
+  }
+
+  private static boolean isInteger(String s) {
+    try {
+      Integer.parseInt(s);
+      return true;
+    } catch (NumberFormatException e) {
+      return false;
+    }
   }
 }

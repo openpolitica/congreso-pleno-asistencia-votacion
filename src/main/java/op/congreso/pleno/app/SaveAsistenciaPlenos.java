@@ -218,7 +218,11 @@ public class SaveAsistenciaPlenos implements Consumer<AsistenciaPlenos> {
         ps.setString(6, r.fechaHora().toLocalTime().format(DateTimeFormatter.ofPattern(HH_MM)));
 
         ps.setString(7, a.getKey().nombre());
+        if (a.getKey().descripcion() == null) {
+          System.out.println(a);
+        }
         ps.setString(8, a.getKey().descripcion());
+
         ps.setInt(9, a.getValue().presentes());
         ps.setInt(10, a.getValue().ausentes());
         ps.setInt(11, a.getValue().licencias());

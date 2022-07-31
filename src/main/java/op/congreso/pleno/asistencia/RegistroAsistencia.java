@@ -99,7 +99,7 @@ public record RegistroAsistencia(
         .keySet()
         .stream()
         .map(k ->
-          k +
+          k.nombre() +
           "," +
           resultadosPorGrupo.get(k).total() +
           "," +
@@ -111,8 +111,7 @@ public record RegistroAsistencia(
           "," +
           resultadosPorGrupo.get(k).suspendidos() +
           "," +
-          resultadosPorGrupo.get(k).otros() +
-          "\n"
+          resultadosPorGrupo.get(k).otros()
         )
         .collect(Collectors.joining("\n"))
     );
