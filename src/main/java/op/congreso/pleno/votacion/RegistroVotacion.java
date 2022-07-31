@@ -54,11 +54,11 @@ public record RegistroVotacion(
   public String printVotacionesAsCsv() {
     // ignore numero column
     return (
-      "grupo_parlamentario,congresista,asistencia\n" +
+      "grupo_parlamentario,congresista,votacion\n" +
       votaciones
         .stream()
         .sorted(Comparator.comparing(ResultadoCongresista::congresista))
-        .map(a -> a.grupoParlamentario() + ",\"" + a.congresista() + "\"," + a.resultado().name())
+        .map(v -> v.grupoParlamentario() + ",\"" + v.congresista() + "\"," + v.resultado().name())
         .collect(Collectors.joining("\n"))
     );
   }
@@ -70,7 +70,7 @@ public record RegistroVotacion(
         .keySet()
         .stream()
         .map(k ->
-          k +
+          k.nombre() +
           "," +
           resultadosPorGrupo.get(k).total() +
           "," +
@@ -80,8 +80,7 @@ public record RegistroVotacion(
           "," +
           resultadosPorGrupo.get(k).abstenciones() +
           "," +
-          resultadosPorGrupo.get(k).sinResponder() +
-          "\n"
+          resultadosPorGrupo.get(k).sinResponder()
         )
         .collect(Collectors.joining("\n"))
     );
@@ -104,8 +103,7 @@ public record RegistroVotacion(
       "\n" +
       "sin_responder," +
       resultados.sinResponder()
-    )//            "ausentes," + resultados.ausentes() + "\n" + // + "\n" +
-    //            "sin_responder," + resultados.sinResponder() + "\n" +
+    )//            "sin_responder," + resultados.sinResponder() + "\n" + //            "ausentes," + resultados.ausentes() + "\n" + // + "\n" +
     //            "otros," + resultados.otros()
     ;
   }

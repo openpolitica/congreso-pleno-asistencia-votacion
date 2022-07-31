@@ -40,12 +40,12 @@ public enum Votacion implements Resultado {
     }
   }
 
-  public static Votacion of(String asistencia) {
-    Votacion votacion = map.get(asistencia.toUpperCase());
-    if (votacion == null) {
-      System.out.println(asistencia + " is null");
+  public static Votacion of(String votacion) {
+    Votacion v1 = map.get(votacion.toUpperCase());
+    if (v1 == null) {
+      return Votacion.valueOf(votacion);
     }
-    return votacion;
+    return v1;
   }
 
   public static boolean is(String text) {

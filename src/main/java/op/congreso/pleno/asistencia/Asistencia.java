@@ -33,7 +33,8 @@ public enum Asistencia implements Resultado {
     .collect(Collectors.toMap(a -> a.codigo, a -> a));
 
   public static Asistencia of(String asistencia) {
-    return map.get(asistencia.toUpperCase().trim());
+    var a1 = map.get(asistencia.toUpperCase().trim());
+    if (a1 != null) return a1; else return Asistencia.valueOf(asistencia);
   }
 
   public static boolean is(String text) {
