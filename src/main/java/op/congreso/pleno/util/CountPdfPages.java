@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import op.congreso.pleno.RegistroPlenoDocument;
 
-public class ConteoPaginas {
+public class CountPdfPages {
 
   public static void main(String[] args) throws IOException {
     var jsonMapper = new ObjectMapper();

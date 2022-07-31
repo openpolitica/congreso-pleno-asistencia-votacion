@@ -11,7 +11,7 @@ import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-public class ExtraeCsvs {
+public class ExtractCsvs {
 
   public static void main(String[] args) throws IOException {
     var dir = Path.of(args[0]);
