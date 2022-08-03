@@ -213,8 +213,30 @@ public record RegistroAsistencia(
         LOG.warn("Diff: \nOld: {} \nNew: {}", resultados, calcResults);
         this.resultados = calcResults;
       }
-      // TODO check sum per group equal to results
+      checkResultsMatch(resultados, resultadosPorGrupo);
       return new RegistroAsistencia(pleno, quorum, fechaHora, asistencias, resultadosPorGrupo, resultados);
+    }
+
+    private void checkResultsMatch(ResultadoAsistencia resultados,
+        Map<GrupoParlamentario, ResultadoAsistencia> resultadosPorGrupo) {
+      var presentes = 0;
+      var ausentes = 0;
+      var otros = 0;
+      var suspendidos = 0;
+      var licencias = 0;
+      var total = 0;
+      for (var grupo : resultadosPorGrupo.keySet()) {
+        presentes = presentes + resultadosPorGrupo.get(grupo).presentes();
+        ausentes = ausentes + resultadosPorGrupo.get(grupo).ausentes();
+        suspendidos = suspendidos + resultadosPorGrupo.get(grupo).suspendidos();
+        otros = otros + resultadosPorGrupo.get(grupo).otros();
+        licencias = licencias + resultadosPorGrupo.get(grupo).licencias();
+        total = total + resultadosPorGrupo.get(grupo).total();
+      }
+      if (presentes != resultados.presentes() || ausentes != resultados.ausentes() || otros != resultados.otros() || suspendidos != resultados.suspendidos()
+          || licencias != resultados.licencias() || total != resultados.total()) {
+        LOG.warn("Resultados calculados son diferentes de resulados generales: {}", fechaHora);
+      }
     }
   }
 }
