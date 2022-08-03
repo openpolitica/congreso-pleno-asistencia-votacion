@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 import op.congreso.pleno.GrupoParlamentario;
 import op.congreso.pleno.Pleno;
 import op.congreso.pleno.ResultadoCongresista;
-import op.congreso.pleno.asistencia.RegistroAsistencia;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -238,7 +237,7 @@ public record RegistroVotacion(
         LOG.warn("Diff: \nOld: {} \nNew: {}", resultados, calcResults);
         this.resultados = calcResults;
       }
-      // TODO check sum per group equal to results
+      checkResultsMatch(resultados, resultadosPorGrupo);
       return new RegistroVotacion(
         pleno,
         quorum,
@@ -250,6 +249,33 @@ public record RegistroVotacion(
         resultadosPorGrupo,
         resultados
       );
+    }
+
+    private void checkResultsMatch(ResultadoVotacion resultados,
+        Map<GrupoParlamentario, ResultadoVotacion> resultadosPorGrupo) {
+      var si = 0;
+      var no = 0;
+      var abstenciones = 0;
+      var sinResponder = 0;
+      var ausentes = 0;
+      var otros = 0;
+      var licencias = 0;
+      var total = 0;
+      for (var grupo : resultadosPorGrupo.keySet()) {
+        si = si + resultadosPorGrupo.get(grupo).si();
+        no = no + resultadosPorGrupo.get(grupo).no();
+        abstenciones = abstenciones + resultadosPorGrupo.get(grupo).abstenciones();
+        sinResponder = sinResponder + resultadosPorGrupo.get(grupo).sinResponder();
+        ausentes = ausentes + resultadosPorGrupo.get(grupo).ausentes();
+        otros = otros + resultadosPorGrupo.get(grupo).otros();
+        licencias = licencias + resultadosPorGrupo.get(grupo).licencias();
+        total = total + resultadosPorGrupo.get(grupo).total();
+      }
+      if (si != resultados.si() || no != resultados.no()
+          || ausentes != resultados.ausentes() || otros != resultados.otros() || sinResponder != resultados.sinResponder()
+          || licencias != resultados.licencias() || total != resultados.total()) {
+        LOG.warn("Resultados calculados son diferentes de resulados generales: {}", fechaHora);
+      }
     }
   }
 }
