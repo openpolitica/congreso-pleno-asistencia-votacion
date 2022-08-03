@@ -12,6 +12,9 @@ import java.util.stream.Collectors;
 import op.congreso.pleno.GrupoParlamentario;
 import op.congreso.pleno.Pleno;
 import op.congreso.pleno.ResultadoCongresista;
+import op.congreso.pleno.asistencia.RegistroAsistencia;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public record RegistroVotacion(
   Pleno pleno,
@@ -65,10 +68,11 @@ public record RegistroVotacion(
 
   public String printResultadosPorGrupoAsCsv() {
     return (
-      "por_partido,numero_legal,si,no,abstenciones,sin_responder\n" +
+      "por_partido,numero_legal,si,no,abstenciones,sin_responder,ausentes,licencias,otros\n" +
       resultadosPorGrupo
         .keySet()
         .stream()
+        .sorted(Comparator.comparing(GrupoParlamentario::nombre))
         .map(k ->
           k.nombre() +
           "," +
@@ -80,9 +84,17 @@ public record RegistroVotacion(
           "," +
           resultadosPorGrupo.get(k).abstenciones() +
           "," +
-          resultadosPorGrupo.get(k).sinResponder()
+          resultadosPorGrupo.get(k).sinResponder() +
+          "," +
+          resultadosPorGrupo.get(k).ausentes() +
+          "," +
+          resultadosPorGrupo.get(k).licencias() +
+          "," +
+          resultadosPorGrupo.get(k).otros()
         )
-        .collect(Collectors.joining("\n"))
+        .collect(Collectors.joining("\n")) + "\n" +
+          "TOTAL," + resultados.total() + "," + resultados.si() + "," + resultados.no() + "," + resultados.abstenciones() + "," +
+          resultados.sinResponder() + "," + resultados.ausentes() + "," + resultados.licencias() + "," + resultados.otros()
     );
   }
 
@@ -102,13 +114,29 @@ public record RegistroVotacion(
       resultados.abstenciones() +
       "\n" +
       "sin_responder," +
-      resultados.sinResponder()
-    )//            "sin_responder," + resultados.sinResponder() + "\n" + //            "ausentes," + resultados.ausentes() + "\n" + // + "\n" +
-    //            "otros," + resultados.otros()
-    ;
+      resultados.sinResponder() +
+      "\n" +
+      "ausentes," +
+      resultados.ausentes() +
+      "\n" +
+      "licencias," +
+      resultados.licencias() +
+      "\n" +
+      "otros," +
+      resultados.otros()
+    ); //            "otros," + resultados.otros() //            "sin_responder," + resultados.sinResponder() + "\n" + //            "ausentes," + resultados.ausentes() + "\n" + // + "\n" +
+  }
+
+  public String printEtiquetasAsCsv() {
+    return (
+      "etiqueta,valor\n" +
+      etiquetas.keySet().stream().map(k -> k + ",\"" + etiquetas.get(k) + "\"").collect(Collectors.joining("\n"))
+    );
   }
 
   public static class Builder {
+
+    static final Logger LOG = LoggerFactory.getLogger(Builder.class);
 
     Pleno pleno;
     int quorum;
@@ -118,6 +146,7 @@ public record RegistroVotacion(
     List<ResultadoCongresista<Votacion>> votaciones;
     Map<GrupoParlamentario, ResultadoVotacion> resultadosPorGrupo;
     ResultadoVotacion resultados;
+    Map<String, String> grupos = new HashMap<>();
 
     public Builder withQuorum(int quorum) {
       this.quorum = quorum;
@@ -154,7 +183,8 @@ public record RegistroVotacion(
       return this;
     }
 
-    public Builder withVotaciones(List<ResultadoCongresista<Votacion>> votaciones) {
+    public Builder withVotaciones(Map<String, String> grupos, List<ResultadoCongresista<Votacion>> votaciones) {
+      this.grupos = grupos;
       this.votaciones = votaciones;
       return this;
     }
@@ -169,7 +199,46 @@ public record RegistroVotacion(
       return this;
     }
 
+    public ResultadoVotacion calculateResultados() {
+      var b = ResultadoVotacion.newBuilder();
+      for (var votacion : votaciones) {
+        b.increase(votacion.resultado());
+      }
+      return b.build();
+    }
+
+    public Map<GrupoParlamentario, ResultadoVotacion> calculateResultadosPorGrupoParlamentario(
+      Map<String, String> grupos
+    ) {
+      var results = new HashMap<GrupoParlamentario, ResultadoVotacion.Builder>();
+      for (var votacion : votaciones) {
+        var grupoParlamentario = new GrupoParlamentario(
+          votacion.grupoParlamentario(),
+          grupos.get(votacion.grupoParlamentario())
+        );
+        results.computeIfPresent(grupoParlamentario, (gp, resultado) -> resultado.increase(votacion.resultado()));
+        results.computeIfAbsent(
+          grupoParlamentario,
+          gp -> ResultadoVotacion.newBuilder().increase(votacion.resultado())
+        );
+      }
+      return results.keySet().stream().collect(Collectors.toMap(k -> k, k -> results.get(k).build()));
+    }
+
     public RegistroVotacion build() {
+      var calcResultsPerGroup = calculateResultadosPorGrupoParlamentario(grupos);
+      var calcResults = calculateResultados();
+      if (!calcResultsPerGroup.equals(resultadosPorGrupo)) {
+        LOG.warn("Resultados por grupo calculados son diferentes de capturados Pleno: {}", fechaHora);
+        LOG.warn("Diff: \nOld: {} \nNew: {}", resultadosPorGrupo, calcResultsPerGroup);
+        this.resultadosPorGrupo = calcResultsPerGroup;
+      }
+      if (!calcResults.equals(resultados)) {
+        LOG.warn("Resultados calculados son diferentes de capturados Pleno: {}", fechaHora);
+        LOG.warn("Diff: \nOld: {} \nNew: {}", resultados, calcResults);
+        this.resultados = calcResults;
+      }
+      // TODO check sum per group equal to results
       return new RegistroVotacion(
         pleno,
         quorum,

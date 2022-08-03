@@ -289,7 +289,7 @@ public class TextractVotacion {
                   var sinResp = Integer.parseInt(lines.get(i));
                   resultadosGrupos.put(
                     new GrupoParlamentario(lines.get(i), grupos.get(lines.get(i))),
-                    ResultadoVotacion.create(si, no, abst, sinResp)
+                    ResultadoVotacion.create(si, no, abst, sinResp, 0, 0, 0)
                   );
                 } catch (Exception e) {
                   System.out.println("Error processing group results: " + gp);
@@ -309,7 +309,7 @@ public class TextractVotacion {
                   var sinResp = Integer.parseInt(lines.get(i));
                   resultadosGrupos.put(
                     new GrupoParlamentario(grupo, grupos.get(grupo)),
-                    ResultadoVotacion.create(si, no, abst, sinResp)
+                    ResultadoVotacion.create(si, no, abst, sinResp, 0, 0, 0)
                   );
                 } else if (lines.get(i).equals("Asistencia para Quórum")) {
                   i++;
@@ -325,7 +325,7 @@ public class TextractVotacion {
 
     return registroBuilder
       .withPleno(plenoBuilder.withGruposParlamentarios(grupos).build())
-      .withVotaciones(resultados)
+      .withVotaciones(grupos, resultados)
       .withResultadosPorPartido(resultadosGrupos)
       .withResultados(resultadosBuilder.build())
       .build();

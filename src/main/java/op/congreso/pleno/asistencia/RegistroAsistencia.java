@@ -5,12 +5,15 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import op.congreso.pleno.GrupoParlamentario;
 import op.congreso.pleno.Pleno;
 import op.congreso.pleno.ResultadoCongresista;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public record RegistroAsistencia(
   Pleno pleno,
@@ -98,6 +101,7 @@ public record RegistroAsistencia(
       resultadosPorGrupo
         .keySet()
         .stream()
+        .sorted(Comparator.comparing(GrupoParlamentario::nombre))
         .map(k ->
           k.nombre() +
           "," +
@@ -113,11 +117,14 @@ public record RegistroAsistencia(
           "," +
           resultadosPorGrupo.get(k).otros()
         )
-        .collect(Collectors.joining("\n"))
+        .collect(Collectors.joining("\n")) + "\n" +
+        "TOTAL," + resultados.total() + "," + resultados.presentes() + "," + resultados.ausentes() + "," + resultados.licencias() + "," + resultados.suspendidos() + ","+resultados.otros()
     );
   }
 
   public static class Builder {
+
+    static final Logger LOG = LoggerFactory.getLogger(Builder.class);
 
     Pleno pleno;
     int quorum;
@@ -125,6 +132,7 @@ public record RegistroAsistencia(
     List<ResultadoCongresista<Asistencia>> asistencias;
     Map<GrupoParlamentario, ResultadoAsistencia> resultadosPorGrupo;
     ResultadoAsistencia resultados;
+    Map<String, String> grupos = new HashMap<>();
 
     public Builder withPleno(Pleno pleno) {
       this.pleno = pleno;
@@ -147,9 +155,39 @@ public record RegistroAsistencia(
       return this;
     }
 
-    public Builder withAsistencias(List<ResultadoCongresista<Asistencia>> asistencias) {
+    public Builder withAsistencias(Map<String, String> grupos, List<ResultadoCongresista<Asistencia>> asistencias) {
       this.asistencias = asistencias;
+      this.grupos = grupos;
       return this;
+    }
+
+    public ResultadoAsistencia calculateResultados() {
+      var b = ResultadoAsistencia.newBuilder();
+      for (var asistencia : asistencias) {
+        b.increase(asistencia.resultado());
+      }
+      return b.build();
+    }
+
+    public Map<GrupoParlamentario, ResultadoAsistencia> calculateResultadosPorGrupoParlamentario(
+      Map<String, String> grupos
+    ) {
+      var results = new HashMap<GrupoParlamentario, ResultadoAsistencia.Builder>();
+      for (var asistencia : asistencias) {
+        var grupoParlamentario = new GrupoParlamentario(
+          asistencia.grupoParlamentario(),
+          grupos.get(asistencia.grupoParlamentario())
+        );
+        results.computeIfPresent(
+          grupoParlamentario,
+          (gp, resultadoAsistencia) -> resultadoAsistencia.increase(asistencia.resultado())
+        );
+        results.computeIfAbsent(
+          grupoParlamentario,
+          gp -> ResultadoAsistencia.newBuilder().increase(asistencia.resultado())
+        );
+      }
+      return results.keySet().stream().collect(Collectors.toMap(k -> k, k -> results.get(k).build()));
     }
 
     public Builder withResultados(ResultadoAsistencia resultados) {
@@ -163,6 +201,19 @@ public record RegistroAsistencia(
     }
 
     public RegistroAsistencia build() {
+      var calcResultsPerGroup = calculateResultadosPorGrupoParlamentario(grupos);
+      var calcResults = calculateResultados();
+      if (!calcResultsPerGroup.equals(resultadosPorGrupo)) {
+        LOG.warn("Resultados por grupo calculados son diferentes de capturados Pleno: {}", fechaHora);
+        LOG.warn("Diff: \nOld: {} \nNew: {}", resultadosPorGrupo, calcResultsPerGroup);
+        this.resultadosPorGrupo = calcResultsPerGroup;
+      }
+      if (!calcResults.equals(resultados)) {
+        LOG.warn("Resultados calculados son diferentes de capturados Pleno: {}", fechaHora);
+        LOG.warn("Diff: \nOld: {} \nNew: {}", resultados, calcResults);
+        this.resultados = calcResults;
+      }
+      // TODO check sum per group equal to results
       return new RegistroAsistencia(pleno, quorum, fechaHora, asistencias, resultadosPorGrupo, resultados);
     }
   }

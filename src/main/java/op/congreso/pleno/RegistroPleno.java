@@ -60,8 +60,7 @@ public record RegistroPleno(
       url +
       "\n" +
       "dia," +
-      fecha.format(DateTimeFormatter.ISO_LOCAL_DATE) +
-      "\n"
+      fecha.format(DateTimeFormatter.ISO_LOCAL_DATE)
     );
   }
 
@@ -72,6 +71,7 @@ public record RegistroPleno(
       gruposParlamentarios
         .keySet()
         .stream()
+        .sorted()
         .map(k -> k + "," + gruposParlamentarios.get(k))
         .collect(Collectors.joining("\n"))
     );

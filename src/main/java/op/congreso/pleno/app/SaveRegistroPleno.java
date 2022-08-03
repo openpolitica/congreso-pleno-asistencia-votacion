@@ -42,7 +42,7 @@ public class SaveRegistroPleno {
       Files.writeString(votacionDir.resolve("votaciones.csv"), v.printVotacionesAsCsv());
       Files.writeString(votacionDir.resolve("resultados_partido.csv"), v.printResultadosPorGrupoAsCsv());
       Files.writeString(votacionDir.resolve("resultados.csv"), v.printResultadosAsCsv());
-      Files.writeString(votacionDir.resolve("etiquetas.csv"), "etiqueta,valor");
+      Files.writeString(votacionDir.resolve("etiquetas.csv"), v.printEtiquetasAsCsv());
     }
   }
 }
