@@ -1,0 +1,9 @@
+etiqueta,valor
+proyectos_resolucion_legislativa,"lista de numeros separados por coma"
+resoluciones_legislativas,"lista de numeros separados por coma"
+cuestion_order_planteado_por,"texto"
+reglamento_congreso_articulos,"lista de numeros separados por coma"
+mociones,"56"
+tipo_votacion,"moción_orden "
+proyectos_ley,"lista de numeros separados por coma"
+leyes,"lista de numeros separados por coma"

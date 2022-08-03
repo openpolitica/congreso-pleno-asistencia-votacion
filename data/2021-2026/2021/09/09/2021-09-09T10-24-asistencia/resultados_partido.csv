@@ -1,0 +1,11 @@
+por_partido,numero_legal,presentes,ausentes,licencias,suspendidos,otros
+AP,16,16,0,0,0,0
+AP-PIS,10,8,1,1,0,0
+APP,15,13,1,1,0,0
+FP,24,23,0,1,0,0
+JP,5,5,0,0,0,0
+PL,37,35,1,1,0,0
+PP,5,5,0,0,0,0
+RP,9,9,0,0,0,0
+SP-PM,9,7,0,2,0,0
+TOTAL,130,121,3,6,0,0

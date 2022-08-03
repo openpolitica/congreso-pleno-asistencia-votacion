@@ -1,0 +1,10 @@
+etiqueta,valor
+proyectos_resolucion_legislativa,"lista de numeros separados por coma"
+resoluciones_legislativas,"lista de numeros separados por coma"
+cuestion_order_planteado_por,"texto"
+reglamento_congreso_articulos,"lista de numeros separados por coma"
+mociones,"lista de numeros de mocion separados por coma"
+tipo_votacion,"texto_sustitutorio"
+temas,"lista de temas relacionados a la votacion.e.g. covid_19"
+proyectos_ley,"602"
+leyes,"lista de numeros separados por coma"

@@ -1,0 +1,10 @@
+etiqueta,valor
+proyectos_resolucion_legislativa,"lista de numeros separados por coma"
+resoluciones_legislativas,"lista de numeros separados por coma"
+cuestion_order_planteado_por,"texto"
+reglamento_congreso_articulos,"lista de numeros separados por coma"
+mociones,"502, 909"
+tipo_votacion,"texto_substitutorio, cuestion_orden"
+temas,"nómina_integrantes_de_comisión_multipartidaria_pro_inversión."
+proyectos_ley,"lista de numeros separados por coma"
+leyes,"lista de numeros separados por coma"
