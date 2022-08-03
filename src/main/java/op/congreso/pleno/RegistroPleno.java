@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import op.congreso.pleno.asistencia.RegistroAsistencia;
 import op.congreso.pleno.votacion.RegistroVotacion;
 
+//TODO add provisional flag and test new PDFs
 public record RegistroPleno(
   String periodoParlamentario,
   String periodoAnual,

@@ -15,7 +15,7 @@ public class SaveRegistroPleno {
       .resolve(registroPleno.periodoParlamentario())
       .resolve(String.valueOf(registroPleno.fecha().getYear()))
       .resolve(registroPleno.fecha().format(DateTimeFormatter.ofPattern("MM")))
-      .resolve(registroPleno.fecha().format(DateTimeFormatter.ISO_LOCAL_DATE));
+      .resolve(registroPleno.fecha().format(DateTimeFormatter.ofPattern("dd")));
     Files.createDirectories(plenoDir);
     // save pleno.csv
     Files.writeString(plenoDir.resolve("pleno.csv"), registroPleno.printPlenoAsCsv());
