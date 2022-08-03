@@ -236,7 +236,7 @@ public class TextractAsistencia {
 
     return registroBuilder
       .withPleno(plenoBuilder.withGruposParlamentarios(grupos).build())
-      .withAsistencias(asistencias)
+      .withAsistencias(grupos, asistencias)
       .withResultadosPorPartido(resultadosGrupos)
       .withResultados(resultadosBuilder.build())
       .build();

@@ -38,5 +38,16 @@ public record ResultadoAsistencia(int presentes, int ausentes, int licencias, in
     public ResultadoAsistencia build() {
       return ResultadoAsistencia.create(presentes, ausentes, licencias, suspendidos, otros);
     }
+
+    public Builder increase(Asistencia asistencia) {
+      switch (asistencia) {
+        case PRESENTE -> this.presentes = this.presentes + 1;
+        case AUSENTE -> this.ausentes = this.ausentes + 1;
+        case LICENCIA_OFICIAL, LICENCIA_PERSONAL, LICENCIA_POR_ENFERMEDAD -> this.licencias = this.licencias + 1;
+        case SUSPENDIDO -> this.suspendidos = this.suspendidos + 1;
+        default -> this.otros = this.otros + 1;
+      }
+      return this;
+    }
   }
 }
