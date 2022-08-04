@@ -13,7 +13,7 @@ public enum Votacion implements Resultado {
   LICENCIA_OFICIAL(List.of("LO"), "LICENCIA OFICIAL"),
   LICENCIA_POR_ENFERMEDAD(List.of("LE"), "LICENCIA POR ENFERMEDAD"),
   LICENCIA_PERSONAL(List.of("LP"), "LICENCIA PERSONAL"),
-  SIN_RESPONDER(List.of("SINRES"), "SIN RESPONDER"),
+  SIN_RESPONDER(List.of("SINRES", "inRes"), "SIN RESPONDER"),
   COMISION_ORDINARIA(List.of("COM"), "COMISION ORDINARIA"),
   COMISION_EXT_INTERNACIONAL(List.of("CEI"), "COMISION EXT. INTERNACIONAL"),
   JUNTA_DE_PORTAVOCES(List.of("JP"), "JUNTA DE PORTAVOCES"),
@@ -35,7 +35,7 @@ public enum Votacion implements Resultado {
   static {
     for (var v : Votacion.values()) {
       for (var k : v.codigos()) {
-        map.put(k, v);
+        map.put(k.toUpperCase(), v);
       }
     }
   }
