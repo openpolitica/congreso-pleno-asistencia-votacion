@@ -332,32 +332,35 @@ public class TextractVotacion {
   }
 
   static List<String> clean(List<String> list) {
-    return list
-      .stream()
-      .map(s ->
-        s
-          .replace("+++ ", "")
-          .replace("+++", "")
-          .replace(" +++", "")
-          .replace("***", "SI")
-          .replace("NO---", "NO")
-          .replace("NO-", "NO")
-          .trim()
-      )
-      .flatMap(s -> {
-        var ss = s.split(" ");
-        if (ss.length > 1 && Votacion.is(ss[0])) {
-          return Stream.of(ss[0], s.substring(s.indexOf(" ") + 1));
-        } else return Stream.of(s);
-      })
-      .flatMap(s -> {
-        var ss = s.split(" ");
-        if (ss.length > 1 && isInteger(ss[0])) {
-          return Stream.of(ss[0], s.substring(s.indexOf(" ") + 1));
-        } else return Stream.of(s);
-      })
-      .filter(s -> !s.isBlank())
-      .toList();
+    List<String> first = new ArrayList<>(list
+            .stream()
+            .map(s ->
+                    s
+                            .replace("+++ ", "")
+                            .replace("+++", "")
+                            .replace(" +++", "")
+                            .replace("***", "SI")
+                            .replace("NO---", "NO")
+                            .replace("NO-", "NO")
+                            .trim()
+            )
+            .flatMap(s -> {
+              var ss = s.split(" ");
+              if (ss.length > 1 && Votacion.is(ss[0])) {
+                return Stream.of(ss[0], s.substring(s.indexOf(" ") + 1));
+              } else return Stream.of(s);
+            })
+            .flatMap(s -> {
+              var ss = s.split(" ");
+              if (ss.length > 1 && isInteger(ss[0])) {
+                return Stream.of(ss[0], s.substring(s.indexOf(" ") + 1));
+              } else return Stream.of(s);
+            })
+            .filter(s -> !s.isBlank())
+            .toList());
+    if (first.get(2).equals("SI"))
+      first.remove(2);
+    return first;
   }
 
   private static boolean isInteger(String s) {
