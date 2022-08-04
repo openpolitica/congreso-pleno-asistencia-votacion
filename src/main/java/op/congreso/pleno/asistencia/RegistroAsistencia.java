@@ -207,12 +207,20 @@ public record RegistroAsistencia(
       this.resultadosPorGrupo = resultadosPorPartido;
       return this;
     }
-    void checkCongresistas() {
-      asistencias.stream()
-              .map(ResultadoCongresista::congresista)
-              .filter(c -> !Congresistas.names.contains(c))
-              .forEach(s -> log.add("Posible nombre de congresista erroneo: " + s));
-    }
+      void checkCongresistas() {
+        var errores = Congresistas.checkCongresistas(asistencias.stream().map(ResultadoCongresista::congresista).toList());
+        if (!errores.isEmpty()) {
+          var map = errores.stream().collect(Collectors.toMap(c -> c, Congresistas::findSimilar));
+          asistencias = asistencias.stream()
+                  .map(v -> {
+                    if (map.containsKey(v.congresista())) {
+                      return v.replaceCongresista(map.get(v.congresista()));
+                    }
+                    return v;
+                  }).toList();
+          log = Congresistas.checkCongresistas(asistencias.stream().map(ResultadoCongresista::congresista).toList());
+        }
+      }
 
     public RegistroAsistencia build() {
       var calcResultsPerGroup = calculateResultadosPorGrupoParlamentario(grupos);
