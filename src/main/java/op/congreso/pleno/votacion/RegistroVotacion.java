@@ -233,12 +233,19 @@ public record RegistroVotacion(
     }
 
     void checkCongresistas() {
-      votaciones.stream()
-              .map(ResultadoCongresista::congresista)
-              .filter(c -> !Congresistas.names.contains(c))
-              .forEach(s -> log.add("Posible nombre de congresista erroneo: " + s));
+      var errores = Congresistas.checkCongresistas(votaciones.stream().map(ResultadoCongresista::congresista).toList());
+      if (!errores.isEmpty()) {
+        var map = errores.stream().collect(Collectors.toMap(c -> c, Congresistas::findSimilar));
+        votaciones = votaciones.stream()
+                .map(v -> {
+                  if (map.containsKey(v.congresista())) {
+                    return v.replaceCongresista(map.get(v.congresista()));
+                  }
+                  return v;
+                }).toList();
+        log = Congresistas.checkCongresistas(votaciones.stream().map(ResultadoCongresista::congresista).toList());
+      }
     }
-
 
     public RegistroVotacion build() {
       var calcResultsPerGroup = calculateResultadosPorGrupoParlamentario(grupos);

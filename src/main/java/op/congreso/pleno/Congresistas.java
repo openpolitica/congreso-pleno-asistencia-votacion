@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import me.xdrop.fuzzywuzzy.FuzzySearch;
 
 public class Congresistas {
     public static Set<String> names = new HashSet<>();
@@ -18,5 +20,17 @@ public class Congresistas {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static List<String> checkCongresistas(List<String> congresistas) {
+        return congresistas.stream()
+                .filter(c -> !Congresistas.names.contains(c))
+                .toList();
+    }
+
+    public static String findSimilar(String c) {
+        var result = FuzzySearch.extractOne(c, names);
+        System.out.println(result);
+        return result.getString();
     }
 }
