@@ -34,8 +34,8 @@ public class ExtractCsvs {
                 Files.writeString(output.resolve("asistencias.csv"), csvFromSheet(workBook, "asistencias"));
                 Files.writeString(output.resolve("resultados.csv"), csvFromSheet(workBook, "resultados"));
                 Files.writeString(
-                  output.resolve("resultados_partido.csv"),
-                  csvFromSheet(workBook, "resultados_partido")
+                  output.resolve("resultados_grupo.csv"),
+                  csvFromSheet(workBook, "resultados_grupo")
                 );
                 Files.writeString(output.resolve("notas.csv"), csvFromSheet(workBook, "notas"));
                 Files.writeString(
@@ -54,8 +54,8 @@ public class ExtractCsvs {
                 Files.writeString(output.resolve("votaciones.csv"), csvFromSheet(workBook, "votaciones"));
                 Files.writeString(output.resolve("resultados.csv"), csvFromSheet(workBook, "resultados"));
                 Files.writeString(
-                  output.resolve("resultados_partido.csv"),
-                  csvFromSheet(workBook, "resultados_partido")
+                  output.resolve("resultados_grupo.csv"),
+                  csvFromSheet(workBook, "resultados_grupo")
                 );
                 Files.writeString(output.resolve("notas.csv"), csvFromSheet(workBook, "notas"));
                 Files.writeString(

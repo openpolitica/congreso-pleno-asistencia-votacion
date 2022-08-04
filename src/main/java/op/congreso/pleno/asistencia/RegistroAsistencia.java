@@ -85,7 +85,7 @@ public record RegistroAsistencia(
 
   public String printResultadosPorGrupoAsCsv() {
     //
-    //por_partido,numero_legal,presentes,ausentes,licencias,otros
+    //grupo_parlamentario,numero_legal,presentes,ausentes,licencias,otros
     //PL,37,33,3,1,0
     //FP,24,19,5,0,0
     //AP,15,13,2,0,0
@@ -97,7 +97,7 @@ public record RegistroAsistencia(
     //JP,5,4,0,1,0
     //NA,4,2,2,0,0
     return (
-      "por_partido,numero_legal,presentes,ausentes,licencias,suspendidos,otros\n" +
+      "grupo_parlamentario,numero_legal,presentes,ausentes,licencias,suspendidos,otros\n" +
       resultadosPorGrupo
         .keySet()
         .stream()
