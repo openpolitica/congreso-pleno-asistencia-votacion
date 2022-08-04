@@ -4,11 +4,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import op.congreso.pleno.Congresistas;
 import op.congreso.pleno.GrupoParlamentario;
 import op.congreso.pleno.Pleno;
 import op.congreso.pleno.ResultadoCongresista;
@@ -24,7 +26,8 @@ public record RegistroVotacion(
   Map<String, String> etiquetas,
   List<ResultadoCongresista<Votacion>> votaciones,
   Map<GrupoParlamentario, ResultadoVotacion> resultadosPorGrupo,
-  ResultadoVotacion resultados
+  ResultadoVotacion resultados,
+  List<String> log
 ) {
   public static Builder newBuilder() {
     return new Builder();
@@ -133,6 +136,10 @@ public record RegistroVotacion(
     );
   }
 
+  public String printLog() {
+    return String.join("\n", log);
+  }
+
   public static class Builder {
 
     static final Logger LOG = LoggerFactory.getLogger(Builder.class);
@@ -146,6 +153,7 @@ public record RegistroVotacion(
     Map<GrupoParlamentario, ResultadoVotacion> resultadosPorGrupo;
     ResultadoVotacion resultados;
     Map<String, String> grupos = new HashMap<>();
+    List<String> log = new ArrayList<>();
 
     public Builder withQuorum(int quorum) {
       this.quorum = quorum;
@@ -224,6 +232,14 @@ public record RegistroVotacion(
       return results.keySet().stream().collect(Collectors.toMap(k -> k, k -> results.get(k).build()));
     }
 
+    void checkCongresistas() {
+      votaciones.stream()
+              .map(ResultadoCongresista::congresista)
+              .filter(c -> !Congresistas.names.contains(c))
+              .forEach(s -> log.add("Posible nombre de congresista erroneo: " + s));
+    }
+
+
     public RegistroVotacion build() {
       var calcResultsPerGroup = calculateResultadosPorGrupoParlamentario(grupos);
       var calcResults = calculateResultados();
@@ -238,6 +254,7 @@ public record RegistroVotacion(
         this.resultados = calcResults;
       }
       checkResultsMatch(resultados, resultadosPorGrupo);
+      checkCongresistas();
       return new RegistroVotacion(
         pleno,
         quorum,
@@ -247,7 +264,8 @@ public record RegistroVotacion(
         etiquetas,
         votaciones,
         resultadosPorGrupo,
-        resultados
+        resultados,
+        log
       );
     }
 

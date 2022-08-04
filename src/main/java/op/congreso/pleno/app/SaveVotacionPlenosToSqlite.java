@@ -11,9 +11,9 @@ import op.congreso.pleno.votacion.RegistroVotacion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SaveVotacionPlenos implements Consumer<VotacionPlenos> {
+public class SaveVotacionPlenosToSqlite implements Consumer<VotacionPlenos> {
 
-  static final Logger LOG = LoggerFactory.getLogger(SaveVotacionPlenos.class);
+  static final Logger LOG = LoggerFactory.getLogger(SaveVotacionPlenosToSqlite.class);
   static final ObjectMapper jsonMapper = new ObjectMapper();
 
   public static final String YYYY_MM_DD = "yyyy-MM-dd";

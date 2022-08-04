@@ -59,7 +59,7 @@ public class LoadDetallePlenosAndSave {
                 .collect(Collectors.toSet());
             var asistenciaPlenos = new AsistenciaPlenos(periodo.getFileName().toString(),
                 asistencias);
-            new SaveAsistenciaPlenos().accept(asistenciaPlenos);
+            new SaveAsistenciaPlenosToSqlite().accept(asistenciaPlenos);
             var votaciones = lsPleno
                 .stream()
                 .filter(s -> s.toString().endsWith("-votacion"))
@@ -67,11 +67,11 @@ public class LoadDetallePlenosAndSave {
                 .peek(registroPlenoBuilder::addVotacion)
                 .collect(Collectors.toSet());
             var votacionPlenos = new VotacionPlenos(periodo.getFileName().toString(), votaciones);
-            new SaveVotacionPlenos().accept(votacionPlenos);
+            new SaveVotacionPlenosToSqlite().accept(votacionPlenos);
           }
 
           var registroPleno = registroPlenoBuilder.withGruposParlamentarios(grupos).build();
-          SaveRegistroPleno.save(registroPleno);
+          SaveRegistroPlenoToCsv.save(registroPleno);
           // TODO save registro plenos to DB
         }
       }
@@ -106,7 +106,8 @@ public class LoadDetallePlenosAndSave {
 
   private Stream<Path> paths(Path p) {
     try {
-      return Files.list(p);
+      if (Files.isDirectory(p)) return Files.list(p);
+      else return Stream.of();
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
