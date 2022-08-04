@@ -82,16 +82,16 @@ public class TextractRegistroPleno {
 
   public static void main(String[] args) throws IOException {
 //            var lines = extractRegistroPleno(
-//                    Path.of("./out/Asis_vot_OFICIAL_12-07-22.pdf"));
-    var lines = loadLines(Path.of("./out/Asis_vot_OFICIAL_12-07-22"));
+//                    Path.of("./out/Asis_vot_OFICIAL_13-07-2022.pdf"));
+    var lines = loadLines(Path.of("./out/Asis_vot_OFICIAL_13-07-2022"));
     var pleno = processLines(
       new RegistroPlenoDocument(
         "2021-2026",
         "Período Anual de Sesiones 2021 - 2022",
         "Segunda Legislatura Ordinaria",
-        "2022-07-12",
-        "Asistencias y votaciones de la sesión del 12-07-2022",
-        "https://www2.congreso.gob.pe/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/Apleno/8B72AAF6D0E4F63C0525888B00560BD7/$FILE/Asis_vot_OFICIAL_12-07-22.pdf",
+        "2022-07-13",
+        "Asistencias y votaciones de la sesión del 13-07-2022",
+        "https://www2.congreso.gob.pe/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/Apleno/F54E4633A78E76420525888A00730BD7/$FILE/Asis_vot_OFICIAL_13-07-2022.pdf",
         "",
         0
       ),
