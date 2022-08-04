@@ -13,9 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sqlite.SQLiteException;
 
-public class SaveAsistenciaPlenos implements Consumer<AsistenciaPlenos> {
+public class SaveAsistenciaPlenosToSqlite implements Consumer<AsistenciaPlenos> {
 
-  static final Logger LOG = LoggerFactory.getLogger(SaveAsistenciaPlenos.class);
+  static final Logger LOG = LoggerFactory.getLogger(SaveAsistenciaPlenosToSqlite.class);
 
   public static final String YYYY_MM_DD = "yyyy-MM-dd";
   public static final String HH_MM = "HH:mm";
@@ -218,9 +218,6 @@ public class SaveAsistenciaPlenos implements Consumer<AsistenciaPlenos> {
         ps.setString(6, r.fechaHora().toLocalTime().format(DateTimeFormatter.ofPattern(HH_MM)));
 
         ps.setString(7, a.getKey().nombre());
-        if (a.getKey().descripcion() == null) {
-          System.out.println(a);
-        }
         ps.setString(8, a.getKey().descripcion());
 
         ps.setInt(9, a.getValue().presentes());

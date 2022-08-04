@@ -6,7 +6,7 @@ import java.nio.file.Path;
 import java.time.format.DateTimeFormatter;
 import op.congreso.pleno.RegistroPleno;
 
-public class SaveRegistroPleno {
+public class SaveRegistroPlenoToCsv {
 
   public static void save(RegistroPleno registroPleno) throws IOException {
     // create data dir
@@ -31,6 +31,7 @@ public class SaveRegistroPleno {
       Files.writeString(asistenciaDir.resolve("asistencias.csv"), a.printAsistenciasAsCsv());
       Files.writeString(asistenciaDir.resolve("resultados_grupo.csv"), a.printResultadosPorGrupoAsCsv());
       Files.writeString(asistenciaDir.resolve("resultados.csv"), a.printResultadosAsCsv());
+      Files.writeString(asistenciaDir.resolve("log.txt"), a.printLog());
     }
     // write votaciones
     for (var v : registroPleno.votaciones().values()) {
@@ -43,6 +44,7 @@ public class SaveRegistroPleno {
       Files.writeString(votacionDir.resolve("resultados_grupo.csv"), v.printResultadosPorGrupoAsCsv());
       Files.writeString(votacionDir.resolve("resultados.csv"), v.printResultadosAsCsv());
       Files.writeString(votacionDir.resolve("etiquetas.csv"), v.printEtiquetasAsCsv());
+      Files.writeString(votacionDir.resolve("log.txt"), v.printLog());
     }
   }
 }

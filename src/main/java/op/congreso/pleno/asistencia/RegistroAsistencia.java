@@ -4,11 +4,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import op.congreso.pleno.Congresistas;
 import op.congreso.pleno.GrupoParlamentario;
 import op.congreso.pleno.Pleno;
 import op.congreso.pleno.ResultadoCongresista;
@@ -21,7 +23,8 @@ public record RegistroAsistencia(
   LocalDateTime fechaHora,
   List<ResultadoCongresista<Asistencia>> asistencias,
   Map<GrupoParlamentario, ResultadoAsistencia> resultadosPorGrupo,
-  ResultadoAsistencia resultados
+  ResultadoAsistencia resultados,
+  List<String> log
 ) {
   public static Builder newBuilder() {
     return new Builder();
@@ -122,6 +125,10 @@ public record RegistroAsistencia(
     );
   }
 
+  public String printLog() {
+    return String.join("\n", log);
+  }
+
   public static class Builder {
 
     static final Logger LOG = LoggerFactory.getLogger(Builder.class);
@@ -133,6 +140,7 @@ public record RegistroAsistencia(
     Map<GrupoParlamentario, ResultadoAsistencia> resultadosPorGrupo;
     ResultadoAsistencia resultados;
     Map<String, String> grupos = new HashMap<>();
+    List<String> log = new ArrayList<>();
 
     public Builder withPleno(Pleno pleno) {
       this.pleno = pleno;
@@ -199,6 +207,12 @@ public record RegistroAsistencia(
       this.resultadosPorGrupo = resultadosPorPartido;
       return this;
     }
+    void checkCongresistas() {
+      asistencias.stream()
+              .map(ResultadoCongresista::congresista)
+              .filter(c -> !Congresistas.names.contains(c))
+              .forEach(s -> log.add("Posible nombre de congresista erroneo: " + s));
+    }
 
     public RegistroAsistencia build() {
       var calcResultsPerGroup = calculateResultadosPorGrupoParlamentario(grupos);
@@ -214,7 +228,8 @@ public record RegistroAsistencia(
         this.resultados = calcResults;
       }
       checkResultsMatch(resultados, resultadosPorGrupo);
-      return new RegistroAsistencia(pleno, quorum, fechaHora, asistencias, resultadosPorGrupo, resultados);
+      checkCongresistas();
+      return new RegistroAsistencia(pleno, quorum, fechaHora, asistencias, resultadosPorGrupo, resultados, log);
     }
 
     private void checkResultsMatch(ResultadoAsistencia resultados,
