@@ -67,7 +67,7 @@ public record RegistroVotacion(
 
   public String printResultadosPorGrupoAsCsv() {
     return (
-      "por_partido,numero_legal,si,no,abstenciones,sin_responder,ausentes,licencias,otros\n" +
+      "grupo_parlamentario,numero_legal,si,no,abstenciones,sin_responder,ausentes,licencias,otros\n" +
       resultadosPorGrupo
         .keySet()
         .stream()

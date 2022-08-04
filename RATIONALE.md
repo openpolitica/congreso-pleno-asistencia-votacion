@@ -15,7 +15,7 @@
           metadatos.csv
           asistencias.csv
           resultados.csv
-          resultados_partido.csv
+          resultados_grupo.csv
           notas.csv
           datos_tipo_asistencia.csv
           datos_grupo_parlamentario.csv
@@ -24,7 +24,7 @@
           etiquetas.csv
           votaciones.csv
           resultados.csv
-          resultados_partido.csv
+          resultados_grupo.csv
           notas.csv
           datos_tipo_votacion.csv
           datos_grupo_parlamentario.csv

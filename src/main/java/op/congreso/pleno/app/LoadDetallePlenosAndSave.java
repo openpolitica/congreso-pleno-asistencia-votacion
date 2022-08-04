@@ -119,7 +119,7 @@ public class LoadDetallePlenosAndSave {
       var votaciones = loadVotacionLista(path.resolve("votaciones.csv"));
       var resultados = loadVotacionResultado(path.resolve("resultados.csv"));
       var resultadosPorGrupo = loadVotacionResultadoPorPartido(
-          path.resolve("resultados_partido.csv"), grupos);
+          path.resolve("resultados_grupo.csv"), grupos);
 
       return builder
           .withVotaciones(grupos, votaciones)
@@ -137,7 +137,7 @@ public class LoadDetallePlenosAndSave {
       var asistencias = loadAsistenciaLista(path.resolve("asistencias.csv"));
       var resultados = loadAsistenciaResultado(path.resolve("resultados.csv"));
       var resultadosPorGrupo = loadAsistenciaResultadoPorPartido(
-          path.resolve("resultados_partido.csv"), grupos);
+          path.resolve("resultados_grupo.csv"), grupos);
 
       return builder
           .withResultados(resultados)
@@ -281,11 +281,11 @@ public class LoadDetallePlenosAndSave {
             .with(CsvSchema.emptySchema().withHeader())
             .<Map<String, String>>readValues(path.toFile())
     ) {
-      // por_partido,numero_legal,presentes,ausentes,licencias,otros
+      // grupo_parlamentario,numero_legal,presentes,ausentes,licencias,otros
       var data = new HashMap<GrupoParlamentario, ResultadoAsistencia>();
       while (it.hasNext()) {
         var v = it.next();
-        var partido = v.get("por_partido");
+        var partido = v.get("grupo_parlamentario");
         if (!partido.isBlank() && !partido.equals("TOTAL")) {
           assert grupos.containsKey(partido);
           data.put(
@@ -315,11 +315,11 @@ public class LoadDetallePlenosAndSave {
             .with(CsvSchema.emptySchema().withHeader())
             .<Map<String, String>>readValues(path.toFile())
     ) {
-      // por_partido,numero_legal,presentes,ausentes,licencias,otros
+      // grupo_parlamentario,numero_legal,presentes,ausentes,licencias,otros
       var data = new HashMap<GrupoParlamentario, ResultadoVotacion>();
       while (it.hasNext()) {
         var v = it.next();
-        var partido = v.get("por_partido");
+        var partido = v.get("grupo_parlamentario");
         if (!partido.isBlank() && !partido.equals("TOTAL")) {
           if (gruposParlamentarios.containsKey(partido)) {
             data.put(
