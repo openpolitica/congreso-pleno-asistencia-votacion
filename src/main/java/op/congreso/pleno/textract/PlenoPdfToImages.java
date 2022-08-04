@@ -31,7 +31,7 @@ public class PlenoPdfToImages {
   }
 
   public static void main(String[] args) throws IOException {
-    final var path = Path.of("./out/Asis_vot_OFICIAL_07-07-22.pdf");
+    final var path = Path.of("./target/out/Asis_vot_OFICIAL_12-07-22.pdf");
     generateImageFromPDF(path);
   }
 }
