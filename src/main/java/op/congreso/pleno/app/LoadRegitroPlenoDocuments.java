@@ -46,20 +46,36 @@ public class LoadRegitroPlenoDocuments {
       .stream()
       .collect(Collectors.toMap(RegistroPlenoDocument::id, p -> p));
 
-    var updated = plenos
-      .stream()
-      .map(p -> existing.getOrDefault(p.id(), p))
-      .map(p -> {
-        if (p.paginas() < 1) {
-          System.out.printf("Descargando %s%n", p);
-          p.download();
-          return p.withPaginas();
-        } else {
-          return p;
+    boolean extractPleno = true;
+
+    var updated = new HashSet<RegistroPlenoDocument>();
+    for (var p : plenos) {
+      var pleno = existing.getOrDefault(p.id(), p);
+      if (p.paginas() < 1) {
+        if (extractPleno) {
+          pleno = p.extract();
+          extractPleno = false;
         }
-      })
-      .collect(Collectors.toSet());
-    var registroPlenos = updated.stream().sorted(Comparator.comparing(RegistroPlenoDocument::id).reversed()).toList();
+      }
+      updated.add(pleno);
+    }
+
+//    var updated = plenos
+//      .stream()
+//      .map(p -> existing.getOrDefault(p.id(), p))
+//      .map(p -> {
+//        if (p.paginas() < 1) {
+//          System.out.printf("Descargando %s%n", p);
+//          p.download();
+//          return p.withPaginas();
+//        } else {
+//          return p;
+//        }
+//      })
+//      .collect(Collectors.toSet());
+    var registroPlenos = updated.stream()
+            .sorted(Comparator.comparing(RegistroPlenoDocument::id).reversed())
+            .toList();
     //json
     Files.writeString(plenosJsonPath, jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(registroPlenos));
     //csv
