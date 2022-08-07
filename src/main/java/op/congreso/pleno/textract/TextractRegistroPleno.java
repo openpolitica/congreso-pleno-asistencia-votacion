@@ -13,7 +13,7 @@ import op.congreso.pleno.asistencia.RegistroAsistencia;
 
 public class TextractRegistroPleno {
 
-  static ArrayList<List<String>> extractRegistroPleno(Path plenoPdf) throws IOException {
+  public static ArrayList<List<String>> extractRegistroPleno(Path plenoPdf) throws IOException {
     List<Path> pages = PlenoPdfToImages.generateImageFromPDF(plenoPdf);
     var list = new ArrayList<List<String>>();
     for (var page : pages) {
