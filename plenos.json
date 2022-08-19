@@ -2,10 +2,19 @@
   "periodoParlamentario" : "Congreso de la República - Periodo Parlamentario 2021 - 2026",
   "periodoAnual" : "Período Anual de Sesiones 2022 - 2023",
   "legislatura" : "Primera Legislatura Ordinaria",
+  "fecha" : "2022-08-18",
+  "titulo" : "Asistencia de la sesión del 18-08-2022",
+  "url" : "https://www2.congreso.gob.pe/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/Apleno/383A2010518496F2052588A3005CE491/$FILE/Asis_OFICIAL_18-08-2022.pdf",
+  "filename" : "Asis_OFICIAL_18-08-2022.pdf",
+  "paginas" : 1
+}, {
+  "periodoParlamentario" : "Congreso de la República - Periodo Parlamentario 2021 - 2026",
+  "periodoAnual" : "Período Anual de Sesiones 2022 - 2023",
+  "legislatura" : "Primera Legislatura Ordinaria",
   "fecha" : "2022-08-16",
-  "titulo" : "asistencias y votaciones PROVISIONALES DE LA SESIÓN DEL 16-08-2022",
-  "url" : "https://www2.congreso.gob.pe/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/Apleno/3CE5CE8EAD40DFE9052588A10006CD0A/$FILE/Asit_vot_PROVISIONAL_del_16-08-2022.pdf",
-  "filename" : "Asit_vot_PROVISIONAL_del_16-08-2022.pdf",
+  "titulo" : "Asistencias y votaciones de la sesión del 16-08-2022",
+  "url" : "https://www2.congreso.gob.pe/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/Apleno/B60B3431812C84BC052588A3005CCD79/$FILE/Asis_vot_OFICIAL_16-08-22.pdf",
+  "filename" : "Asis_vot_OFICIAL_16-08-22.pdf",
   "paginas" : 8
 }, {
   "periodoParlamentario" : "Congreso de la República - Periodo Parlamentario 2021 - 2026",
