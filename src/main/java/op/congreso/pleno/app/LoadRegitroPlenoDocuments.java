@@ -74,6 +74,8 @@ public class LoadRegitroPlenoDocuments {
       if (p.paginas() < 1 && pleno.periodoParlamentario().equals(current)) {
         if (extractPleno) {
           pleno = p.extract();
+          Files.writeString(Path.of("pr-title.txt"), pleno.prTitle());
+          Files.writeString(Path.of("pr-content.txt"), pleno.prContent());
           extractPleno = false;
         }
       }

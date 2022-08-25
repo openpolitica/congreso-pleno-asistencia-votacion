@@ -215,4 +215,16 @@ public record RegistroPlenoDocument(
     SaveRegistroPlenoToCsv.save(regPleno);
     return this.withPaginas();
   }
+
+  public String prTitle() {
+    return "Asistencias/Votaciones de Pleno: " + id();
+  }
+
+  public String prContent() {
+    StringBuilder text = new StringBuilder("Paginas: " + paginas);
+    for (int i = 1; i <= paginas; i++) {
+      text.append("\n- [ ] ").append(i);
+    }
+    return text.toString();
+  }
 }

@@ -17,11 +17,6 @@ jobs:
     runs-on: ubuntu-latest
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - name: Set
-        id: set
-        run: |
-          echo "test" > test.txt
-          echo "::set-output name=today::$(cat test.txt)"
       - name: echo
         run: |
           echo ${{steps.set.outputs.today}}
@@ -79,8 +74,15 @@ jobs:
             --install datasette-block-robots \
             --install datasette-pretty-json
 
+      - name: Set
+        id: set-pr
+        run: |
+          echo "::set-output name=pr-title::$(cat pr-title.txt)"
+          echo "::set-output name=pr-content::$(cat pr-content.txt)"
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3
         with:
-          title: Cambios en Registro de Plenos
+          title: ${{steps.set-pr.outputs.pr-title}}
+          body: ${{steps.set-pr.outputs.pr-content}}
+
 
