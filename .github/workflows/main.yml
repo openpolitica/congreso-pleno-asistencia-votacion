@@ -34,6 +34,10 @@ jobs:
         run: mvn -B clean compile
 
       - name: Run Actualizar Plenos
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: mvn exec:java -D"exec.mainClass"="op.congreso.pleno.app.LoadRegitroPlenoDocuments"
       - name: Run Preparar Plenos DB
         run: mvn -B exec:java -D"exec.mainClass"="op.congreso.pleno.app.LoadDetallePlenosAndSave"
