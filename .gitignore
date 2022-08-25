@@ -3,3 +3,5 @@
 target/
 backup/
 out/
+
+pr-*.txt

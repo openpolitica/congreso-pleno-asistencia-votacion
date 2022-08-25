@@ -217,14 +217,18 @@ public record RegistroPlenoDocument(
     return this.withPaginas();
   }
 
+  public String prBranchName() {
+    return "pleno-" + fecha();
+  }
+
   public String prTitle() {
-    return "Asistencias/Votaciones de Pleno: " + id();
+    return "Pleno: " + id();
   }
 
   public String prContent() {
     StringBuilder text = new StringBuilder("Paginas: " + paginas);
     for (int i = 1; i <= paginas; i++) {
-      text.append("\n- [ ] ").append(i);
+      text.append("\\n- [ ] ").append(i);
     }
     return text.toString();
   }
