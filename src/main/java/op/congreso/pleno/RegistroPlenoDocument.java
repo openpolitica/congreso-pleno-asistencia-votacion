@@ -37,16 +37,17 @@ public record RegistroPlenoDocument(
     );
   }
 
+  public static String parsePeriodo(String text) {
+    String val = text;
+    var m1 = periodo.matcher(text);
+    if (m1.find()) val = m1.group().replace(" ", "");
+    return val;
+  }
+
   public static RegistroPlenoDocument parse(Map<String, String> v) {
-    var periodoParlamentario = v.get("periodo_parlamentario");
-    var m1 = periodo.matcher(periodoParlamentario);
-    if (m1.find()) periodoParlamentario = m1.group().replace(" ", "");
-    var periodoAnual = v.get("periodo_anual");
-    var m = periodo.matcher(periodoAnual);
-    if (m.find()) periodoAnual = m.group().replace(" ", "");
     return new RegistroPlenoDocument(
-      periodoParlamentario,
-      periodoAnual,
+      parsePeriodo(v.get("periodo_parlamentario")),
+      parsePeriodo(v.get("periodo_anual")),
       v.get("legislatura"),
       v.get("fecha"),
       v.get("titulo"),
@@ -191,8 +192,8 @@ public record RegistroPlenoDocument(
             root.put(
               titulo,
               new RegistroPlenoDocument(
-                pp,
-                pa,
+                parsePeriodo(pp),
+                parsePeriodo(pa),
                 l,
                 date,
                 titulo,
