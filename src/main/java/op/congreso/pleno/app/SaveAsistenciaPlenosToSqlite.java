@@ -13,9 +13,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sqlite.SQLiteException;
 
-public class SaveAsistenciaPlenosToSqlite implements Consumer<AsistenciaPlenos> {
+public class SaveAsistenciaPlenosToSqlite
+  implements Consumer<AsistenciaPlenos> {
 
-  static final Logger LOG = LoggerFactory.getLogger(SaveAsistenciaPlenosToSqlite.class);
+  static final Logger LOG = LoggerFactory.getLogger(
+    SaveAsistenciaPlenosToSqlite.class
+  );
 
   public static final String YYYY_MM_DD = "yyyy-MM-dd";
   public static final String HH_MM = "HH:mm";
@@ -28,7 +31,10 @@ public class SaveAsistenciaPlenosToSqlite implements Consumer<AsistenciaPlenos> 
 
   @Override
   public void accept(AsistenciaPlenos asistenciaPlenos) {
-    var jdbcUrl = "jdbc:sqlite:%s-asistencias-votaciones.db".formatted(asistenciaPlenos.periodo());
+    var jdbcUrl =
+      "jdbc:sqlite:%s-asistencias-votaciones.db".formatted(
+          asistenciaPlenos.periodo()
+        );
     try (var connection = DriverManager.getConnection(jdbcUrl)) {
       var statement = connection.createStatement();
       statement.executeUpdate("pragma journal_mode = WAL");
@@ -79,12 +85,18 @@ public class SaveAsistenciaPlenosToSqlite implements Consumer<AsistenciaPlenos> 
     abstract List<String> createIndexesStatement();
 
     String index(String field) {
-      return "CREATE INDEX IF NOT EXISTS %s_%s ON %s(\"%s\");\n".formatted(tableName, field, tableName, field);
+      return "CREATE INDEX IF NOT EXISTS %s_%s ON %s(\"%s\");\n".formatted(
+          tableName,
+          field,
+          tableName,
+          field
+        );
     }
 
     abstract String prepareStatement();
 
-    abstract void addBatch(PreparedStatement ps, RegistroAsistencia pl) throws SQLException, IOException;
+    abstract void addBatch(PreparedStatement ps, RegistroAsistencia pl)
+      throws SQLException, IOException;
   }
 
   static class AsistenciaResultadoLoad extends TableLoad {
@@ -119,7 +131,11 @@ public class SaveAsistenciaPlenosToSqlite implements Consumer<AsistenciaPlenos> 
 
     @Override
     List<String> createIndexesStatement() {
-      return List.of(index("periodo_parlamentario"), index("periodo_anual"), index("legislatura"));
+      return List.of(
+        index("periodo_parlamentario"),
+        index("periodo_anual"),
+        index("legislatura")
+      );
     }
 
     @Override
@@ -135,13 +151,20 @@ public class SaveAsistenciaPlenosToSqlite implements Consumer<AsistenciaPlenos> 
     }
 
     @Override
-    void addBatch(PreparedStatement ps, RegistroAsistencia r) throws SQLException {
+    void addBatch(PreparedStatement ps, RegistroAsistencia r)
+      throws SQLException {
       ps.setString(1, r.pleno().id());
       ps.setString(2, r.pleno().periodoParlamentario());
       ps.setString(3, r.pleno().periodoAnual());
       ps.setString(4, r.pleno().legislatura());
-      ps.setString(5, r.pleno().fecha().format(DateTimeFormatter.ofPattern(YYYY_MM_DD)));
-      ps.setString(6, r.fechaHora().toLocalTime().format(DateTimeFormatter.ofPattern(HH_MM)));
+      ps.setString(
+        5,
+        r.pleno().fecha().format(DateTimeFormatter.ofPattern(YYYY_MM_DD))
+      );
+      ps.setString(
+        6,
+        r.fechaHora().toLocalTime().format(DateTimeFormatter.ofPattern(HH_MM))
+      );
 
       ps.setInt(7, r.quorum());
       ps.setInt(8, r.resultados().presentes());
@@ -208,14 +231,21 @@ public class SaveAsistenciaPlenosToSqlite implements Consumer<AsistenciaPlenos> 
     }
 
     @Override
-    void addBatch(PreparedStatement ps, RegistroAsistencia r) throws SQLException {
+    void addBatch(PreparedStatement ps, RegistroAsistencia r)
+      throws SQLException {
       for (var a : r.resultadosPorGrupo().entrySet()) {
         ps.setString(1, r.pleno().id());
         ps.setString(2, r.pleno().periodoParlamentario());
         ps.setString(3, r.pleno().periodoAnual());
         ps.setString(4, r.pleno().legislatura());
-        ps.setString(5, r.pleno().fecha().format(DateTimeFormatter.ofPattern(YYYY_MM_DD)));
-        ps.setString(6, r.fechaHora().toLocalTime().format(DateTimeFormatter.ofPattern(HH_MM)));
+        ps.setString(
+          5,
+          r.pleno().fecha().format(DateTimeFormatter.ofPattern(YYYY_MM_DD))
+        );
+        ps.setString(
+          6,
+          r.fechaHora().toLocalTime().format(DateTimeFormatter.ofPattern(HH_MM))
+        );
 
         ps.setString(7, a.getKey().nombre());
         ps.setString(8, a.getKey().descripcion());
@@ -286,21 +316,35 @@ public class SaveAsistenciaPlenosToSqlite implements Consumer<AsistenciaPlenos> 
     }
 
     @Override
-    void addBatch(PreparedStatement ps, RegistroAsistencia r) throws SQLException {
+    void addBatch(PreparedStatement ps, RegistroAsistencia r)
+      throws SQLException {
       for (var a : r.asistencias()) {
         ps.setString(1, r.pleno().id());
         ps.setString(2, r.pleno().periodoParlamentario());
         ps.setString(3, r.pleno().periodoAnual());
         ps.setString(4, r.pleno().legislatura());
-        ps.setString(5, r.pleno().fecha().format(DateTimeFormatter.ofPattern(YYYY_MM_DD)));
-        ps.setString(6, r.fechaHora().toLocalTime().format(DateTimeFormatter.ofPattern(HH_MM)));
+        ps.setString(
+          5,
+          r.pleno().fecha().format(DateTimeFormatter.ofPattern(YYYY_MM_DD))
+        );
+        ps.setString(
+          6,
+          r.fechaHora().toLocalTime().format(DateTimeFormatter.ofPattern(HH_MM))
+        );
 
         ps.setString(7, a.congresista());
         ps.setString(8, a.grupoParlamentario());
-        if (r.pleno().gruposParlamentarios().get(a.grupoParlamentario()) == null) {
-          throw new IllegalArgumentException("a.grupoParlamentarioDescripcion == null");
+        if (
+          r.pleno().gruposParlamentarios().get(a.grupoParlamentario()) == null
+        ) {
+          throw new IllegalArgumentException(
+            "a.grupoParlamentarioDescripcion == null"
+          );
         }
-        ps.setString(9, r.pleno().gruposParlamentarios().get(a.grupoParlamentario()));
+        ps.setString(
+          9,
+          r.pleno().gruposParlamentarios().get(a.grupoParlamentario())
+        );
         if (a.resultado() == null) throw new RuntimeException(
           "Error with " + a + " at " + r.pleno() + " @ " + r.fechaHora()
         );

@@ -10,7 +10,15 @@ public record ResultadoVotacion(
   int otros,
   int total
 ) {
-  public static ResultadoVotacion create(int si, int no, int abstenciones, int sinResp, int ausentes, int licencias, int otros) {
+  public static ResultadoVotacion create(
+    int si,
+    int no,
+    int abstenciones,
+    int sinResp,
+    int ausentes,
+    int licencias,
+    int otros
+  ) {
     return new ResultadoVotacion(
       si,
       no,
@@ -42,7 +50,9 @@ public record ResultadoVotacion(
         case ABSTENCION -> this.abstenciones = resultado;
         case SIN_RESPONDER -> this.sinResp = resultado;
         case AUSENTE -> this.ausentes = resultado;
-        case LICENCIA_OFICIAL, LICENCIA_PERSONAL, LICENCIA_POR_ENFERMEDAD -> this.licencias =
+        case LICENCIA_OFICIAL,
+          LICENCIA_PERSONAL,
+          LICENCIA_POR_ENFERMEDAD -> this.licencias =
           this.licencias + resultado;
         default -> this.otros = resultado;
       }
@@ -68,7 +78,9 @@ public record ResultadoVotacion(
         case ABSTENCION -> this.abstenciones = this.abstenciones + 1;
         case SIN_RESPONDER -> this.sinResp = this.sinResp + 1;
         case AUSENTE -> this.ausentes = this.ausentes + 1;
-        case LICENCIA_OFICIAL, LICENCIA_PERSONAL, LICENCIA_POR_ENFERMEDAD -> this.licencias = this.licencias + 1;
+        case LICENCIA_OFICIAL,
+          LICENCIA_PERSONAL,
+          LICENCIA_POR_ENFERMEDAD -> this.licencias = this.licencias + 1;
         default -> this.otros = this.otros + 1;
       }
       return this;

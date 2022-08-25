@@ -13,7 +13,8 @@ import op.congreso.pleno.asistencia.RegistroAsistencia;
 
 public class TextractRegistroPleno {
 
-  public static ArrayList<List<String>> extractRegistroPleno(Path plenoPdf) throws IOException {
+  public static ArrayList<List<String>> extractRegistroPleno(Path plenoPdf)
+    throws IOException {
     List<Path> pages = PlenoPdfToImages.generateImageFromPDF(plenoPdf);
     var list = new ArrayList<List<String>>();
     for (var page : pages) {
@@ -32,7 +33,10 @@ public class TextractRegistroPleno {
         .map(p -> {
           try {
             var lines = Files.readAllLines(p);
-            if (lines.contains(Constantes.ASISTENCIA) || lines.get(3).startsWith(Constantes.ASISTENCIA)) {
+            if (
+              lines.contains(Constantes.ASISTENCIA) ||
+              lines.get(3).startsWith(Constantes.ASISTENCIA)
+            ) {
               return TextractAsistencia.clean(lines);
             } else if (lines.contains(Constantes.VOTACION)) {
               return TextractVotacion.clean(lines);
@@ -45,7 +49,10 @@ public class TextractRegistroPleno {
     }
   }
 
-  public static RegistroPleno processLines(RegistroPlenoDocument document, List<List<String>> list) {
+  public static RegistroPleno processLines(
+    RegistroPlenoDocument document,
+    List<List<String>> list
+  ) {
     var builder = RegistroPleno.newBuilder(document);
     RegistroAsistencia latestAsistencia = null;
     var pageNumber = 1;
@@ -53,7 +60,10 @@ public class TextractRegistroPleno {
     for (var lines : list) {
       System.out.println("Processing page: " + pageNumber);
       try {
-        if (lines.contains(Constantes.ASISTENCIA) || lines.get(3).startsWith(Constantes.ASISTENCIA)) {
+        if (
+          lines.contains(Constantes.ASISTENCIA) ||
+          lines.get(3).startsWith(Constantes.ASISTENCIA)
+        ) {
           var asistencia = TextractAsistencia.load(lines);
           builder.addAsistencia(asistencia);
           latestAsistencia = asistencia;
@@ -75,14 +85,16 @@ public class TextractRegistroPleno {
       }
       pageNumber++;
     }
-    if (latestAsistencia != null) builder.withGruposParlamentarios(latestAsistencia.pleno().gruposParlamentarios());
+    if (latestAsistencia != null) builder.withGruposParlamentarios(
+      latestAsistencia.pleno().gruposParlamentarios()
+    );
     System.out.println(errors);
     return builder.build();
   }
 
   public static void main(String[] args) throws IOException {
-//            var lines = extractRegistroPleno(
-//                    Path.of("./out/Asis_vot_OFICIAL_13-07-2022.pdf"));
+    //            var lines = extractRegistroPleno(
+    //                    Path.of("./out/Asis_vot_OFICIAL_13-07-2022.pdf"));
     var lines = loadLines(Path.of("./out/Asis_vot_OFICIAL_13-07-2022"));
     var pleno = processLines(
       new RegistroPlenoDocument(

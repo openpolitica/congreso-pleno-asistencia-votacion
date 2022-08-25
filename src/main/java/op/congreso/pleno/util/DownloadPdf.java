@@ -13,7 +13,10 @@ public class DownloadPdf {
   public static void main(String[] args) throws IOException {
     ObjectMapper jsonMapper = new ObjectMapper();
     var bytes = Files.readAllBytes(Path.of("plenos.json"));
-    var plenos = jsonMapper.readValue(bytes, new TypeReference<List<RegistroPlenoDocument>>() {});
+    var plenos = jsonMapper.readValue(
+      bytes,
+      new TypeReference<List<RegistroPlenoDocument>>() {}
+    );
 
     plenos.stream().parallel().forEach(RegistroPlenoDocument::download);
   }
