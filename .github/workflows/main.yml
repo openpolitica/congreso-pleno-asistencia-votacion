@@ -19,7 +19,7 @@ jobs:
     steps:
       - name: Set
         run: |
-          cat "test" > test.txt
+          echo "test" > test.txt
           echo "::set-output name=today::$(cat test.txt)"
       - name: echo
         run: |
