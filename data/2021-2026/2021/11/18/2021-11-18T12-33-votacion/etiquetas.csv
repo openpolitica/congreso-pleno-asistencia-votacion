@@ -1,10 +1,6 @@
 etiqueta,valor
-proyectos_resolucion_legislativa,"lista de numeros separados por coma"
-resoluciones_legislativas,"lista de numeros separados por coma"
-cuestion_order_planteado_por,"texto"
 reglamento_congreso_articulos,"6"
-mociones,"lista de numeros de mocion separados por coma"
-tipo_votacion,"texto_substitutorio"
+tipo_votacion,"exoneracion_de_la_segunda_votacion"
 temas,"agricultura_familiar"
 proyectos_ley,"33"
 leyes,"30355"
