@@ -75,7 +75,7 @@ public class LoadRegitroPlenoDocuments {
         if (extractPleno) {
           pleno = p.extract();
           Files.writeString(Path.of("pr-title.txt"), pleno.prTitle());
-          Files.writeString(Path.of("pr-branch.txt"), pleno.prTitle());
+          Files.writeString(Path.of("pr-branch.txt"), pleno.prBranchName());
           Files.writeString(Path.of("pr-content.txt"), pleno.prContent());
           extractPleno = false;
         }
