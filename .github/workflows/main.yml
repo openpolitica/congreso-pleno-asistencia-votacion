@@ -83,10 +83,12 @@ jobs:
         run: |
           echo "::set-output name=pr-title::$(cat pr-title.txt)"
           echo "::set-output name=pr-content::$(cat pr-content.txt)"
+          echo "::set-output name=pr-branch::$(cat pr-branch.txt)"
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3
         with:
           title: ${{steps.set-pr.outputs.pr-title}}
+          branch: ${{steps.set-pr.outputs.pr-branch}}
           body: ${{steps.set-pr.outputs.pr-content}}
 
 
