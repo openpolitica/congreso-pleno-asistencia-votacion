@@ -71,14 +71,14 @@ public class LoadRegitroPlenoDocuments {
     var updated = new HashSet<RegistroPlenoDocument>();
     for (var p : plenos) {
       var pleno = existing.getOrDefault(p.id(), p);
-//      if (p.paginas() < 1 && pleno.periodoParlamentario().equals(current)) {
-//        if (extractPleno) {
-//          pleno = p.extract();
-//          Files.writeString(Path.of("pr-title.txt"), pleno.prTitle());
-//          Files.writeString(Path.of("pr-content.txt"), pleno.prContent());
-//          extractPleno = false;
-//        }
-//      }
+      if (p.paginas() < 1 && pleno.periodoParlamentario().equals(current)) {
+        if (extractPleno) {
+          pleno = p.extract();
+          Files.writeString(Path.of("pr-title.txt"), pleno.prTitle());
+          Files.writeString(Path.of("pr-content.txt"), pleno.prContent());
+          extractPleno = false;
+        }
+      }
       updated.add(pleno);
     }
 
