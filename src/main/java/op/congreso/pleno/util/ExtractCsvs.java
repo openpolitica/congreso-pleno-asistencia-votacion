@@ -30,14 +30,26 @@ public class ExtractCsvs {
             // Open and existing XLSX file
             try (var workBook = new XSSFWorkbook(path.toFile())) {
               if (filename.endsWith("-asistencia")) {
-                Files.writeString(output.resolve("metadatos.csv"), csvFromSheet(workBook, "metadatos"));
-                Files.writeString(output.resolve("asistencias.csv"), csvFromSheet(workBook, "asistencias"));
-                Files.writeString(output.resolve("resultados.csv"), csvFromSheet(workBook, "resultados"));
+                Files.writeString(
+                  output.resolve("metadatos.csv"),
+                  csvFromSheet(workBook, "metadatos")
+                );
+                Files.writeString(
+                  output.resolve("asistencias.csv"),
+                  csvFromSheet(workBook, "asistencias")
+                );
+                Files.writeString(
+                  output.resolve("resultados.csv"),
+                  csvFromSheet(workBook, "resultados")
+                );
                 Files.writeString(
                   output.resolve("resultados_grupo.csv"),
                   csvFromSheet(workBook, "resultados_grupo")
                 );
-                Files.writeString(output.resolve("notas.csv"), csvFromSheet(workBook, "notas"));
+                Files.writeString(
+                  output.resolve("notas.csv"),
+                  csvFromSheet(workBook, "notas")
+                );
                 Files.writeString(
                   output.resolve("datos_tipo_asistencia.csv"),
                   csvFromSheet(workBook, "datos_tipo_asistencia")
@@ -46,18 +58,36 @@ public class ExtractCsvs {
                   output.resolve("datos_grupo_parlamentario.csv"),
                   csvFromSheet(workBook, "datos_grupo_parlamentario")
                 );
-                Files.writeString(output.resolve("version.csv"), csvFromSheet(workBook, "version"));
+                Files.writeString(
+                  output.resolve("version.csv"),
+                  csvFromSheet(workBook, "version")
+                );
               }
               if (filename.endsWith("-votacion")) {
-                Files.writeString(output.resolve("metadatos.csv"), csvFromSheet(workBook, "metadatos"));
-                Files.writeString(output.resolve("etiquetas.csv"), csvFromSheet(workBook, "etiquetas"));
-                Files.writeString(output.resolve("votaciones.csv"), csvFromSheet(workBook, "votaciones"));
-                Files.writeString(output.resolve("resultados.csv"), csvFromSheet(workBook, "resultados"));
+                Files.writeString(
+                  output.resolve("metadatos.csv"),
+                  csvFromSheet(workBook, "metadatos")
+                );
+                Files.writeString(
+                  output.resolve("etiquetas.csv"),
+                  csvFromSheet(workBook, "etiquetas")
+                );
+                Files.writeString(
+                  output.resolve("votaciones.csv"),
+                  csvFromSheet(workBook, "votaciones")
+                );
+                Files.writeString(
+                  output.resolve("resultados.csv"),
+                  csvFromSheet(workBook, "resultados")
+                );
                 Files.writeString(
                   output.resolve("resultados_grupo.csv"),
                   csvFromSheet(workBook, "resultados_grupo")
                 );
-                Files.writeString(output.resolve("notas.csv"), csvFromSheet(workBook, "notas"));
+                Files.writeString(
+                  output.resolve("notas.csv"),
+                  csvFromSheet(workBook, "notas")
+                );
                 Files.writeString(
                   output.resolve("datos_tipo_votacion.csv"),
                   csvFromSheet(workBook, "datos_tipo_votacion")
@@ -66,7 +96,10 @@ public class ExtractCsvs {
                   output.resolve("datos_grupo_parlamentario.csv"),
                   csvFromSheet(workBook, "datos_grupo_parlamentario")
                 );
-                Files.writeString(output.resolve("version.csv"), csvFromSheet(workBook, "version"));
+                Files.writeString(
+                  output.resolve("version.csv"),
+                  csvFromSheet(workBook, "version")
+                );
               }
             } catch (Exception e) {
               throw new RuntimeException("Error at " + path, e);
@@ -79,7 +112,10 @@ public class ExtractCsvs {
     }
   }
 
-  private static StringBuilder csvFromSheet(XSSFWorkbook workbook, String sheetName) {
+  private static StringBuilder csvFromSheet(
+    XSSFWorkbook workbook,
+    String sheetName
+  ) {
     StringBuilder b = new StringBuilder();
     for (Row row : workbook.getSheet(sheetName)) {
       Iterator<Cell> cellIterator = row.cellIterator();
@@ -89,7 +125,9 @@ public class ExtractCsvs {
         String v;
         try {
           if (cell.getCellType().equals(CellType.FORMULA)) {
-            FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
+            FormulaEvaluator evaluator = workbook
+              .getCreationHelper()
+              .createFormulaEvaluator();
             DataFormatter formatter = new DataFormatter();
             v = formatter.formatCellValue(cell, evaluator);
           } else {

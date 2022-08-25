@@ -26,8 +26,14 @@ public class TextractToText {
         .build()
     ) {
       byte[] bytes = Files.readAllBytes(path);
-      final var document = Document.builder().bytes(SdkBytes.fromByteArray(bytes)).build();
-      final var request = DetectDocumentTextRequest.builder().document(document).build();
+      final var document = Document
+        .builder()
+        .bytes(SdkBytes.fromByteArray(bytes))
+        .build();
+      final var request = DetectDocumentTextRequest
+        .builder()
+        .document(document)
+        .build();
       final var response = textractClient.detectDocumentText(request);
 
       final var blocks = response.blocks();
@@ -41,12 +47,18 @@ public class TextractToText {
         }
         i++;
       }
-      if (lines.contains(Constantes.ASISTENCIA) || lines.get(3).startsWith(Constantes.ASISTENCIA)) {
+      if (
+        lines.contains(Constantes.ASISTENCIA) ||
+        lines.get(3).startsWith(Constantes.ASISTENCIA)
+      ) {
         lines = TextractAsistencia.clean(lines);
       } else if (lines.contains(Constantes.VOTACION)) {
         lines = TextractVotacion.clean(lines);
       }
-      Files.writeString(Path.of(path.toString().replace(".png", ".txt")), String.join("\n", lines));
+      Files.writeString(
+        Path.of(path.toString().replace(".png", ".txt")),
+        String.join("\n", lines)
+      );
       return lines;
     } catch (IOException e) {
       throw new RuntimeException(e);

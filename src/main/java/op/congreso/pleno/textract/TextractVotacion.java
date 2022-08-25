@@ -25,7 +25,11 @@ public class TextractVotacion {
 
   public static void main(String[] args) throws IOException {
     try {
-      var lines = clean(Files.readAllLines(Path.of("./out/Asis_vot_OFICIAL_07-07-22/page_16.txt")));
+      var lines = clean(
+        Files.readAllLines(
+          Path.of("./out/Asis_vot_OFICIAL_07-07-22/page_16.txt")
+        )
+      );
 
       var registro = load(65, lines);
 
@@ -36,7 +40,12 @@ public class TextractVotacion {
   }
 
   static RegistroVotacion load(int quorum, List<String> lines) {
-    lines = lines.stream().map(s -> s.replace(" +++", "")).map(s -> s.replace("+++ ", "")).toList();
+    lines =
+      lines
+        .stream()
+        .map(s -> s.replace(" +++", ""))
+        .map(s -> s.replace("+++ ", ""))
+        .toList();
 
     var registroBuilder = RegistroVotacion.newBuilder().withQuorum(quorum);
     var plenoBuilder = Pleno.newBuilder();
@@ -58,7 +67,9 @@ public class TextractVotacion {
         switch (i) {
           case 0 -> titulo = lines.get(i);
           case 1 -> plenoBuilder.withLegislatura(lines.get(i));
-          case 2 -> registroBuilder.withPresidente(lines.get(i).substring("Presidente: ".length()));
+          case 2 -> registroBuilder.withPresidente(
+            lines.get(i).substring("Presidente: ".length())
+          );
           case 3 -> plenoBuilder.withTitulo(lines.get(i));
           case 4 -> type = lines.get(i);
           case 5 -> {
@@ -115,13 +126,18 @@ public class TextractVotacion {
         // Process GP + Congresista + Votacion
         if (VALID_GP.contains(previous)) { // GP found in previous round
           var congresista = lines.get(i); // get congresista from current line
-          var maybeVotacion = congresista.substring(congresista.lastIndexOf(" ") + 1); // check if maybe contains votacion at the end
+          var maybeVotacion = congresista.substring(
+            congresista.lastIndexOf(" ") + 1
+          ); // check if maybe contains votacion at the end
           if (maybeVotacion.equals("+++") || maybeVotacion.equals("-")) {
-            congresista = congresista.substring(0, congresista.lastIndexOf(" ")); // get congresista
-            maybeVotacion = congresista.substring(congresista.lastIndexOf(" ") + 1);
+            congresista =
+              congresista.substring(0, congresista.lastIndexOf(" ")); // get congresista
+            maybeVotacion =
+              congresista.substring(congresista.lastIndexOf(" ") + 1);
           }
           if (Votacion.is(maybeVotacion)) { // if it does
-            congresista = congresista.substring(0, congresista.lastIndexOf(" ")); // get congresista
+            congresista =
+              congresista.substring(0, congresista.lastIndexOf(" ")); // get congresista
             // and add votacion
             resultados.add(
               new ResultadoCongresista<>(
@@ -148,10 +164,22 @@ public class TextractVotacion {
               } else {
                 prev = votacionWords[2];
               }
-              resultados.add(new ResultadoCongresista<>(previous, congresista, Votacion.of(votacionWords[0])));
+              resultados.add(
+                new ResultadoCongresista<>(
+                  previous,
+                  congresista,
+                  Votacion.of(votacionWords[0])
+                )
+              );
               previous = prev;
             } else {
-              resultados.add(new ResultadoCongresista<>(previous, congresista, Votacion.of(votacionWords[0])));
+              resultados.add(
+                new ResultadoCongresista<>(
+                  previous,
+                  congresista,
+                  Votacion.of(votacionWords[0])
+                )
+              );
               previous = "";
             }
           }
@@ -159,13 +187,18 @@ public class TextractVotacion {
           var gp = lines.get(i).trim();
           i++;
           var congresista = lines.get(i); // get congresista
-          var maybeVotacion = congresista.substring(congresista.lastIndexOf(" ") + 1);
+          var maybeVotacion = congresista.substring(
+            congresista.lastIndexOf(" ") + 1
+          );
           if (maybeVotacion.equals("+++") || maybeVotacion.equals("-")) {
-            congresista = congresista.substring(0, congresista.lastIndexOf(" ")); // get congresista
-            maybeVotacion = congresista.substring(congresista.lastIndexOf(" ") + 1);
+            congresista =
+              congresista.substring(0, congresista.lastIndexOf(" ")); // get congresista
+            maybeVotacion =
+              congresista.substring(congresista.lastIndexOf(" ") + 1);
           }
           if (Votacion.is(maybeVotacion)) { // if votacion included
-            congresista = congresista.substring(0, congresista.lastIndexOf(" ")); // extract congresista
+            congresista =
+              congresista.substring(0, congresista.lastIndexOf(" ")); // extract congresista
             // and add resultado
             resultados.add(
               new ResultadoCongresista<>(
@@ -191,15 +224,34 @@ public class TextractVotacion {
                 previous = votacionWords[2];
               }
             }
-            resultados.add(new ResultadoCongresista<>(gp, congresista, Votacion.of(votacionWords[0])));
+            resultados.add(
+              new ResultadoCongresista<>(
+                gp,
+                congresista,
+                Votacion.of(votacionWords[0])
+              )
+            );
           }
         } else if (!lines.get(i).equals("+++")) { // if line does not have additional characters
-          var gp = lines.get(i).contains(" ") ? lines.get(i).substring(0, lines.get(i).indexOf(" ")) : lines.get(i);
-          var congresista = lines.get(i).substring(lines.get(i).indexOf(" ") + 1);
-          var maybeVotacion = congresista.substring(congresista.lastIndexOf(" ") + 1);
+          var gp = lines.get(i).contains(" ")
+            ? lines.get(i).substring(0, lines.get(i).indexOf(" "))
+            : lines.get(i);
+          var congresista = lines
+            .get(i)
+            .substring(lines.get(i).indexOf(" ") + 1);
+          var maybeVotacion = congresista.substring(
+            congresista.lastIndexOf(" ") + 1
+          );
           if (Votacion.is(maybeVotacion)) {
-            congresista = congresista.substring(0, congresista.lastIndexOf(" "));
-            resultados.add(new ResultadoCongresista<>(gp, congresista, Votacion.of(maybeVotacion)));
+            congresista =
+              congresista.substring(0, congresista.lastIndexOf(" "));
+            resultados.add(
+              new ResultadoCongresista<>(
+                gp,
+                congresista,
+                Votacion.of(maybeVotacion)
+              )
+            );
           } else {
             i++;
             var votacionWords = lines.get(i).split("\\s+");
@@ -217,7 +269,13 @@ public class TextractVotacion {
                 previous = votacionWords[2];
               }
             }
-            resultados.add(new ResultadoCongresista<>(gp, congresista, Votacion.of(votacionWords[0])));
+            resultados.add(
+              new ResultadoCongresista<>(
+                gp,
+                congresista,
+                Votacion.of(votacionWords[0])
+              )
+            );
           }
         }
       } else { // Process resultados
@@ -253,15 +311,25 @@ public class TextractVotacion {
             if (Votacion.is(votacion)) {
               i++;
               var votacionTotal = lines.get(i);
-              resultadosBuilder.with(Votacion.of(votacion), Integer.parseInt(votacionTotal));
-            } else if (lines.get(i).contains("(") && lines.get(i).contains(")")) {
+              resultadosBuilder.with(
+                Votacion.of(votacion),
+                Integer.parseInt(votacionTotal)
+              );
+            } else if (
+              lines.get(i).contains("(") && lines.get(i).contains(")")
+            ) {
               try {
-                var matcher = VOTACION_GROUP.matcher(lines.get(i).substring(lines.get(i).lastIndexOf("(")));
+                var matcher = VOTACION_GROUP.matcher(
+                  lines.get(i).substring(lines.get(i).lastIndexOf("("))
+                );
                 if (matcher.find()) {
                   var asis = matcher.group();
                   i++;
                   var result = lines.get(i);
-                  resultadosBuilder.with(Votacion.of(asis), Integer.parseInt(result));
+                  resultadosBuilder.with(
+                    Votacion.of(asis),
+                    Integer.parseInt(result)
+                  );
                 }
               } catch (Exception e) {
                 System.out.println("Error processing total: " + lines.get(i));
@@ -288,17 +356,31 @@ public class TextractVotacion {
                   i++;
                   var sinResp = Integer.parseInt(lines.get(i));
                   resultadosGrupos.put(
-                    new GrupoParlamentario(lines.get(i), grupos.get(lines.get(i))),
+                    new GrupoParlamentario(
+                      lines.get(i),
+                      grupos.get(lines.get(i))
+                    ),
                     ResultadoVotacion.create(si, no, abst, sinResp, 0, 0, 0)
                   );
                 } catch (Exception e) {
                   System.out.println("Error processing group results: " + gp);
                   e.printStackTrace();
                 }
-              } else if (!lines.get(i).isBlank() && lines.get(i).contains(" ")) {
-                if (VALID_GP.contains(lines.get(i).substring(0, lines.get(i).indexOf(" ")))) {
-                  String grupo = lines.get(i).substring(0, lines.get(i).indexOf(" "));
-                  grupos.put(grupo, lines.get(i).substring(lines.get(i).indexOf(" ") + 1));
+              } else if (
+                !lines.get(i).isBlank() && lines.get(i).contains(" ")
+              ) {
+                if (
+                  VALID_GP.contains(
+                    lines.get(i).substring(0, lines.get(i).indexOf(" "))
+                  )
+                ) {
+                  String grupo = lines
+                    .get(i)
+                    .substring(0, lines.get(i).indexOf(" "));
+                  grupos.put(
+                    grupo,
+                    lines.get(i).substring(lines.get(i).indexOf(" ") + 1)
+                  );
                   i++;
                   var si = Integer.parseInt(lines.get(i));
                   i++;
@@ -332,34 +414,35 @@ public class TextractVotacion {
   }
 
   static List<String> clean(List<String> list) {
-    List<String> first = new ArrayList<>(list
-            .stream()
-            .map(s ->
-                    s
-                            .replace("+++ ", "")
-                            .replace("+++", "")
-                            .replace(" +++", "")
-                            .replace("***", "SI")
-                            .replace("NO---", "NO")
-                            .replace("NO-", "NO")
-                            .trim()
-            )
-            .flatMap(s -> {
-              var ss = s.split(" ");
-              if (ss.length > 1 && Votacion.is(ss[0])) {
-                return Stream.of(ss[0], s.substring(s.indexOf(" ") + 1));
-              } else return Stream.of(s);
-            })
-            .flatMap(s -> {
-              var ss = s.split(" ");
-              if (ss.length > 1 && isInteger(ss[0])) {
-                return Stream.of(ss[0], s.substring(s.indexOf(" ") + 1));
-              } else return Stream.of(s);
-            })
-            .filter(s -> !s.isBlank())
-            .toList());
-    if (first.get(2).equals("SI"))
-      first.remove(2);
+    List<String> first = new ArrayList<>(
+      list
+        .stream()
+        .map(s ->
+          s
+            .replace("+++ ", "")
+            .replace("+++", "")
+            .replace(" +++", "")
+            .replace("***", "SI")
+            .replace("NO---", "NO")
+            .replace("NO-", "NO")
+            .trim()
+        )
+        .flatMap(s -> {
+          var ss = s.split(" ");
+          if (ss.length > 1 && Votacion.is(ss[0])) {
+            return Stream.of(ss[0], s.substring(s.indexOf(" ") + 1));
+          } else return Stream.of(s);
+        })
+        .flatMap(s -> {
+          var ss = s.split(" ");
+          if (ss.length > 1 && isInteger(ss[0])) {
+            return Stream.of(ss[0], s.substring(s.indexOf(" ") + 1));
+          } else return Stream.of(s);
+        })
+        .filter(s -> !s.isBlank())
+        .toList()
+    );
+    if (first.get(2).equals("SI")) first.remove(2);
     return first;
   }
 

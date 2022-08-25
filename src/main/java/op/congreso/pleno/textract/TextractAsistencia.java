@@ -26,7 +26,9 @@ public class TextractAsistencia {
 
   public static void main(String[] args) throws IOException {
     try {
-      var lines = Files.readAllLines(Path.of("./out/Asis_vot_OFICIAL_07-07-22/page_8.txt"));
+      var lines = Files.readAllLines(
+        Path.of("./out/Asis_vot_OFICIAL_07-07-22/page_8.txt")
+      );
 
       var registro = load(clean(lines));
 
@@ -68,7 +70,9 @@ public class TextractAsistencia {
               plenoBuilder.withFecha(fechaHora.toLocalDate());
             } else if (text.startsWith(Constantes.ASISTENCIA)) {
               type = Constantes.ASISTENCIA;
-              var fechaText = text.substring(Constantes.ASISTENCIA.length() + 1);
+              var fechaText = text.substring(
+                Constantes.ASISTENCIA.length() + 1
+              );
               fechaHora = LocalDateTime.parse(fechaText, FECHA_HORA_PATTERN);
               registroBuilder.withFechaHora(fechaHora);
               plenoBuilder.withFecha(fechaHora.toLocalDate());
@@ -81,8 +85,14 @@ public class TextractAsistencia {
           i++;
           var congresista = lines.get(i);
           // Check Congresista text does not contain Asistencia
-          if (Asistencia.is(congresista.substring(congresista.lastIndexOf(" ") + 1))) { // if it contains Asistencia
-            var asistencia = congresista.substring(congresista.lastIndexOf(" ")); // get asistencia
+          if (
+            Asistencia.is(
+              congresista.substring(congresista.lastIndexOf(" ") + 1)
+            )
+          ) { // if it contains Asistencia
+            var asistencia = congresista.substring(
+              congresista.lastIndexOf(" ")
+            ); // get asistencia
             // and build resultado
             asistencias.add(
               new ResultadoCongresista<>(
@@ -95,14 +105,26 @@ public class TextractAsistencia {
             i++;
             var asistencia = lines.get(i); // get asistencia from next line
             // and build resultado
-            asistencias.add(new ResultadoCongresista<>(text.trim(), congresista, Asistencia.of(asistencia)));
+            asistencias.add(
+              new ResultadoCongresista<>(
+                text.trim(),
+                congresista,
+                Asistencia.of(asistencia)
+              )
+            );
           }
         } else { // else GP is in the same line as congresista
           var gp = text.substring(0, text.indexOf(" ")); // get GP from first work
           // Check Congresista text does not contain Asistencia
           var congresista = text.substring(text.indexOf(" ") + 1);
-          if (Asistencia.is(congresista.substring(congresista.lastIndexOf(" ") + 1))) { // if it contains asistencia
-            var asistencia = congresista.substring(congresista.lastIndexOf(" ")); // get asistencia
+          if (
+            Asistencia.is(
+              congresista.substring(congresista.lastIndexOf(" ") + 1)
+            )
+          ) { // if it contains asistencia
+            var asistencia = congresista.substring(
+              congresista.lastIndexOf(" ")
+            ); // get asistencia
             // and build resultado
             asistencias.add(
               new ResultadoCongresista<>(
@@ -115,7 +137,13 @@ public class TextractAsistencia {
             i++;
             var asistencia = lines.get(i); // get asistencia from next line
             // and build resultado
-            asistencias.add(new ResultadoCongresista<>(gp, congresista, Asistencia.of(asistencia)));
+            asistencias.add(
+              new ResultadoCongresista<>(
+                gp,
+                congresista,
+                Asistencia.of(asistencia)
+              )
+            );
           }
         }
       } else { // Process resultados
@@ -150,11 +178,20 @@ public class TextractAsistencia {
                   previous = result.substring(result.indexOf(" ") + 1);
                   result = result.substring(0, result.indexOf(" "));
                 }
-                resultadosBuilder.with(Asistencia.of(asis), Integer.parseInt(result.replace(".", "")));
+                resultadosBuilder.with(
+                  Asistencia.of(asis),
+                  Integer.parseInt(result.replace(".", ""))
+                );
               }
             } else if (text.contains("(") && text.contains(")")) { // Or get Asistencia from within ()
-              if (Asistencia.isDescripcion(text.substring(0, text.lastIndexOf("(") - 1))) {
-                var matcher = ASISTENCIA_GROUP.matcher(text.substring(text.lastIndexOf("(")));
+              if (
+                Asistencia.isDescripcion(
+                  text.substring(0, text.lastIndexOf("(") - 1)
+                )
+              ) {
+                var matcher = ASISTENCIA_GROUP.matcher(
+                  text.substring(text.lastIndexOf("("))
+                );
                 if (matcher.find()) {
                   var asis = matcher.group();
                   i++;
@@ -163,7 +200,10 @@ public class TextractAsistencia {
                     previous = result.substring(result.indexOf(" ") + 1);
                     result = result.substring(0, result.indexOf(" "));
                   }
-                  resultadosBuilder.with(Asistencia.of(asis), Integer.parseInt(result.replace(".", "")));
+                  resultadosBuilder.with(
+                    Asistencia.of(asis),
+                    Integer.parseInt(result.replace(".", ""))
+                  );
                 }
               }
             } else { // Or get resulados per GP
@@ -177,12 +217,20 @@ public class TextractAsistencia {
                 i++;
                 var licencias = Integer.parseInt(lines.get(i).replace(".", ""));
                 i++;
-                var suspendidos = Integer.parseInt(lines.get(i).replace(".", ""));
+                var suspendidos = Integer.parseInt(
+                  lines.get(i).replace(".", "")
+                );
                 i++;
                 var otros = Integer.parseInt(lines.get(i).replace(".", ""));
                 resultadosGrupos.put(
                   new GrupoParlamentario(text, grupos.get(text)),
-                  ResultadoAsistencia.create(presentes, ausentes, licencias, suspendidos, otros)
+                  ResultadoAsistencia.create(
+                    presentes,
+                    ausentes,
+                    licencias,
+                    suspendidos,
+                    otros
+                  )
                 );
                 previous = "";
               } else if (VALID_GP.contains(text)) {
@@ -195,12 +243,20 @@ public class TextractAsistencia {
                 i++;
                 var licencias = Integer.parseInt(lines.get(i).replace(".", ""));
                 i++;
-                var suspendidos = Integer.parseInt(lines.get(i).replace(".", ""));
+                var suspendidos = Integer.parseInt(
+                  lines.get(i).replace(".", "")
+                );
                 i++;
                 var otros = Integer.parseInt(lines.get(i).replace(".", ""));
                 resultadosGrupos.put(
                   new GrupoParlamentario(text, grupos.get(text)),
-                  ResultadoAsistencia.create(presentes, ausentes, licencias, suspendidos, otros)
+                  ResultadoAsistencia.create(
+                    presentes,
+                    ausentes,
+                    licencias,
+                    suspendidos,
+                    otros
+                  )
                 );
               } else if (!text.isBlank() && text.contains(" ")) {
                 if (VALID_GP.contains(text.substring(0, text.indexOf(" ")))) {
@@ -218,7 +274,13 @@ public class TextractAsistencia {
                   var otros = Integer.parseInt(lines.get(i));
                   resultadosGrupos.put(
                     new GrupoParlamentario(grupo, grupos.get(grupo)),
-                    ResultadoAsistencia.create(presentes, ausentes, licencias, suspendidos, otros)
+                    ResultadoAsistencia.create(
+                      presentes,
+                      ausentes,
+                      licencias,
+                      suspendidos,
+                      otros
+                    )
                   );
                 } else if (text.equals("Asistencia para Quórum")) { // Finally get quorum
                   i++;

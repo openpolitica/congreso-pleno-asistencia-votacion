@@ -37,7 +37,13 @@ public record RegistroAsistencia(
       asistencias
         .stream()
         .sorted(Comparator.comparing(ResultadoCongresista::congresista))
-        .map(a -> a.grupoParlamentario() + ",\"" + a.congresista() + "\"," + a.resultado().name())
+        .map(a ->
+          a.grupoParlamentario() +
+          ",\"" +
+          a.congresista() +
+          "\"," +
+          a.resultado().name()
+        )
         .collect(Collectors.joining("\n"))
     );
   }
@@ -120,8 +126,20 @@ public record RegistroAsistencia(
           "," +
           resultadosPorGrupo.get(k).otros()
         )
-        .collect(Collectors.joining("\n")) + "\n" +
-        "TOTAL," + resultados.total() + "," + resultados.presentes() + "," + resultados.ausentes() + "," + resultados.licencias() + "," + resultados.suspendidos() + ","+resultados.otros()
+        .collect(Collectors.joining("\n")) +
+      "\n" +
+      "TOTAL," +
+      resultados.total() +
+      "," +
+      resultados.presentes() +
+      "," +
+      resultados.ausentes() +
+      "," +
+      resultados.licencias() +
+      "," +
+      resultados.suspendidos() +
+      "," +
+      resultados.otros()
     );
   }
 
@@ -158,12 +176,18 @@ public record RegistroAsistencia(
     }
 
     public Builder withFechaHora(LocalDate fecha, String hora) {
-      var horaTime = LocalTime.parse(hora, DateTimeFormatter.ofPattern("HH:mm"));
+      var horaTime = LocalTime.parse(
+        hora,
+        DateTimeFormatter.ofPattern("HH:mm")
+      );
       this.fechaHora = fecha.atTime(horaTime);
       return this;
     }
 
-    public Builder withAsistencias(Map<String, String> grupos, List<ResultadoCongresista<Asistencia>> asistencias) {
+    public Builder withAsistencias(
+      Map<String, String> grupos,
+      List<ResultadoCongresista<Asistencia>> asistencias
+    ) {
       this.asistencias = asistencias;
       this.grupos = grupos;
       return this;
@@ -188,14 +212,19 @@ public record RegistroAsistencia(
         );
         results.computeIfPresent(
           grupoParlamentario,
-          (gp, resultadoAsistencia) -> resultadoAsistencia.increase(asistencia.resultado())
+          (gp, resultadoAsistencia) ->
+            resultadoAsistencia.increase(asistencia.resultado())
         );
         results.computeIfAbsent(
           grupoParlamentario,
-          gp -> ResultadoAsistencia.newBuilder().increase(asistencia.resultado())
+          gp ->
+            ResultadoAsistencia.newBuilder().increase(asistencia.resultado())
         );
       }
-      return results.keySet().stream().collect(Collectors.toMap(k -> k, k -> results.get(k).build()));
+      return results
+        .keySet()
+        .stream()
+        .collect(Collectors.toMap(k -> k, k -> results.get(k).build()));
     }
 
     public Builder withResultados(ResultadoAsistencia resultados) {
@@ -203,45 +232,80 @@ public record RegistroAsistencia(
       return this;
     }
 
-    public Builder withResultadosPorPartido(Map<GrupoParlamentario, ResultadoAsistencia> resultadosPorPartido) {
+    public Builder withResultadosPorPartido(
+      Map<GrupoParlamentario, ResultadoAsistencia> resultadosPorPartido
+    ) {
       this.resultadosPorGrupo = resultadosPorPartido;
       return this;
     }
-      void checkCongresistas() {
-        var errores = Congresistas.checkCongresistas(asistencias.stream().map(ResultadoCongresista::congresista).toList());
-        if (!errores.isEmpty()) {
-          var map = errores.stream().collect(Collectors.toMap(c -> c, Congresistas::findSimilar));
-          asistencias = asistencias.stream()
-                  .map(v -> {
-                    if (map.containsKey(v.congresista())) {
-                      return v.replaceCongresista(map.get(v.congresista()));
-                    }
-                    return v;
-                  }).toList();
-          log = Congresistas.checkCongresistas(asistencias.stream().map(ResultadoCongresista::congresista).toList());
-        }
+
+    void checkCongresistas() {
+      var errores = Congresistas.checkCongresistas(
+        asistencias.stream().map(ResultadoCongresista::congresista).toList()
+      );
+      if (!errores.isEmpty()) {
+        var map = errores
+          .stream()
+          .collect(Collectors.toMap(c -> c, Congresistas::findSimilar));
+        asistencias =
+          asistencias
+            .stream()
+            .map(v -> {
+              if (map.containsKey(v.congresista())) {
+                return v.replaceCongresista(map.get(v.congresista()));
+              }
+              return v;
+            })
+            .toList();
+        log =
+          Congresistas.checkCongresistas(
+            asistencias.stream().map(ResultadoCongresista::congresista).toList()
+          );
       }
+    }
 
     public RegistroAsistencia build() {
-      var calcResultsPerGroup = calculateResultadosPorGrupoParlamentario(grupos);
+      var calcResultsPerGroup = calculateResultadosPorGrupoParlamentario(
+        grupos
+      );
       var calcResults = calculateResultados();
       if (!calcResultsPerGroup.equals(resultadosPorGrupo)) {
-        LOG.warn("Resultados por grupo calculados son diferentes de capturados Pleno: {}", fechaHora);
-        LOG.warn("Diff: \nOld: {} \nNew: {}", resultadosPorGrupo, calcResultsPerGroup);
+        LOG.warn(
+          "Resultados por grupo calculados son diferentes de capturados Pleno: {}",
+          fechaHora
+        );
+        LOG.warn(
+          "Diff: \nOld: {} \nNew: {}",
+          resultadosPorGrupo,
+          calcResultsPerGroup
+        );
         this.resultadosPorGrupo = calcResultsPerGroup;
       }
       if (!calcResults.equals(resultados)) {
-        LOG.warn("Resultados calculados son diferentes de capturados Pleno: {}", fechaHora);
+        LOG.warn(
+          "Resultados calculados son diferentes de capturados Pleno: {}",
+          fechaHora
+        );
         LOG.warn("Diff: \nOld: {} \nNew: {}", resultados, calcResults);
         this.resultados = calcResults;
       }
       checkResultsMatch(resultados, resultadosPorGrupo);
       checkCongresistas();
-      return new RegistroAsistencia(pleno, quorum, fechaHora, asistencias, resultadosPorGrupo, resultados, log);
+      return new RegistroAsistencia(
+        pleno,
+        quorum,
+        fechaHora,
+        asistencias,
+        resultadosPorGrupo,
+        resultados,
+        log
+      );
     }
 
-    private void checkResultsMatch(ResultadoAsistencia resultados,
-        Map<GrupoParlamentario, ResultadoAsistencia> resultadosPorGrupo) {
+    private void checkResultsMatch(
+      ResultadoAsistencia resultados,
+      Map<GrupoParlamentario, ResultadoAsistencia> resultadosPorGrupo
+    ) {
       var presentes = 0;
       var ausentes = 0;
       var otros = 0;
@@ -256,9 +320,18 @@ public record RegistroAsistencia(
         licencias = licencias + resultadosPorGrupo.get(grupo).licencias();
         total = total + resultadosPorGrupo.get(grupo).total();
       }
-      if (presentes != resultados.presentes() || ausentes != resultados.ausentes() || otros != resultados.otros() || suspendidos != resultados.suspendidos()
-          || licencias != resultados.licencias() || total != resultados.total()) {
-        LOG.warn("Resultados calculados son diferentes de resulados generales: {}", fechaHora);
+      if (
+        presentes != resultados.presentes() ||
+        ausentes != resultados.ausentes() ||
+        otros != resultados.otros() ||
+        suspendidos != resultados.suspendidos() ||
+        licencias != resultados.licencias() ||
+        total != resultados.total()
+      ) {
+        LOG.warn(
+          "Resultados calculados son diferentes de resulados generales: {}",
+          fechaHora
+        );
       }
     }
   }

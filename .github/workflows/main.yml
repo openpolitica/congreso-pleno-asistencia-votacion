@@ -17,6 +17,13 @@ jobs:
     runs-on: ubuntu-latest
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+      - name: Set
+        run: |
+          cat "test" > test.txt
+          echo "::set-output name=today::$(cat test.txt)"
+      - name: echo
+        run: |
+          echo ${{steps.set_today.outputs.today}}
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 

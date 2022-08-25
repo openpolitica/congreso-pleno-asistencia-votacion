@@ -42,7 +42,11 @@ public enum Asistencia implements Resultado {
   }
 
   public static boolean isDescripcion(String text) {
-    return map.values().stream().map(Asistencia::descripcion).anyMatch(s -> s.equals(text.toUpperCase()));
+    return map
+      .values()
+      .stream()
+      .map(Asistencia::descripcion)
+      .anyMatch(s -> s.equals(text.toUpperCase()));
   }
 
   @Override

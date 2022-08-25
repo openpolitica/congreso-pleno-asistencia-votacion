@@ -1,22 +1,27 @@
 package op.congreso.pleno.app;
 
-import static op.congreso.pleno.RegistroPlenoDocument.*;
+import static op.congreso.pleno.RegistroPlenoDocument.collect;
+import static op.congreso.pleno.RegistroPlenoDocument.collectPleno;
+import static op.congreso.pleno.RegistroPlenoDocument.csvHeader;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 import op.congreso.pleno.RegistroPlenoDocument;
 
 public class LoadRegitroPlenoDocuments {
 
   public static void main(String[] args) throws IOException {
-    var root = collect("/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/new_asistenciavotacion", 5);
+    var root = collect(
+      "/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/new_asistenciavotacion",
+      5
+    );
 
     var plenos = new HashSet<RegistroPlenoDocument>();
 
@@ -29,29 +34,44 @@ public class LoadRegitroPlenoDocuments {
         for (var legislatura : periodo.entrySet()) {
           System.out.println(legislatura.getKey());
 
-          var p = collectPleno(periodos.getKey(), anual.getKey(), legislatura.getKey(), legislatura.getValue());
+          var p = collectPleno(
+            periodos.getKey(),
+            anual.getKey(),
+            legislatura.getKey(),
+            legislatura.getValue()
+          );
           plenos.addAll(p.values());
         }
       }
     }
 
-    var jsonMapper = new ObjectMapper();
+    //    var mapper = new ObjectMapper();
+    var mapper = new CsvMapper();
 
-    var plenosJsonPath = Path.of("plenos.json");
     var plenosCsvPath = Path.of("plenos.csv");
 
-    var bytes = Files.readAllBytes(plenosJsonPath);
-    var existing = jsonMapper
-      .readValue(bytes, new TypeReference<List<RegistroPlenoDocument>>() {})
-      .stream()
-      .collect(Collectors.toMap(RegistroPlenoDocument::id, p -> p));
+    var existing = new HashMap<String, RegistroPlenoDocument>();
+
+    try (
+      final var it = mapper
+        .readerFor(Map.class)
+        .with(CsvSchema.emptySchema().withHeader())
+        .<Map<String, String>>readValues(plenosCsvPath.toFile())
+    ) {
+      while (it.hasNext()) {
+        var v = it.next();
+        var pleno = RegistroPlenoDocument.parse(v);
+        existing.put(pleno.id(), pleno);
+      }
+    }
 
     boolean extractPleno = true;
+    var current = "2021-2026";
 
     var updated = new HashSet<RegistroPlenoDocument>();
     for (var p : plenos) {
       var pleno = existing.getOrDefault(p.id(), p);
-      if (p.paginas() < 1) {
+      if (p.paginas() < 1 && pleno.periodoParlamentario().equals(current)) {
         if (extractPleno) {
           pleno = p.extract();
           extractPleno = false;
@@ -60,24 +80,25 @@ public class LoadRegitroPlenoDocuments {
       updated.add(pleno);
     }
 
-//    var updated = plenos
-//      .stream()
-//      .map(p -> existing.getOrDefault(p.id(), p))
-//      .map(p -> {
-//        if (p.paginas() < 1) {
-//          System.out.printf("Descargando %s%n", p);
-//          p.download();
-//          return p.withPaginas();
-//        } else {
-//          return p;
-//        }
-//      })
-//      .collect(Collectors.toSet());
-    var registroPlenos = updated.stream()
-            .sorted(Comparator.comparing(RegistroPlenoDocument::id).reversed())
-            .toList();
+    //    var updated = plenos
+    //      .stream()
+    //      .map(p -> existing.getOrDefault(p.id(), p))
+    //      .map(p -> {
+    //        if (p.paginas() < 1) {
+    //          System.out.printf("Descargando %s%n", p);
+    //          p.download();
+    //          return p.withPaginas();
+    //        } else {
+    //          return p;
+    //        }
+    //      })
+    //      .collect(Collectors.toSet());
+    var registroPlenos = updated
+      .stream()
+      .sorted(Comparator.comparing(RegistroPlenoDocument::id).reversed())
+      .toList();
     //json
-    Files.writeString(plenosJsonPath, jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(registroPlenos));
+    //    Files.writeString(plenosJsonPath, mapper.writerWithDefaultPrettyPrinter().writeValueAsString(registroPlenos));
     //csv
     var content = csvHeader();
     registroPlenos.forEach(pleno -> content.append(pleno.csvEntry()));

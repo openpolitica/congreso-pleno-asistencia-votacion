@@ -13,7 +13,9 @@ import org.slf4j.LoggerFactory;
 
 public class SaveVotacionPlenosToSqlite implements Consumer<VotacionPlenos> {
 
-  static final Logger LOG = LoggerFactory.getLogger(SaveVotacionPlenosToSqlite.class);
+  static final Logger LOG = LoggerFactory.getLogger(
+    SaveVotacionPlenosToSqlite.class
+  );
   static final ObjectMapper jsonMapper = new ObjectMapper();
 
   public static final String YYYY_MM_DD = "yyyy-MM-dd";
@@ -27,7 +29,10 @@ public class SaveVotacionPlenosToSqlite implements Consumer<VotacionPlenos> {
 
   @Override
   public void accept(VotacionPlenos votacionPlenos) {
-    var jdbcUrl = "jdbc:sqlite:%s-asistencias-votaciones.db".formatted(votacionPlenos.periodo());
+    var jdbcUrl =
+      "jdbc:sqlite:%s-asistencias-votaciones.db".formatted(
+          votacionPlenos.periodo()
+        );
     try (var connection = DriverManager.getConnection(jdbcUrl)) {
       var statement = connection.createStatement();
       statement.executeUpdate("pragma journal_mode = WAL");
@@ -75,12 +80,18 @@ public class SaveVotacionPlenosToSqlite implements Consumer<VotacionPlenos> {
     abstract List<String> createIndexesStatement();
 
     String index(String field) {
-      return "CREATE INDEX IF NOT EXISTS %s_%s ON %s(\"%s\");\n".formatted(tableName, field, tableName, field);
+      return "CREATE INDEX IF NOT EXISTS %s_%s ON %s(\"%s\");\n".formatted(
+          tableName,
+          field,
+          tableName,
+          field
+        );
     }
 
     abstract String prepareStatement();
 
-    abstract void addBatch(PreparedStatement ps, RegistroVotacion pl) throws Exception;
+    abstract void addBatch(PreparedStatement ps, RegistroVotacion pl)
+      throws Exception;
   }
 
   static class VotacionResultadoLoad extends TableLoad {
@@ -118,7 +129,11 @@ public class SaveVotacionPlenosToSqlite implements Consumer<VotacionPlenos> {
 
     @Override
     List<String> createIndexesStatement() {
-      return List.of(index("periodo_parlamentario"), index("periodo_anual"), index("legislatura"));
+      return List.of(
+        index("periodo_parlamentario"),
+        index("periodo_anual"),
+        index("legislatura")
+      );
     }
 
     @Override
@@ -139,7 +154,10 @@ public class SaveVotacionPlenosToSqlite implements Consumer<VotacionPlenos> {
       ps.setString(2, r.pleno().periodoParlamentario());
       ps.setString(3, r.pleno().periodoAnual());
       ps.setString(4, r.pleno().legislatura());
-      ps.setString(5, r.pleno().fecha().format(DateTimeFormatter.ofPattern(YYYY_MM_DD)));
+      ps.setString(
+        5,
+        r.pleno().fecha().format(DateTimeFormatter.ofPattern(YYYY_MM_DD))
+      );
       ps.setString(6, r.fechaHora().format(DateTimeFormatter.ofPattern(HH_MM)));
 
       ps.setString(7, r.asunto());
@@ -220,8 +238,14 @@ public class SaveVotacionPlenosToSqlite implements Consumer<VotacionPlenos> {
         ps.setString(2, r.pleno().periodoParlamentario());
         ps.setString(3, r.pleno().periodoAnual());
         ps.setString(4, r.pleno().legislatura());
-        ps.setString(5, r.pleno().fecha().format(DateTimeFormatter.ofPattern(YYYY_MM_DD)));
-        ps.setString(6, r.fechaHora().format(DateTimeFormatter.ofPattern(HH_MM)));
+        ps.setString(
+          5,
+          r.pleno().fecha().format(DateTimeFormatter.ofPattern(YYYY_MM_DD))
+        );
+        ps.setString(
+          6,
+          r.fechaHora().format(DateTimeFormatter.ofPattern(HH_MM))
+        );
         ps.setString(7, r.asunto());
         ps.setString(8, r.presidente());
         ps.setString(9, jsonMapper.writeValueAsString(r.etiquetas()));
@@ -304,15 +328,24 @@ public class SaveVotacionPlenosToSqlite implements Consumer<VotacionPlenos> {
         ps.setString(2, r.pleno().periodoParlamentario());
         ps.setString(3, r.pleno().periodoAnual());
         ps.setString(4, r.pleno().legislatura());
-        ps.setString(5, r.pleno().fecha().format(DateTimeFormatter.ofPattern(YYYY_MM_DD)));
-        ps.setString(6, r.fechaHora().format(DateTimeFormatter.ofPattern(HH_MM)));
+        ps.setString(
+          5,
+          r.pleno().fecha().format(DateTimeFormatter.ofPattern(YYYY_MM_DD))
+        );
+        ps.setString(
+          6,
+          r.fechaHora().format(DateTimeFormatter.ofPattern(HH_MM))
+        );
         ps.setString(7, r.asunto());
         ps.setString(8, r.presidente());
         ps.setString(9, jsonMapper.writeValueAsString(r.etiquetas()));
 
         ps.setString(10, v.congresista());
         ps.setString(11, v.grupoParlamentario());
-        ps.setString(12, r.pleno().gruposParlamentarios().get(v.grupoParlamentario()));
+        ps.setString(
+          12,
+          r.pleno().gruposParlamentarios().get(v.grupoParlamentario())
+        );
 
         ps.setString(13, v.resultado().name());
         ps.setString(14, v.resultado().descripcion());

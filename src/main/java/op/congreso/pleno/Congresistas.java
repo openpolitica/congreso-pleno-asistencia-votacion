@@ -9,28 +9,33 @@ import java.util.Set;
 import me.xdrop.fuzzywuzzy.FuzzySearch;
 
 public class Congresistas {
-    public static Set<String> names = new HashSet<>();
-    static {
-        try {
-            var lines = Files.readAllLines(Path.of("data/2021-2026/congresistas.csv"));
-            for (int i = 1; i < lines.size(); i++) {
-                var l = lines.get(i);
-                names.add(l.replace("\"",""));
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
-    public static List<String> checkCongresistas(List<String> congresistas) {
-        return congresistas.stream()
-                .filter(c -> !Congresistas.names.contains(c))
-                .toList();
-    }
+  public static Set<String> names = new HashSet<>();
 
-    public static String findSimilar(String c) {
-        var result = FuzzySearch.extractOne(c, names);
-        System.out.println(result);
-        return result.getString();
+  static {
+    try {
+      var lines = Files.readAllLines(
+        Path.of("data/2021-2026/congresistas.csv")
+      );
+      for (int i = 1; i < lines.size(); i++) {
+        var l = lines.get(i);
+        names.add(l.replace("\"", ""));
+      }
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
+  }
+
+  public static List<String> checkCongresistas(List<String> congresistas) {
+    return congresistas
+      .stream()
+      .filter(c -> !Congresistas.names.contains(c))
+      .toList();
+  }
+
+  public static String findSimilar(String c) {
+    var result = FuzzySearch.extractOne(c, names);
+    System.out.println(result);
+    return result.getString();
+  }
 }
