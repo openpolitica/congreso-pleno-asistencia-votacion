@@ -7,9 +7,8 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import op.congreso.pleno.Constantes;
-import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsProvider;
 import software.amazon.awssdk.core.SdkBytes;
-import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.textract.TextractClient;
 import software.amazon.awssdk.services.textract.model.BlockType;
 import software.amazon.awssdk.services.textract.model.DetectDocumentTextRequest;
@@ -21,9 +20,10 @@ public class TextractToText {
     try (
       TextractClient textractClient = TextractClient
         .builder()
-        .region(Region.US_EAST_1)
-        .credentialsProvider(ProfileCredentialsProvider.create())
-        .build()
+//        .region(Region.US_EAST_1)
+//        .credentialsProvider(ProfileCredentialsProvider.create())
+              .credentialsProvider(EnvironmentVariableCredentialsProvider.create())
+              .build()
     ) {
       byte[] bytes = Files.readAllBytes(path);
       final var document = Document
