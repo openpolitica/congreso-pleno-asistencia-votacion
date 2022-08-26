@@ -226,10 +226,6 @@ public record RegistroPlenoDocument(
   }
 
   public String prContent() {
-    StringBuilder text = new StringBuilder("Paginas: " + paginas);
-    for (int i = 1; i <= paginas; i++) {
-      text.append("\\n- [ ] ").append(i);
-    }
-    return text.toString();
+    return "Paginas: " + paginas;
   }
 }
