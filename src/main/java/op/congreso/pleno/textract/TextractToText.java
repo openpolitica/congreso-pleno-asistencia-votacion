@@ -20,7 +20,6 @@ public class TextractToText {
     try (
       TextractClient textractClient = TextractClient
         .builder()
-//        .credentialsProvider(ProfileCredentialsProvider.create())
               .credentialsProvider(EnvironmentVariableCredentialsProvider.create())
               .build()
     ) {
