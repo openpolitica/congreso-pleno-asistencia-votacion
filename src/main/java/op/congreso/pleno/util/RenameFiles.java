@@ -17,13 +17,13 @@ public class RenameFiles {
               .flatMap(RenameFiles::list) // pleno
               .flatMap(RenameFiles::list) // asis/vot
               .filter(path ->
-                      path.getFileName().toString().equals("resultados_partido.csv")
-//                path.getFileName().toString().startsWith("datos_")
+//                      path.getFileName().toString().equals("resultados_partido.csv")
+                path.getFileName().toString().startsWith("datos_")
               )
               .forEach(path -> {
                 try {
-                  Files.move(path, path.getParent().resolve("resultados_grupo.csv"));
-//                  Files.delete(path);
+//                  Files.move(path, path.getParent().resolve("resultados_grupo.csv"));
+                  Files.delete(path);
                 } catch (IOException e) {
                   throw new RuntimeException(e);
                 }
