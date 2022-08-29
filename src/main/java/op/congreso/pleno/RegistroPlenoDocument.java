@@ -226,10 +226,10 @@ public record RegistroPlenoDocument(
   }
 
   public String prContent() {
-    return "Periodo parlamentario: " + periodoParlamentario + "\\n" +
-            "Periodo anual: " + periodoAnual + "\\n" +
-            "Titulo: " + titulo + "\\n" +
-            "URL: <" + url + ">\\n" +
+    return "Periodo parlamentario: " + periodoParlamentario + " | " +
+            "Periodo anual: " + periodoAnual + " | " +
+            "Titulo: " + titulo + " | " +
+            "URL: <" + url + "> |" +
             "Paginas: " + paginas;
   }
 }
