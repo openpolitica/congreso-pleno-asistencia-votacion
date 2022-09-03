@@ -14,40 +14,19 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import op.congreso.pleno.RegistroPlenoDocument;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LoadRegitroPlenoDocuments {
 
+  static final Logger LOG = LoggerFactory.getLogger(
+    LoadRegitroPlenoDocuments.class
+  );
+  public static final String CURRENT = "2021-2026";
+
   public static void main(String[] args) throws IOException {
-    var root = collect(
-      "/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/new_asistenciavotacion",
-      5
-    );
-
-    var plenos = new HashSet<RegistroPlenoDocument>();
-
-    for (var periodos : root.entrySet()) {
-      System.out.println(periodos.getKey());
-      var year = collect(periodos.getValue(), 4);
-      for (var anual : year.entrySet()) {
-        System.out.println(anual.getKey());
-        var periodo = collect(anual.getValue(), 3);
-        for (var legislatura : periodo.entrySet()) {
-          System.out.println(legislatura.getKey());
-
-          var p = collectPleno(
-            periodos.getKey(),
-            anual.getKey(),
-            legislatura.getKey(),
-            legislatura.getValue()
-          );
-          plenos.addAll(p.values());
-        }
-      }
-    }
-
-    //    var mapper = new ObjectMapper();
+    LOG.info("Load existing plenos");
     var mapper = new CsvMapper();
-
     var plenosCsvPath = Path.of("plenos.csv");
 
     var existing = new HashMap<String, RegistroPlenoDocument>();
@@ -61,19 +40,58 @@ public class LoadRegitroPlenoDocuments {
       while (it.hasNext()) {
         var v = it.next();
         var pleno = RegistroPlenoDocument.parse(v);
-        existing.put(pleno.id(), pleno);
+        if (pleno.periodoParlamentario().equals(CURRENT)) existing.put(
+          pleno.id(),
+          pleno
+        );
       }
     }
+    LOG.info("Starting to collect plenos");
+    var root = collect(
+      "/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/new_asistenciavotacion",
+      5
+    );
+
+    var plenos = new HashSet<RegistroPlenoDocument>();
+
+    for (var periodos : root.entrySet()) {
+      LOG.debug("Periodo: {}", periodos.getKey());
+      var year = collect(periodos.getValue(), 4);
+      for (var anual : year.entrySet()) {
+        LOG.debug("Periodo Anual: {}", anual.getKey());
+        var periodo = collect(anual.getValue(), 3);
+        for (var legislatura : periodo.entrySet()) {
+          LOG.debug("Legislatura: {}", legislatura.getKey());
+
+          var p = collectPleno(
+            periodos.getKey(),
+            anual.getKey(),
+            legislatura.getKey(),
+            legislatura.getValue()
+          );
+          p
+            .values()
+            .stream()
+            .filter(p1 -> p1.periodoParlamentario().equals("2021-2026"))
+            .forEach(plenos::add);
+        }
+      }
+    }
+    LOG.info("Plenos collected: {}", plenos.size());
 
     boolean extractPleno = true;
-    var current = "2021-2026";
 
     var updated = new HashSet<RegistroPlenoDocument>();
     for (var p : plenos) {
       var pleno = existing.getOrDefault(p.id(), p);
-      if (p.paginas() < 1 && pleno.periodoParlamentario().equals(current)) {
+      if (
+        !pleno.provisional() &&
+        pleno.paginas() < 1 &&
+        pleno.periodoParlamentario().equals(CURRENT)
+      ) {
         if (extractPleno) {
-          pleno = p.extract();
+          LOG.info("Extracting Pleno: {}", pleno.fecha());
+          pleno = pleno.extract();
           Files.writeString(Path.of("pr-title.txt"), pleno.prTitle());
           Files.writeString(Path.of("pr-branch.txt"), pleno.prBranchName());
           Files.writeString(Path.of("pr-content.txt"), pleno.prContent());
@@ -83,28 +101,15 @@ public class LoadRegitroPlenoDocuments {
       updated.add(pleno);
     }
 
-    //    var updated = plenos
-    //      .stream()
-    //      .map(p -> existing.getOrDefault(p.id(), p))
-    //      .map(p -> {
-    //        if (p.paginas() < 1) {
-    //          System.out.printf("Descargando %s%n", p);
-    //          p.download();
-    //          return p.withPaginas();
-    //        } else {
-    //          return p;
-    //        }
-    //      })
-    //      .collect(Collectors.toSet());
     var registroPlenos = updated
       .stream()
       .sorted(Comparator.comparing(RegistroPlenoDocument::id).reversed())
       .toList();
-    //json
-    //    Files.writeString(plenosJsonPath, mapper.writerWithDefaultPrettyPrinter().writeValueAsString(registroPlenos));
-    //csv
+
+    LOG.info("Writing CSV to file");
     var content = csvHeader();
     registroPlenos.forEach(pleno -> content.append(pleno.csvEntry()));
     Files.writeString(plenosCsvPath, content.toString());
+    LOG.info("Done");
   }
 }

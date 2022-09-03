@@ -14,10 +14,13 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import op.congreso.pleno.app.SaveRegistroPlenoToCsv;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.jsoup.Jsoup;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public record RegistroPlenoDocument(
   String periodoParlamentario,
@@ -27,13 +30,15 @@ public record RegistroPlenoDocument(
   String titulo,
   String url,
   String filename,
-  int paginas
+  int paginas,
+  boolean provisional
 ) {
+  static final Logger LOG = LoggerFactory.getLogger(RegistroPlenoDocument.class);
   static Pattern periodo = Pattern.compile("\\d\\d\\d\\d ?- ?\\d\\d\\d\\d$");
   public static StringBuilder csvHeader() {
     return new StringBuilder(
       "periodo_parlamentario,periodo_anual,legislatura," +
-      "fecha,titulo,url,filename,paginas\n"
+      "fecha,titulo,url,filename,paginas,provisional\n"
     );
   }
 
@@ -53,12 +58,16 @@ public record RegistroPlenoDocument(
       v.get("titulo"),
       v.get("url"),
       v.get("filename"),
-      Integer.parseInt(v.get("paginas"))
+      Integer.parseInt(v.get("paginas")),
+      Optional
+        .ofNullable(v.get("provisional"))
+        .map(Boolean::parseBoolean)
+        .orElse(Boolean.FALSE)
     );
   }
 
   public String csvEntry() {
-    return "%s,%s,%s,%s,\"%s\",%s,%s,%s%n".formatted(
+    return "%s,%s,%s,%s,\"%s\",%s,%s,%s,%s%n".formatted(
         periodoParlamentario,
         periodoAnual,
         legislatura,
@@ -66,7 +75,8 @@ public record RegistroPlenoDocument(
         titulo,
         url,
         filename,
-        paginas
+        paginas,
+        provisional
       );
   }
 
@@ -94,7 +104,8 @@ public record RegistroPlenoDocument(
       titulo,
       url,
       filename,
-      countPages()
+      countPages(),
+      provisional
     );
   }
 
@@ -116,14 +127,16 @@ public record RegistroPlenoDocument(
     try {
       var dir = Path.of(directory());
       if (!Files.isDirectory(dir)) Files.createDirectories(dir);
-      ReadableByteChannel readableByteChannel = Channels.newChannel(
+      var readableByteChannel = Channels.newChannel(
         new URL(url()).openStream()
       );
-      try (var fileOutputStream = new FileOutputStream(path())) {
+      var path = path();
+      try (var fileOutputStream = new FileOutputStream(path)) {
         fileOutputStream
           .getChannel()
           .transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
       }
+      LOG.info("PDF downloaded: {}", path);
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -199,7 +212,8 @@ public record RegistroPlenoDocument(
                 titulo,
                 fullUrl,
                 fullUrl.split("/")[9],
-                0
+                0,
+                titulo.contains("PROVISIONAL")
               )
             );
           }
@@ -226,10 +240,21 @@ public record RegistroPlenoDocument(
   }
 
   public String prContent() {
-    return "Periodo parlamentario: " + periodoParlamentario + " | " +
-            "Periodo anual: " + periodoAnual + " | " +
-            "Titulo: " + titulo + " | " +
-            "URL: <" + url + "> |" +
-            "Paginas: " + paginas;
+    return (
+      "Periodo parlamentario: " +
+      periodoParlamentario +
+      " | " +
+      "Periodo anual: " +
+      periodoAnual +
+      " | " +
+      "Titulo: " +
+      titulo +
+      " | " +
+      "URL: <" +
+      url +
+      "> |" +
+      "Paginas: " +
+      paginas
+    );
   }
 }

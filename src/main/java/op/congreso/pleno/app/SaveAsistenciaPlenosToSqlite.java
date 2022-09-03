@@ -44,23 +44,23 @@ public class SaveAsistenciaPlenosToSqlite
       statement.executeUpdate("pragma page_size = 32768");
 
       for (var tableLoad : tableLoadList) {
-        LOG.info("Loading {}", tableLoad.tableName);
+        LOG.debug("Loading {}", tableLoad.tableName);
         statement.executeUpdate(tableLoad.createTableStatement());
         for (String s : tableLoad.createIndexesStatement()) {
           statement.executeUpdate(s);
         }
-        LOG.info("Table {} created", tableLoad.tableName);
+        LOG.debug("Table {} created", tableLoad.tableName);
 
         var ps = connection.prepareStatement(tableLoad.prepareStatement());
-        LOG.info("Statement for {} prepared", tableLoad.tableName);
+        LOG.debug("Statement for {} prepared", tableLoad.tableName);
 
         for (var m : asistenciaPlenos.registros()) {
           tableLoad.addBatch(ps, m);
         }
 
-        LOG.info("Batch for {} ready", tableLoad.tableName);
+        LOG.debug("Batch for {} ready", tableLoad.tableName);
         ps.executeBatch();
-        LOG.info("Table {} updated", tableLoad.tableName);
+        LOG.debug("Table {} updated", tableLoad.tableName);
       }
       statement.executeUpdate("pragma vacuum;");
       statement.executeUpdate("pragma optimize;");

@@ -9,16 +9,20 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.apache.pdfbox.tools.imageio.ImageIOUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PlenoPdfToImages {
-
+  static final Logger LOG = LoggerFactory.getLogger(PlenoPdfToImages.class);
   static List<Path> generateImageFromPDF(Path pdfPath) throws IOException {
     try (var document = PDDocument.load(pdfPath.toFile())) {
       var pdfRenderer = new PDFRenderer(document);
-      Path dir = Path.of(pdfPath.toString().replace(".pdf", ""));
+      var dir = Path.of(pdfPath.toString().replace(".pdf", ""));
       if (!Files.isDirectory(dir)) Files.createDirectories(dir);
       var pages = new ArrayList<Path>();
-      for (int page = 0; page < document.getNumberOfPages(); ++page) {
+      int numberOfPages = document.getNumberOfPages();
+      LOG.info("PDF {} with pages: {}", pdfPath, numberOfPages);
+      for (int page = 0; page < numberOfPages; ++page) {
         var bim = pdfRenderer.renderImageWithDPI(page, 300, ImageType.RGB);
 
         var pagePath = dir.resolve("page_" + (page + 1) + ".png");

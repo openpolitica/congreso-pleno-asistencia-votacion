@@ -3,63 +3,83 @@ package op.congreso.pleno.textract;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import op.congreso.pleno.Constantes;
 import op.congreso.pleno.RegistroPleno;
 import op.congreso.pleno.RegistroPlenoDocument;
 import op.congreso.pleno.app.SaveRegistroPlenoToCsv;
 import op.congreso.pleno.asistencia.RegistroAsistencia;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsProvider;
+import software.amazon.awssdk.services.textract.TextractClient;
 
 public class TextractRegistroPleno {
+  static final Logger LOG = LoggerFactory.getLogger(TextractRegistroPleno.class);
 
-  public static ArrayList<List<String>> extractRegistroPleno(Path plenoPdf)
+  public static Map<Path, List<String>> extractRegistroPleno(Path plenoPdf)
     throws IOException {
-    List<Path> pages = PlenoPdfToImages.generateImageFromPDF(plenoPdf);
-    var list = new ArrayList<List<String>>();
-    for (var page : pages) {
-      var lines = TextractToText.imageLines(page);
-      list.add(lines);
+    LOG.info("Generate images from PDF...");
+    var pages = PlenoPdfToImages.generateImageFromPDF(plenoPdf);
+    LOG.info("Extract lines...");
+    var list = new HashMap<Path, List<String>>();
+    try (
+            TextractClient textractClient = TextractClient
+                    .builder()
+                    .credentialsProvider(EnvironmentVariableCredentialsProvider.create())
+                    .build()
+    ) {
+      var t2t = new TextractToText(textractClient);
+      for (var page : pages) {
+        var lines = t2t.imageLines2(page);
+        list.put(page, lines);
+        LOG.info("Lines extracted from {}", page);
+      }
     }
     return list;
   }
 
-  public static List<List<String>> loadLines(Path path) throws IOException {
+  public static Map<Path, List<String>> loadLines(Path path) throws IOException {
     try (var ls = Files.list(path)) {
-      return ls
+      var map = new HashMap<Path, List<String>>();
+      ls
         .filter(p -> p.toString().endsWith(".txt"))
-        .peek(System.out::println)
         .sorted()
-        .map(p -> {
+        .forEach(p -> {
           try {
             var lines = Files.readAllLines(p);
             if (
               lines.contains(Constantes.ASISTENCIA) ||
               lines.get(3).startsWith(Constantes.ASISTENCIA)
             ) {
-              return TextractAsistencia.clean(lines);
+              var l = TextractAsistencia.clean(lines);
+              map.put(p, l);
             } else if (lines.contains(Constantes.VOTACION)) {
-              return TextractVotacion.clean(lines);
-            } else return List.<String>of();
+              var l = TextractVotacion.clean(lines);
+              map.put(p, l);
+            } else map.put(p, List.of());
           } catch (IOException e) {
             throw new RuntimeException(e);
           }
-        })
-        .toList();
+        });
+      return map;
     }
   }
 
   public static RegistroPleno processLines(
     RegistroPlenoDocument document,
-    List<List<String>> list
+    Map<Path, List<String>> list
   ) {
     var builder = RegistroPleno.newBuilder(document);
     RegistroAsistencia latestAsistencia = null;
     var pageNumber = 1;
     var errors = 0;
-    for (var lines : list) {
-      System.out.println("Processing page: " + pageNumber);
+    for (var key : list.keySet()) {
+      LOG.info("Processing page: {}", key);
       try {
+        var lines = list.get(key);
         if (
           lines.contains(Constantes.ASISTENCIA) ||
           lines.get(3).startsWith(Constantes.ASISTENCIA)
@@ -105,7 +125,8 @@ public class TextractRegistroPleno {
         "Asistencias y votaciones de la sesión del 13-07-2022",
         "https://www2.congreso.gob.pe/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/Apleno/F54E4633A78E76420525888A00730BD7/$FILE/Asis_vot_OFICIAL_13-07-2022.pdf",
         "",
-        0
+        0,
+        false
       ),
       lines
     );

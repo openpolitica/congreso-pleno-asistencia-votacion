@@ -27,9 +27,14 @@ import op.congreso.pleno.asistencia.ResultadoAsistencia;
 import op.congreso.pleno.votacion.RegistroVotacion;
 import op.congreso.pleno.votacion.ResultadoVotacion;
 import op.congreso.pleno.votacion.Votacion;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LoadDetallePlenosAndSave {
 
+  static final Logger LOG = LoggerFactory.getLogger(
+    LoadDetallePlenosAndSave.class
+  );
   final ObjectMapper mapper = new CsvMapper();
 
   public static void main(String[] args) throws IOException {
@@ -37,7 +42,9 @@ public class LoadDetallePlenosAndSave {
   }
 
   void load() throws IOException {
-    try (final var ls = Files.list(Path.of("data"))) {
+    var data = Path.of("data");
+    LOG.info("Starting to load data from: {}", data.toAbsolutePath());
+    try (final var ls = Files.list(data)) {
       var periodos = ls.toList();
       for (var periodo : periodos) {
         var plenos = paths(periodo) // periodo anual

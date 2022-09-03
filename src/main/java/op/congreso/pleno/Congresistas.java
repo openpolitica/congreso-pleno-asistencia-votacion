@@ -35,7 +35,6 @@ public class Congresistas {
 
   public static String findSimilar(String c) {
     var result = FuzzySearch.extractOne(c, names);
-    System.out.println(result);
     return result.getString();
   }
 }
