@@ -79,7 +79,7 @@ public class LoadRegitroPlenoDocuments {
     }
     LOG.info("Plenos collected: {}", plenos.size());
 
-    boolean extractPleno = true;
+    boolean extractPleno = false; // opt-out to do this manually yet
 
     var updated = new HashSet<RegistroPlenoDocument>();
     for (var p : plenos) {
