@@ -15,6 +15,7 @@ import software.amazon.awssdk.services.textract.model.DetectDocumentTextRequest;
 import software.amazon.awssdk.services.textract.model.Document;
 
 public class TextractToText {
+
   final TextractClient textractClient;
 
   public TextractToText(TextractClient textractClient) {
@@ -23,41 +24,44 @@ public class TextractToText {
 
   List<String> imageLines2(Path path) {
     try {
-      byte[] bytes = Files.readAllBytes(path);
-      final var document = Document
-              .builder()
-              .bytes(SdkBytes.fromByteArray(bytes))
-              .build();
-      final var request = DetectDocumentTextRequest
-              .builder()
-              .document(document)
-              .build();
-      final var response = textractClient.detectDocumentText(request);
+      var to = Path.of(path.toString().replace(".png", ".txt"));
 
-      final var blocks = response.blocks();
-      int i = 0;
-      List<String> lines = new ArrayList<>();
-      while (i < blocks.size()) {
-        final var block = blocks.get(i);
-        if (block.blockType().equals(BlockType.LINE)) {
-          final var text = block.text();
-          lines.add(text);
+      if (!Files.exists(to)) {
+        byte[] bytes = Files.readAllBytes(path);
+        final var document = Document
+          .builder()
+          .bytes(SdkBytes.fromByteArray(bytes))
+          .build();
+        final var request = DetectDocumentTextRequest
+          .builder()
+          .document(document)
+          .build();
+        final var response = textractClient.detectDocumentText(request);
+
+        final var blocks = response.blocks();
+        int i = 0;
+        List<String> lines = new ArrayList<>();
+        while (i < blocks.size()) {
+          final var block = blocks.get(i);
+          if (block.blockType().equals(BlockType.LINE)) {
+            final var text = block.text();
+            lines.add(text);
+          }
+          i++;
         }
-        i++;
+        if (
+          lines.contains(Constantes.ASISTENCIA) ||
+          lines.get(3).startsWith(Constantes.ASISTENCIA)
+        ) {
+          lines = TextractAsistencia.clean(lines);
+        } else if (lines.contains(Constantes.VOTACION)) {
+          lines = TextractVotacion.clean(lines);
+        }
+        Files.writeString(to, String.join("\n", lines));
+        return lines;
+      } else {
+        return Files.readAllLines(to);
       }
-      if (
-              lines.contains(Constantes.ASISTENCIA) ||
-                      lines.get(3).startsWith(Constantes.ASISTENCIA)
-      ) {
-        lines = TextractAsistencia.clean(lines);
-      } else if (lines.contains(Constantes.VOTACION)) {
-        lines = TextractVotacion.clean(lines);
-      }
-      Files.writeString(
-              Path.of(path.toString().replace(".png", ".txt")),
-              String.join("\n", lines)
-      );
-      return lines;
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -92,6 +96,10 @@ public class TextractToText {
         }
         i++;
       }
+      Files.writeString(
+        Path.of(path.toString().replace(".png", ".txt")),
+        String.join("\n", lines)
+      );
       if (
         lines.contains(Constantes.ASISTENCIA) ||
         lines.get(3).startsWith(Constantes.ASISTENCIA)
@@ -100,10 +108,6 @@ public class TextractToText {
       } else if (lines.contains(Constantes.VOTACION)) {
         lines = TextractVotacion.clean(lines);
       }
-      Files.writeString(
-        Path.of(path.toString().replace(".png", ".txt")),
-        String.join("\n", lines)
-      );
       return lines;
     } catch (IOException e) {
       throw new RuntimeException(e);

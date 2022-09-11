@@ -13,7 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PlenoPdfToImages {
+
   static final Logger LOG = LoggerFactory.getLogger(PlenoPdfToImages.class);
+
   static List<Path> generateImageFromPDF(Path pdfPath) throws IOException {
     try (var document = PDDocument.load(pdfPath.toFile())) {
       var pdfRenderer = new PDFRenderer(document);
@@ -23,12 +25,13 @@ public class PlenoPdfToImages {
       int numberOfPages = document.getNumberOfPages();
       LOG.info("PDF {} with pages: {}", pdfPath, numberOfPages);
       for (int page = 0; page < numberOfPages; ++page) {
-        var bim = pdfRenderer.renderImageWithDPI(page, 300, ImageType.RGB);
-
         var pagePath = dir.resolve("page_" + (page + 1) + ".png");
         pages.add(pagePath);
 
-        ImageIOUtil.writeImage(bim, pagePath.toString(), 300);
+        if (!Files.exists(pagePath)) {
+          var bim = pdfRenderer.renderImageWithDPI(page, 300, ImageType.RGB);
+          ImageIOUtil.writeImage(bim, pagePath.toString(), 300);
+        }
       }
       return pages;
     }

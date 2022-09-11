@@ -3,6 +3,8 @@ package op.congreso.pleno;
 import static op.congreso.pleno.textract.TextractRegistroPleno.extractRegistroPleno;
 import static op.congreso.pleno.textract.TextractRegistroPleno.processLines;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
@@ -33,7 +35,9 @@ public record RegistroPlenoDocument(
   int paginas,
   boolean provisional
 ) {
-  static final Logger LOG = LoggerFactory.getLogger(RegistroPlenoDocument.class);
+  static final Logger LOG = LoggerFactory.getLogger(
+    RegistroPlenoDocument.class
+  );
   static Pattern periodo = Pattern.compile("\\d\\d\\d\\d ?- ?\\d\\d\\d\\d$");
   public static StringBuilder csvHeader() {
     return new StringBuilder(
@@ -64,6 +68,14 @@ public record RegistroPlenoDocument(
         .map(Boolean::parseBoolean)
         .orElse(Boolean.FALSE)
     );
+  }
+
+  public static RegistroPlenoDocument parseJson(String s) {
+    try {
+      return new ObjectMapper().readValue(s, RegistroPlenoDocument.class);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   public String csvEntry() {
@@ -225,6 +237,10 @@ public record RegistroPlenoDocument(
 
   public RegistroPlenoDocument extract() throws IOException {
     download();
+    Files.writeString(
+      Path.of(path() + ".json"),
+      new ObjectMapper().writeValueAsString(this)
+    );
     var lines = extractRegistroPleno(Path.of(path()));
     var regPleno = processLines(this, lines);
     SaveRegistroPlenoToCsv.save(regPleno);
