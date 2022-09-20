@@ -1,7 +1,5 @@
 package op.congreso.pleno.app;
 
-import static op.congreso.pleno.RegistroPlenoDocument.collect;
-import static op.congreso.pleno.RegistroPlenoDocument.collectPleno;
 import static op.congreso.pleno.RegistroPlenoDocument.csvHeader;
 
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;

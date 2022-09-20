@@ -12,7 +12,6 @@ import java.util.stream.Stream;
 import op.congreso.pleno.Constantes;
 import op.congreso.pleno.RegistroPleno;
 import op.congreso.pleno.RegistroPlenoDocument;
-import op.congreso.pleno.app.SaveRegistroPlenoToCsv;
 import op.congreso.pleno.asistencia.RegistroAsistencia;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -154,7 +153,7 @@ public class TextractRegistroPleno {
           lines.contains(Constantes.ASISTENCIA) ||
           lines.get(3).startsWith(Constantes.ASISTENCIA)
         ) {
-          var asistencia = TextractAsistencia.load(lines);
+          var asistencia = TextractAsistenciaV2.load(lines);
           builder.addAsistencia(asistencia);
           latestAsistencia = asistencia;
         } else if (lines.contains(Constantes.VOTACION)) {
@@ -163,7 +162,7 @@ public class TextractRegistroPleno {
             // TODO potential error
             quorum = latestAsistencia.quorum();
           }
-          var votacion = TextractVotacion.load(quorum, lines);
+          var votacion = TextractVotacionV2.load(quorum, lines);
           builder.addVotacion(votacion);
         } else {
           // TODO potential error
