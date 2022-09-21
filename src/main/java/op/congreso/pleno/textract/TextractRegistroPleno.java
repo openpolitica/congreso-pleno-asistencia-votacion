@@ -202,7 +202,7 @@ public class TextractRegistroPleno {
     //    System.out.println(pleno);
     //    SaveRegistroPlenoToCsv.save(pleno);
     TextractRegistroPleno
-      .retryProcessRegistroPleno(Path.of("target/pdf"))
+      .retryProcessRegistroPleno(Path.of("out/pdf"))
       .forEach((path, strings) -> System.out.println(path + " -> " + strings));
   }
 }

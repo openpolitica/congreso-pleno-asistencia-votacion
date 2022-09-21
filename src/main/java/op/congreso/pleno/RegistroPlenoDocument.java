@@ -94,7 +94,7 @@ public record RegistroPlenoDocument(
 
   String directory() {
     return (
-      "target/pdf/" +
+      "out/pdf/" +
       periodoParlamentario +
       "/" +
       periodoAnual +

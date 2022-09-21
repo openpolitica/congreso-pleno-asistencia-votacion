@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import op.congreso.pleno.Constantes;
 import op.congreso.pleno.GrupoParlamentario;
@@ -41,12 +42,11 @@ public class TextractAsistenciaV2 {
     }
   }
 
-  static RegistroAsistencia load(List<String> lines) {
+  static RegistroAsistencia load(List<String> lines) throws IOException {
     var registroBuilder = RegistroAsistencia.newBuilder();
     var plenoBuilder = Pleno.newBuilder();
     var resultadosBuilder = ResultadoAsistencia.newBuilder();
     var asistencias = new ArrayList<ResultadoCongresista<Asistencia>>();
-    var grupos = new HashMap<String, String>();
     var resultadosGrupos = new HashMap<GrupoParlamentario, ResultadoAsistencia>();
 
     int i = 0;
@@ -337,6 +337,13 @@ public class TextractAsistenciaV2 {
     }
 
 //    if (fechaHora == null) errors++;
+
+    var allGrupos = GrupoParlamentarioUtil.all();
+
+    var grupos =
+    asistencias.stream()
+            .map(ResultadoCongresista::grupoParlamentario)
+            .collect(Collectors.toMap(a -> a, allGrupos::get));
 
     return registroBuilder
       .withPleno(plenoBuilder.withGruposParlamentarios(grupos).build())

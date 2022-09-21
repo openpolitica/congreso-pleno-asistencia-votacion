@@ -9,7 +9,7 @@ import op.congreso.pleno.textract.TextractRegistroPleno;
 public class RetryProcessRegistroPleno {
 
   public static void main(String[] args) throws IOException {
-    Path of = Path.of("target/pdf");
+    Path of = Path.of("out/pdf");
     var pleno = TextractRegistroPleno.plenoToRetry(of);
     var lines = TextractRegistroPleno.retryProcessRegistroPleno(of);
     var regPleno = processLines(pleno, lines);
