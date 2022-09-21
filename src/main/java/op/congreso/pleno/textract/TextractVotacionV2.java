@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import op.congreso.pleno.GrupoParlamentario;
 import op.congreso.pleno.Pleno;
@@ -42,7 +43,7 @@ public class TextractVotacionV2 {
     }
   }
 
-  static RegistroVotacion load(int quorum, List<String> lines) {
+  static RegistroVotacion load(int quorum, List<String> lines) throws IOException {
     lines =
       lines
         .stream()
@@ -54,7 +55,6 @@ public class TextractVotacionV2 {
     var plenoBuilder = Pleno.newBuilder();
     var resultadosBuilder = ResultadoVotacion.newBuilder();
     var resultados = new ArrayList<ResultadoCongresista<Votacion>>();
-    var grupos = new HashMap<String, String>();
     var resultadosGrupos = new HashMap<GrupoParlamentario, ResultadoVotacion>();
 
     int i = 0;
@@ -425,6 +425,11 @@ public class TextractVotacionV2 {
       i++;
     }
 
+    var allGrupos = GrupoParlamentarioUtil.all();
+    var grupos =
+            resultados.stream()
+                    .map(ResultadoCongresista::grupoParlamentario)
+                    .collect(Collectors.toMap(a -> a, allGrupos::get));
     return registroBuilder
       .withPleno(plenoBuilder.withGruposParlamentarios(grupos).build())
       .withVotaciones(grupos, resultados)
