@@ -34,7 +34,11 @@ public class Congresistas {
   }
 
   public static String findSimilar(String c) {
-    var result = FuzzySearch.extractOne(c, names);
-    return result.getString();
+    var result = FuzzySearch.extractTop(c, names, 2);
+    return result.get(0).getString();
+  }
+
+  public static void main(String[] args) {
+   System.out.println(Congresistas.findSimilar("ECHAIZ DE NUNEZ IZAGA, GLADYS M."));
   }
 }

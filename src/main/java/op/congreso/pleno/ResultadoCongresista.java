@@ -145,21 +145,26 @@ public record ResultadoCongresista<T>(
     System.out.println(b.build());
 
     var b1 = new Builder<Votacion>();
-    b1.processVotacionLine("APP");
-    b1.processVotacionLine("ACUÑA PERALTA, MARIA GRIMANEZA");
-    StringBuilder sinRes_sp = new StringBuilder("SinRes SP");
+    b1.processVotacionLine("FP");
+    b1.processVotacionLine("BARBARÁN REYES, ROSANGELLA ANDREA");
+    StringBuilder sinRes_sp = new StringBuilder("NO");
     b1.processVotacionLine(sinRes_sp);
     System.out.println(b1.isReady());
     System.out.println(b1.build());
     b1 = new Builder<>();
-    b1.processVotacionLine(sinRes_sp);
-    b1.processVotacionLine("ELERA GARCÍA, WILMAR ALBERTO");
-    b1.processVotacionLine("SI BM");
+    b1.processVotacionLine("RP");
+    b1.processVotacionLine("JÁUREGUI MARTÍNEZ DE AGUAYO, MARIA aus");
     System.out.println(b1.isReady());
     System.out.println(b1.build());
     b1.processVotacionLine("PAREDES CASTRO, FRANCIS JHASMINA");
     b1.processVotacionLine("SI");
     b1.processVotacionLine("APP");
     b1.processVotacionLine("ACUÑA PERALTA, SEGUNDO HÉCTOR");
+//FP
+//BARBARÁN REYES, ROSANGELLA ANDREA
+//NO
+//RP
+//JÁUREGUI MARTÍNEZ DE AGUAYO, MARIA aus
+//CD-JPP
   }
 }

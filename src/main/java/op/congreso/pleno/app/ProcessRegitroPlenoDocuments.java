@@ -51,7 +51,7 @@ public class ProcessRegitroPlenoDocuments {
     for (var p : existing.values()) {
       var pleno = existing.getOrDefault(p.id(), p);
       if (
-        pleno.fecha().equals("2022-07-13")
+        pleno.fecha().equals("2022-07-12")
         //        !pleno.provisional() &&
         //        pleno.paginas() < 1 &&
         //        pleno.periodoParlamentario().equals(CURRENT)
