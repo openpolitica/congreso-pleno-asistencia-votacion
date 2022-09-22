@@ -164,7 +164,7 @@ public class TextractAsistenciaV2 {
           //            }
           //          }
         } else { // Process resultados
-          if (text.equals("Asistencia para Quórum")) { // Finally get quorum
+          if (text.equals("Asistencia para Quórum") || text.equals("Asistencia para Quorum")) { // Finally get quorum
              i++;
              registroBuilder.withQuorum(Integer.parseInt(lines.get(i)));
           }
