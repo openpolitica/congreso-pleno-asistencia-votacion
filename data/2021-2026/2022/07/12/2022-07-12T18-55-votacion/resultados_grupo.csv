@@ -1,5 +1,5 @@
 grupo_parlamentario,numero_legal,si,no,abstenciones,sin_responder,ausentes,licencias,otros
-AP,15,12,0,3,0,0,0,0
+AP,15,11,0,3,1,0,0,0
 AP-PIS,10,10,0,0,0,0,0,0
 APP,14,11,0,0,0,3,0,0
 BM,10,9,0,0,1,0,0,0
@@ -12,4 +12,4 @@ PL,16,14,0,0,0,1,1,0
 PP,5,2,0,1,0,1,1,0
 RP,9,9,0,0,0,0,0,0
 SP,5,4,0,0,0,1,0,0
-TOTAL,130,112,0,4,3,6,5,0
+TOTAL,130,111,0,4,4,6,5,0
