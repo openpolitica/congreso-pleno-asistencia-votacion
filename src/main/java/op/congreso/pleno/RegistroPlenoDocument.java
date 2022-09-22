@@ -94,12 +94,7 @@ public record RegistroPlenoDocument(
 
   String directory() {
     return (
-      "out/pdf/" +
-      periodoParlamentario +
-      "/" +
-      periodoAnual +
-      "/" +
-      legislatura
+      "out/pdf/" + periodoParlamentario + "/" + periodoAnual + "/" + legislatura
     );
   }
 

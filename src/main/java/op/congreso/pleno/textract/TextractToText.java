@@ -49,14 +49,14 @@ public class TextractToText {
           }
           i++;
         }
-//        if (
-//          lines.contains(Constantes.ASISTENCIA) ||
-//          lines.get(3).startsWith(Constantes.ASISTENCIA)
-//        ) {
-//          lines = TextractAsistencia.clean(lines);
-//        } else if (lines.contains(Constantes.VOTACION)) {
-//          lines = TextractVotacion.clean(lines);
-//        }
+        //        if (
+        //          lines.contains(Constantes.ASISTENCIA) ||
+        //          lines.get(3).startsWith(Constantes.ASISTENCIA)
+        //        ) {
+        //          lines = TextractAsistencia.clean(lines);
+        //        } else if (lines.contains(Constantes.VOTACION)) {
+        //          lines = TextractVotacion.clean(lines);
+        //        }
         Files.writeString(to, String.join("\n", lines));
         return lines;
       } else {
