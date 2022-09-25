@@ -240,7 +240,7 @@ public record RegistroPlenoDocument(
       " | " +
       "URL: <" +
       url +
-      "> |" +
+      "> | " +
       "Paginas: " +
       paginas
     );

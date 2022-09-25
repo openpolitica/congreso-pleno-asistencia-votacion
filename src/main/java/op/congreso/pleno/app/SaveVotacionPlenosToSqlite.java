@@ -227,6 +227,9 @@ public class SaveVotacionPlenosToSqlite implements Consumer<VotacionPlenos> {
         ps.setString(9, jsonMapper.writeValueAsString(r.etiquetas()));
 
         ps.setString(10, a.getKey().nombre());
+        if (a.getKey().descripcion() == null) {
+          throw new IllegalStateException("null grupo descripcion");
+        }
         ps.setString(11, a.getKey().descripcion());
 
         ps.setInt(12, a.getValue().si());
@@ -312,7 +315,11 @@ public class SaveVotacionPlenosToSqlite implements Consumer<VotacionPlenos> {
 
         ps.setString(10, v.congresista());
         ps.setString(11, v.grupoParlamentario());
-        ps.setString(12, r.pleno().gruposParlamentarios().get(v.grupoParlamentario()));
+        String gp = r.pleno().gruposParlamentarios().get(v.grupoParlamentario());
+        if (gp == null) {
+          throw new IllegalStateException("null grupo descripcion");
+        }
+        ps.setString(12, gp);
 
         ps.setString(13, v.resultado().name());
         ps.setString(14, v.resultado().descripcion());

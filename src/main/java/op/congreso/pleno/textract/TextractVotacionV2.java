@@ -7,11 +7,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import op.congreso.pleno.GrupoParlamentario;
 import op.congreso.pleno.Pleno;
 import op.congreso.pleno.ResultadoCongresista;
@@ -30,7 +28,9 @@ public class TextractVotacionV2 {
 
   public static void main(String[] args) throws IOException {
     try {
-      var lines = Files.readAllLines(Path.of("./out/pdf/2021-2026/2021-2022/Segunda Legislatura Ordinaria/Asis_vot_OFICIAL_14-07-22/page_26.txt"));
+      var lines = Files.readAllLines(
+        Path.of("./out/pdf/2021-2026/2021-2022/Segunda Legislatura Ordinaria/Asis_vot_OFICIAL_14-07-22/page_26.txt")
+      );
 
       var registro = load(65, lines);
 
@@ -41,7 +41,29 @@ public class TextractVotacionV2 {
   }
 
   static RegistroVotacion load(int quorum, List<String> lines) throws IOException {
-    lines = lines.stream().map(s -> s.replace(" +++", "")).map(s -> s.replace("+++ ", "")).toList();
+    lines =
+      lines
+        .stream()
+        .map(s ->
+          s
+            .replace("GLADYS M.", "GLADYS MARGOT")
+            // Wrong GP
+            .replace("AP PIS", "AP-PIS")
+            .trim()
+        )
+              .map(s -> {
+                if (s.equals("EP")) return "FP";
+                else return s;
+              })
+        .map(s -> {
+          if (s.contains("-JPP") && !s.contains("CD-JPP"))
+            return s.replace("-JPP", "CD-JPP");
+          else
+            return s;
+        })
+        .map(s -> s.replace(" +++", ""))
+        .map(s -> s.replace("+++ ", ""))
+        .toList();
 
     var registroBuilder = RegistroVotacion.newBuilder().withQuorum(quorum);
     var plenoBuilder = Pleno.newBuilder();
@@ -415,47 +437,13 @@ public class TextractVotacionV2 {
         .stream()
         .map(s ->
           s
-            .replace("+++ ", "")
-            .replace("+++", "")
-            .replace(" +++", "")
-            .replace("***", "")
-            .replace("NO---", "NO")
-            .replace("NO-", "NO")
+            .replace("GLADYS M.", "GLADYS MARGOT")
+            // Wrong GP
+            .replace("AP PIS", "AP-PIS")
             .trim()
         )
-        .flatMap(s -> {
-          var ss = s.split(" ");
-          if (ss.length > 1 && Arrays.stream(ss).anyMatch(Votacion::is)) {
-            var t = "";
-            for (int i = 0; i < ss.length; i++) {
-              if (Votacion.is(ss[i])) {
-                var as = ss[i];
-                StringBuilder after = new StringBuilder();
-                while (i < ss.length) {
-                  after.append(" ").append(ss[i]);
-                  i++;
-                }
-                return Stream.of(t, as, after.toString());
-              } else {
-                t = t + " " + ss[i];
-              }
-            }
-            return Stream.of(ss[0], s.substring(s.indexOf(" ") + 1));
-          } else return Stream.of(s);
-        })
-        .flatMap(s -> {
-          var ss = s.split(" ");
-          if (ss.length > 1 && Votacion.is(ss[0])) {
-            return Stream.of(ss[0], s.substring(s.indexOf(" ") + 1));
-          } else return Stream.of(s);
-        })
-        .flatMap(s -> {
-          var ss = s.split(" ");
-          if (ss.length > 1 && isInteger(ss[0])) {
-            return Stream.of(ss[0], s.substring(s.indexOf(" ") + 1));
-          } else return Stream.of(s);
-        })
-        .filter(s -> !s.isBlank())
+        .map(s -> s.replace(" +++", ""))
+        .map(s -> s.replace("+++ ", ""))
         .toList()
     );
     if (first.get(2).equals("SI")) first.remove(2);

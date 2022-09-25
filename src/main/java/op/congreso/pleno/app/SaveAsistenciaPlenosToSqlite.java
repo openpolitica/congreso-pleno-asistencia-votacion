@@ -218,6 +218,9 @@ public class SaveAsistenciaPlenosToSqlite implements Consumer<AsistenciaPlenos> 
         ps.setString(6, r.fechaHora().toLocalTime().format(DateTimeFormatter.ofPattern(HH_MM)));
 
         ps.setString(7, a.getKey().nombre());
+        if (a.getKey().descripcion() == null) {
+          throw new IllegalStateException("null grupo descripcion");
+        }
         ps.setString(8, a.getKey().descripcion());
 
         ps.setInt(9, a.getValue().presentes());

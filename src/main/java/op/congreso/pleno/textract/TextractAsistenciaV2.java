@@ -31,7 +31,9 @@ public class TextractAsistenciaV2 {
 
   public static void main(String[] args) throws IOException {
     try {
-      var lines = Files.readAllLines(Path.of("./out/pdf/2021-2026/2021-2022/Segunda Legislatura Ordinaria/Asis_vot_OFICIAL_14-07-22/page_26.txt"));
+      var lines = Files.readAllLines(
+        Path.of("./out/pdf/2021-2026/2021-2022/Segunda Legislatura Ordinaria/Asis_vot_OFICIAL_14-07-22/page_26.txt")
+      );
 
       var registro = load(clean(lines));
 
@@ -42,6 +44,22 @@ public class TextractAsistenciaV2 {
   }
 
   static RegistroAsistencia load(List<String> lines) throws IOException {
+    lines = lines.stream()
+            .map(s ->
+                    s
+                            .replace("GLADYS M.", "GLADYS MARGOT")
+                            // Wrong GP
+                            .replace("AP PIS", "AP-PIS")
+                            .trim()
+            )
+            .map(s -> {
+              if (s.contains("-JPP") && !s.contains("CD-JPP"))
+                return s.replace("-JPP", "CD-JPP");
+              else
+                return s;
+            })
+            .toList();
+
     var registroBuilder = RegistroAsistencia.newBuilder();
     var plenoBuilder = Pleno.newBuilder();
     var resultadosBuilder = ResultadoAsistencia.newBuilder();
@@ -357,13 +375,9 @@ public class TextractAsistenciaV2 {
       .stream()
       .map(s ->
         s
-          .replace("+++ ", "")
-          .replace("+++", "")
-          .replace(" +++", "")
-          .replace("***", "")
-          .replace("NO---", "NO")
-          .replace("NO-", "NO")
+          .replace("GLADYS M.", "GLADYS MARGOT")
           // Wrong GP
+          .replace("AP PIS", "AP-PIS")
           .trim()
       )
       .flatMap(s -> {
