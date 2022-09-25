@@ -44,34 +44,31 @@ public class TextractAsistenciaV2 {
   }
 
   static RegistroAsistencia load(List<String> lines) throws IOException {
-    lines = lines.stream()
-            .map(s ->
-                    s
-                            .replace("GLADYS M.", "GLADYS MARGOT")
-                            // Wrong GP
-                            .replace("AP PIS", "AP-PIS")
-                            .replace("CD- JPP", "CD-JPP")
-                            .replace("CD JPP", "CD-JPP")
-                            .trim()
-            )
-            .map(s -> {
-              if (s.endsWith(" EP")) return s.replace("EP", "FP");
-              if (s.equals("EP")) return "FP";
-              return s;
-            })
-            .map(s -> {
-              if (s.contains("CD-J") && !s.contains("CD-JPP"))
-                return s.replace("CD-J", "CD-JPP");
-              else
-                return s;
-            })
-            .map(s -> {
-              if (s.contains("-JPP") && !s.contains("CD-JPP"))
-                return s.replace("-JPP", "CD-JPP");
-              else
-                return s;
-            })
-            .toList();
+    lines =
+      lines
+        .stream()
+        .map(s ->
+          s
+            .replace("GLADYS M.", "GLADYS MARGOT")
+            // Wrong GP
+            .replace("AP PIS", "AP-PIS")
+            .replace("CD- JPP", "CD-JPP")
+            .replace("CD JPP", "CD-JPP")
+            .replace("ID-JPP", "CD-JPP")
+            .trim()
+        )
+        .map(s -> {
+          if (s.endsWith(" EP")) return s.replace("EP", "FP");
+          if (s.equals("EP")) return "FP";
+          return s;
+        })
+        .map(s -> {
+          if (s.contains("CD-J") && !s.contains("CD-JPP")) return s.replace("CD-J", "CD-JPP"); else return s;
+        })
+        .map(s -> {
+          if (s.contains("-JPP") && !s.contains("CD-JPP")) return s.replace("-JPP", "CD-JPP"); else return s;
+        })
+        .toList();
 
     var registroBuilder = RegistroAsistencia.newBuilder();
     var plenoBuilder = Pleno.newBuilder();

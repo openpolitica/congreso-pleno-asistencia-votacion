@@ -26,9 +26,8 @@ public class GrupoParlamentarioUtil {
       return gp;
     } else {
       var result = FuzzySearch.extractOne(gp, VALID_GP);
-      if (similar(gp, result)) return result.getString();
-      else throw new IllegalArgumentException(
-              "Not similar found, score: " + result.getScore()
+      if (similar(gp, result)) return result.getString(); else throw new IllegalArgumentException(
+        "Not similar found, score: " + result.getScore()
       );
     }
   }
