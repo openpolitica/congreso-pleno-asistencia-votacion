@@ -52,8 +52,9 @@ public class TextractVotacionV2 {
             .trim()
         )
               .map(s -> {
+                if (s.endsWith(" EP")) return s.replace("EP", "FP");
                 if (s.equals("EP")) return "FP";
-                else return s;
+                return s;
               })
         .map(s -> {
           if (s.contains("-JPP") && !s.contains("CD-JPP"))
@@ -63,6 +64,7 @@ public class TextractVotacionV2 {
         })
         .map(s -> s.replace(" +++", ""))
         .map(s -> s.replace("+++ ", ""))
+        .filter(s -> !s.equals("***"))
         .toList();
 
     var registroBuilder = RegistroVotacion.newBuilder().withQuorum(quorum);
