@@ -22,13 +22,19 @@ public class GrupoParlamentarioUtil {
   }
 
   public static String findSimilar(String gp) {
-    var result = FuzzySearch.extractOne(gp, VALID_GP);
-    if (similar(gp, result)) return result.getString(); else throw new IllegalArgumentException(
-      "Not similar found, score: " + result.getScore()
-    );
+    if (VALID_GP.contains(gp)) {
+      return gp;
+    } else {
+      var result = FuzzySearch.extractOne(gp, VALID_GP);
+      if (similar(gp, result)) return result.getString();
+      else throw new IllegalArgumentException(
+              "Not similar found, score: " + result.getScore()
+      );
+    }
   }
 
   public static boolean isSimilar(String gp) {
+    if (VALID_GP.contains(gp)) return true;
     var result = FuzzySearch.extractOne(gp, VALID_GP);
     return similar(gp, result);
   }
@@ -50,5 +56,9 @@ public class GrupoParlamentarioUtil {
       .map(a -> a.split(","))
       .filter(a -> a.length == 2)
       .collect(Collectors.toMap(a -> a[0], a -> a[1]));
+  }
+
+  public static boolean is(String gp) {
+    return VALID_GP.contains(gp);
   }
 }

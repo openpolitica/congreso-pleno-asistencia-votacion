@@ -103,7 +103,7 @@ public class TextractVotacionV2 {
           StringBuilder asunto = new StringBuilder();
           i++;
           asunto.append(lines.get(i));
-          while (!GrupoParlamentarioUtil.isSimilar(lines.get(i + 1))) {
+          while (!GrupoParlamentarioUtil.is(lines.get(i + 1))) {
             i++;
             var next = lines.get(i);
             asunto.append(" ").append(next);

@@ -53,6 +53,11 @@ public class TextractAsistenciaV2 {
                             .trim()
             )
             .map(s -> {
+              if (s.endsWith(" EP")) return s.replace("EP", "FP");
+              if (s.equals("EP")) return "FP";
+              return s;
+            })
+            .map(s -> {
               if (s.contains("-JPP") && !s.contains("CD-JPP"))
                 return s.replace("-JPP", "CD-JPP");
               else
