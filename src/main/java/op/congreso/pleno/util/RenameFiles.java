@@ -32,9 +32,7 @@ public class RenameFiles {
 
   private static Stream<Path> list(Path path) {
     try {
-      if (Files.isDirectory(path)) return Files.list(
-        path
-      ); else return Stream.of();
+      if (Files.isDirectory(path)) return Files.list(path); else return Stream.of();
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

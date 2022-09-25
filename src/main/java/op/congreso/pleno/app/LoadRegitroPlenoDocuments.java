@@ -19,9 +19,7 @@ import org.slf4j.LoggerFactory;
 
 public class LoadRegitroPlenoDocuments {
 
-  static final Logger LOG = LoggerFactory.getLogger(
-    LoadRegitroPlenoDocuments.class
-  );
+  static final Logger LOG = LoggerFactory.getLogger(LoadRegitroPlenoDocuments.class);
   public static final String CURRENT = "2021-2026";
 
   public static void main(String[] args) throws IOException {
@@ -40,17 +38,11 @@ public class LoadRegitroPlenoDocuments {
       while (it.hasNext()) {
         var v = it.next();
         var pleno = RegistroPlenoDocument.parse(v);
-        if (pleno.periodoParlamentario().equals(CURRENT)) existing.put(
-          pleno.id(),
-          pleno
-        );
+        if (pleno.periodoParlamentario().equals(CURRENT)) existing.put(pleno.id(), pleno);
       }
     }
     LOG.info("Starting to collect plenos");
-    var root = collect(
-      "/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/new_asistenciavotacion",
-      5
-    );
+    var root = collect("/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/new_asistenciavotacion", 5);
 
     var plenos = new HashSet<RegistroPlenoDocument>();
 
@@ -63,17 +55,8 @@ public class LoadRegitroPlenoDocuments {
         for (var legislatura : periodo.entrySet()) {
           LOG.debug("Legislatura: {}", legislatura.getKey());
 
-          var p = collectPleno(
-            periodos.getKey(),
-            anual.getKey(),
-            legislatura.getKey(),
-            legislatura.getValue()
-          );
-          p
-            .values()
-            .stream()
-            .filter(p1 -> p1.periodoParlamentario().equals("2021-2026"))
-            .forEach(plenos::add);
+          var p = collectPleno(periodos.getKey(), anual.getKey(), legislatura.getKey(), legislatura.getValue());
+          p.values().stream().filter(p1 -> p1.periodoParlamentario().equals("2021-2026")).forEach(plenos::add);
         }
       }
     }
@@ -85,10 +68,7 @@ public class LoadRegitroPlenoDocuments {
       updated.add(pleno);
     }
 
-    var registroPlenos = updated
-      .stream()
-      .sorted(Comparator.comparing(RegistroPlenoDocument::id).reversed())
-      .toList();
+    var registroPlenos = updated.stream().sorted(Comparator.comparing(RegistroPlenoDocument::id).reversed()).toList();
 
     LOG.info("Writing CSV to file");
     var content = csvHeader();

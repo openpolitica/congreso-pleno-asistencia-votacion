@@ -63,13 +63,7 @@ public record RegistroVotacion(
       votaciones
         .stream()
         .sorted(Comparator.comparing(ResultadoCongresista::congresista))
-        .map(v ->
-          v.grupoParlamentario() +
-          ",\"" +
-          v.congresista() +
-          "\"," +
-          v.resultado().name()
-        )
+        .map(v -> v.grupoParlamentario() + ",\"" + v.congresista() + "\"," + v.resultado().name())
         .collect(Collectors.joining("\n"))
     );
   }
@@ -153,11 +147,7 @@ public record RegistroVotacion(
   public String printEtiquetasAsCsv() {
     return (
       "etiqueta,valor\n" +
-      etiquetas
-        .keySet()
-        .stream()
-        .map(k -> k + ",\"" + etiquetas.get(k) + "\"")
-        .collect(Collectors.joining("\n"))
+      etiquetas.keySet().stream().map(k -> k + ",\"" + etiquetas.get(k) + "\"").collect(Collectors.joining("\n"))
     );
   }
 
@@ -196,10 +186,7 @@ public record RegistroVotacion(
     }
 
     public Builder withFechaHora(LocalDate fecha, String hora) {
-      var horaTime = LocalTime.parse(
-        hora,
-        DateTimeFormatter.ofPattern("HH:mm")
-      );
+      var horaTime = LocalTime.parse(hora, DateTimeFormatter.ofPattern("HH:mm"));
       this.fechaHora = fecha.atTime(horaTime);
       return this;
     }
@@ -218,10 +205,7 @@ public record RegistroVotacion(
       return this;
     }
 
-    public Builder withVotaciones(
-      Map<String, String> grupos,
-      List<ResultadoCongresista<Votacion>> votaciones
-    ) {
+    public Builder withVotaciones(Map<String, String> grupos, List<ResultadoCongresista<Votacion>> votaciones) {
       this.grupos = grupos;
       this.votaciones = votaciones;
       return this;
@@ -232,9 +216,7 @@ public record RegistroVotacion(
       return this;
     }
 
-    public Builder withResultadosPorPartido(
-      Map<GrupoParlamentario, ResultadoVotacion> resultadosPorPartido
-    ) {
+    public Builder withResultadosPorPartido(Map<GrupoParlamentario, ResultadoVotacion> resultadosPorPartido) {
       this.resultadosPorGrupo = resultadosPorPartido;
       return this;
     }
@@ -256,29 +238,19 @@ public record RegistroVotacion(
           votacion.grupoParlamentario(),
           grupos.get(votacion.grupoParlamentario())
         );
-        results.computeIfPresent(
-          grupoParlamentario,
-          (gp, resultado) -> resultado.increase(votacion.resultado())
-        );
+        results.computeIfPresent(grupoParlamentario, (gp, resultado) -> resultado.increase(votacion.resultado()));
         results.computeIfAbsent(
           grupoParlamentario,
           gp -> ResultadoVotacion.newBuilder().increase(votacion.resultado())
         );
       }
-      return results
-        .keySet()
-        .stream()
-        .collect(Collectors.toMap(k -> k, k -> results.get(k).build()));
+      return results.keySet().stream().collect(Collectors.toMap(k -> k, k -> results.get(k).build()));
     }
 
     void checkCongresistas() {
-      var errores = Congresistas.checkCongresistas(
-        votaciones.stream().map(ResultadoCongresista::congresista).toList()
-      );
+      var errores = Congresistas.checkCongresistas(votaciones.stream().map(ResultadoCongresista::congresista).toList());
       if (!errores.isEmpty()) {
-        var map = errores
-          .stream()
-          .collect(Collectors.toMap(c -> c, Congresistas::findSimilar));
+        var map = errores.stream().collect(Collectors.toMap(c -> c, Congresistas::findSimilar));
         votaciones =
           votaciones
             .stream()
@@ -289,35 +261,20 @@ public record RegistroVotacion(
               return v;
             })
             .toList();
-        log =
-          Congresistas.checkCongresistas(
-            votaciones.stream().map(ResultadoCongresista::congresista).toList()
-          );
+        log = Congresistas.checkCongresistas(votaciones.stream().map(ResultadoCongresista::congresista).toList());
       }
     }
 
     public RegistroVotacion build() {
-      var calcResultsPerGroup = calculateResultadosPorGrupoParlamentario(
-        grupos
-      );
+      var calcResultsPerGroup = calculateResultadosPorGrupoParlamentario(grupos);
       var calcResults = calculateResultados();
       if (!calcResultsPerGroup.equals(resultadosPorGrupo)) {
-        LOG.warn(
-          "Resultados por grupo calculados son diferentes de capturados Pleno: {}",
-          fechaHora
-        );
-        LOG.warn(
-          "Diff: \nOld: {} \nNew: {}",
-          resultadosPorGrupo,
-          calcResultsPerGroup
-        );
+        LOG.warn("Resultados por grupo calculados son diferentes de capturados Pleno: {}", fechaHora);
+        LOG.warn("Diff: \nOld: {} \nNew: {}", resultadosPorGrupo, calcResultsPerGroup);
         this.resultadosPorGrupo = calcResultsPerGroup;
       }
       if (!calcResults.equals(resultados)) {
-        LOG.warn(
-          "Resultados calculados son diferentes de capturados Pleno: {}",
-          fechaHora
-        );
+        LOG.warn("Resultados calculados son diferentes de capturados Pleno: {}", fechaHora);
         LOG.warn("Diff: \nOld: {} \nNew: {}", resultados, calcResults);
         this.resultados = calcResults;
       }
@@ -352,10 +309,8 @@ public record RegistroVotacion(
       for (var grupo : resultadosPorGrupo.keySet()) {
         si = si + resultadosPorGrupo.get(grupo).si();
         no = no + resultadosPorGrupo.get(grupo).no();
-        abstenciones =
-          abstenciones + resultadosPorGrupo.get(grupo).abstenciones();
-        sinResponder =
-          sinResponder + resultadosPorGrupo.get(grupo).sinResponder();
+        abstenciones = abstenciones + resultadosPorGrupo.get(grupo).abstenciones();
+        sinResponder = sinResponder + resultadosPorGrupo.get(grupo).sinResponder();
         ausentes = ausentes + resultadosPorGrupo.get(grupo).ausentes();
         otros = otros + resultadosPorGrupo.get(grupo).otros();
         licencias = licencias + resultadosPorGrupo.get(grupo).licencias();
@@ -370,10 +325,7 @@ public record RegistroVotacion(
         licencias != resultados.licencias() ||
         total != resultados.total()
       ) {
-        LOG.warn(
-          "Resultados calculados son diferentes de resulados generales: {}",
-          fechaHora
-        );
+        LOG.warn("Resultados calculados son diferentes de resulados generales: {}", fechaHora);
       }
     }
   }

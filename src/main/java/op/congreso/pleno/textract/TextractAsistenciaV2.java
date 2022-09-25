@@ -25,17 +25,13 @@ import org.slf4j.LoggerFactory;
 
 public class TextractAsistenciaV2 {
 
-  public static Logger LOG = LoggerFactory.getLogger(
-    TextractAsistenciaV2.class
-  );
+  public static Logger LOG = LoggerFactory.getLogger(TextractAsistenciaV2.class);
 
   //  public static final Pattern ASISTENCIA_GROUP = Pattern.compile("(\\w+)");
 
   public static void main(String[] args) throws IOException {
     try {
-      var lines = Files.readAllLines(
-        Path.of("./out/Asis_vot_OFICIAL_07-07-22/page_8.txt")
-      );
+      var lines = Files.readAllLines(Path.of("./out/pdf/2021-2026/2021-2022/Segunda Legislatura Ordinaria/Asis_vot_OFICIAL_14-07-22/page_26.txt"));
 
       var registro = load(clean(lines));
 
@@ -74,15 +70,12 @@ public class TextractAsistenciaV2 {
               if (text.equals(Constantes.ASISTENCIA)) {
                 type = text;
                 i++;
-                fechaHora =
-                  LocalDateTime.parse(lines.get(i), FECHA_HORA_PATTERN);
+                fechaHora = LocalDateTime.parse(lines.get(i), FECHA_HORA_PATTERN);
                 registroBuilder.withFechaHora(fechaHora);
                 plenoBuilder.withFecha(fechaHora.toLocalDate());
               } else if (text.startsWith(Constantes.ASISTENCIA)) {
                 type = Constantes.ASISTENCIA;
-                var fechaText = text.substring(
-                  Constantes.ASISTENCIA.length() + 1
-                );
+                var fechaText = text.substring(Constantes.ASISTENCIA.length() + 1);
                 fechaHora = LocalDateTime.parse(fechaText, FECHA_HORA_PATTERN);
                 registroBuilder.withFechaHora(fechaHora);
                 plenoBuilder.withFecha(fechaHora.toLocalDate());
@@ -165,8 +158,8 @@ public class TextractAsistenciaV2 {
           //          }
         } else { // Process resultados
           if (text.equals("Asistencia para Quórum") || text.equals("Asistencia para Quorum")) { // Finally get quorum
-             i++;
-             registroBuilder.withQuorum(Integer.parseInt(lines.get(i)));
+            i++;
+            registroBuilder.withQuorum(Integer.parseInt(lines.get(i)));
           }
           // First: get resultado headers:
           // Resultados de la ASISTENCIA
@@ -348,11 +341,7 @@ public class TextractAsistenciaV2 {
 
     var allGrupos = GrupoParlamentarioUtil.all();
 
-    var gp = asistencias
-      .stream()
-      .map(ResultadoCongresista::grupoParlamentario)
-      .distinct()
-      .toList();
+    var gp = asistencias.stream().map(ResultadoCongresista::grupoParlamentario).distinct().toList();
     var grupos = gp.stream().collect(Collectors.toMap(a -> a, allGrupos::get));
 
     return registroBuilder

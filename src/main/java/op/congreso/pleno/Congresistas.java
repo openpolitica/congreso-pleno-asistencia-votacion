@@ -14,9 +14,7 @@ public class Congresistas {
 
   static {
     try {
-      var lines = Files.readAllLines(
-        Path.of("data/2021-2026/congresistas.csv")
-      );
+      var lines = Files.readAllLines(Path.of("data/2021-2026/congresistas.csv"));
       for (int i = 1; i < lines.size(); i++) {
         var l = lines.get(i);
         names.add(l.replace("\"", ""));
@@ -27,10 +25,7 @@ public class Congresistas {
   }
 
   public static List<String> checkCongresistas(List<String> congresistas) {
-    return congresistas
-      .stream()
-      .filter(c -> !Congresistas.names.contains(c))
-      .toList();
+    return congresistas.stream().filter(c -> !Congresistas.names.contains(c)).toList();
   }
 
   public static String findSimilar(String c) {
@@ -39,6 +34,6 @@ public class Congresistas {
   }
 
   public static void main(String[] args) {
-   System.out.println(Congresistas.findSimilar("ECHAIZ DE NUNEZ IZAGA, GLADYS M."));
+    System.out.println(Congresistas.findSimilar("ECHAIZ DE NUNEZ IZAGA, GLADYS M."));
   }
 }

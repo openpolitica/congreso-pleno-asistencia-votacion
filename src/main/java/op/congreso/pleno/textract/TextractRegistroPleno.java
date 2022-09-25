@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -20,12 +21,9 @@ import software.amazon.awssdk.services.textract.TextractClient;
 
 public class TextractRegistroPleno {
 
-  static final Logger LOG = LoggerFactory.getLogger(
-    TextractRegistroPleno.class
-  );
+  static final Logger LOG = LoggerFactory.getLogger(TextractRegistroPleno.class);
 
-  public static Map<Path, List<String>> extractRegistroPleno(Path plenoPdf)
-    throws IOException {
+  public static Map<Path, List<String>> extractRegistroPleno(Path plenoPdf) throws IOException {
     LOG.info("Generate images from PDF...");
     var pages = PlenoPdfToImages.generateImageFromPDF(plenoPdf);
     LOG.info("Extract lines...");
@@ -46,8 +44,7 @@ public class TextractRegistroPleno {
     return list;
   }
 
-  public static RegistroPlenoDocument plenoToRetry(Path base)
-    throws IOException {
+  public static RegistroPlenoDocument plenoToRetry(Path base) throws IOException {
     return Files
       .list(base)
       .flatMap(listDir()) // pp
@@ -66,8 +63,7 @@ public class TextractRegistroPleno {
       .get();
   }
 
-  public static Map<Path, List<String>> retryProcessRegistroPleno(Path base)
-    throws IOException {
+  public static Map<Path, List<String>> retryProcessRegistroPleno(Path base) throws IOException {
     return Files
       .list(base)
       .flatMap(listDir()) // pp
@@ -109,8 +105,7 @@ public class TextractRegistroPleno {
     };
   }
 
-  public static Map<Path, List<String>> loadLines(Path path)
-    throws IOException {
+  public static Map<Path, List<String>> loadLines(Path path) throws IOException {
     try (var ls = Files.list(path)) {
       var map = new HashMap<Path, List<String>>();
       ls
@@ -119,10 +114,7 @@ public class TextractRegistroPleno {
         .forEach(p -> {
           try {
             var lines = Files.readAllLines(p);
-            if (
-              lines.contains(Constantes.ASISTENCIA) ||
-              lines.get(3).startsWith(Constantes.ASISTENCIA)
-            ) {
+            if (lines.contains(Constantes.ASISTENCIA) || lines.get(3).startsWith(Constantes.ASISTENCIA)) {
               var l = TextractAsistencia.clean(lines);
               map.put(p, l);
             } else if (lines.contains(Constantes.VOTACION)) {
@@ -137,22 +129,17 @@ public class TextractRegistroPleno {
     }
   }
 
-  public static RegistroPleno processLines(
-    RegistroPlenoDocument document,
-    Map<Path, List<String>> list
-  ) {
+  public static RegistroPleno processLines(RegistroPlenoDocument document, Map<Path, List<String>> list) {
     var builder = RegistroPleno.newBuilder(document);
     RegistroAsistencia latestAsistencia = null;
     var pageNumber = 1;
     var errors = 0;
-    for (var key : list.keySet()) {
+    var paths = list.keySet().stream().sorted().toList();
+    for (var key : paths) {
       LOG.info("Processing page: {}", key);
       try {
         var lines = list.get(key);
-        if (
-          lines.contains(Constantes.ASISTENCIA) ||
-          lines.get(3).startsWith(Constantes.ASISTENCIA)
-        ) {
+        if (lines.contains(Constantes.ASISTENCIA) || lines.get(3).startsWith(Constantes.ASISTENCIA)) {
           var asistencia = TextractAsistenciaV2.load(lines);
           builder.addAsistencia(asistencia);
           latestAsistencia = asistencia;
@@ -174,9 +161,7 @@ public class TextractRegistroPleno {
       }
       pageNumber++;
     }
-    if (latestAsistencia != null) builder.withGruposParlamentarios(
-      latestAsistencia.pleno().gruposParlamentarios()
-    );
+    if (latestAsistencia != null) builder.withGruposParlamentarios(latestAsistencia.pleno().gruposParlamentarios());
     System.out.println(errors);
     return builder.build();
   }

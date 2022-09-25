@@ -17,9 +17,7 @@ import org.slf4j.LoggerFactory;
 
 public class ProcessRegitroPlenoDocuments {
 
-  static final Logger LOG = LoggerFactory.getLogger(
-    ProcessRegitroPlenoDocuments.class
-  );
+  static final Logger LOG = LoggerFactory.getLogger(ProcessRegitroPlenoDocuments.class);
   public static final String CURRENT = "2021-2026";
 
   public static void main(String[] args) throws IOException {
@@ -38,10 +36,7 @@ public class ProcessRegitroPlenoDocuments {
       while (it.hasNext()) {
         var v = it.next();
         var pleno = RegistroPlenoDocument.parse(v);
-        if (pleno.periodoParlamentario().equals(CURRENT)) existing.put(
-          pleno.id(),
-          pleno
-        );
+        if (pleno.periodoParlamentario().equals(CURRENT)) existing.put(pleno.id(), pleno);
       }
     }
 
@@ -51,10 +46,8 @@ public class ProcessRegitroPlenoDocuments {
     for (var p : existing.values()) {
       var pleno = existing.getOrDefault(p.id(), p);
       if (
-        pleno.fecha().equals("2022-07-07")
-        //        !pleno.provisional() &&
-        //        pleno.paginas() < 1 &&
-        //        pleno.periodoParlamentario().equals(CURRENT)
+        //        pleno.fecha().equals("2022-07-07")
+        !pleno.provisional() && pleno.paginas() < 1 && pleno.periodoParlamentario().equals(CURRENT)
       ) {
         if (extractPleno) {
           LOG.info("Extracting Pleno: {}", pleno.fecha());
@@ -68,10 +61,7 @@ public class ProcessRegitroPlenoDocuments {
       updated.add(pleno);
     }
 
-    var registroPlenos = updated
-      .stream()
-      .sorted(Comparator.comparing(RegistroPlenoDocument::id).reversed())
-      .toList();
+    var registroPlenos = updated.stream().sorted(Comparator.comparing(RegistroPlenoDocument::id).reversed()).toList();
 
     LOG.info("Writing CSV to file");
     var content = csvHeader();

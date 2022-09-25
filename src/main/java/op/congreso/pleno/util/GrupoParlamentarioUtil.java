@@ -23,9 +23,7 @@ public class GrupoParlamentarioUtil {
 
   public static String findSimilar(String gp) {
     var result = FuzzySearch.extractOne(gp, VALID_GP);
-    if (
-      similar(gp, result)
-    ) return result.getString(); else throw new IllegalArgumentException(
+    if (similar(gp, result)) return result.getString(); else throw new IllegalArgumentException(
       "Not similar found, score: " + result.getScore()
     );
   }
@@ -36,10 +34,7 @@ public class GrupoParlamentarioUtil {
   }
 
   private static boolean similar(String gp, ExtractedResult result) {
-    return (
-      result.getScore() >= 50 &&
-      Math.abs(result.getString().length() - gp.length()) < 4
-    );
+    return (result.getScore() >= 50 && Math.abs(result.getString().length() - gp.length()) < 4);
   }
 
   public static void main(String[] args) {

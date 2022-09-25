@@ -50,9 +50,7 @@ public record ResultadoVotacion(
         case ABSTENCION -> this.abstenciones = resultado;
         case SIN_RESPONDER -> this.sinResp = resultado;
         case AUSENTE -> this.ausentes = resultado;
-        case LICENCIA_OFICIAL,
-          LICENCIA_PERSONAL,
-          LICENCIA_POR_ENFERMEDAD -> this.licencias =
+        case LICENCIA_OFICIAL, LICENCIA_PERSONAL, LICENCIA_POR_ENFERMEDAD -> this.licencias =
           this.licencias + resultado;
         default -> this.otros = resultado;
       }
@@ -78,9 +76,7 @@ public record ResultadoVotacion(
         case ABSTENCION -> this.abstenciones = this.abstenciones + 1;
         case SIN_RESPONDER -> this.sinResp = this.sinResp + 1;
         case AUSENTE -> this.ausentes = this.ausentes + 1;
-        case LICENCIA_OFICIAL,
-          LICENCIA_PERSONAL,
-          LICENCIA_POR_ENFERMEDAD -> this.licencias = this.licencias + 1;
+        case LICENCIA_OFICIAL, LICENCIA_PERSONAL, LICENCIA_POR_ENFERMEDAD -> this.licencias = this.licencias + 1;
         default -> this.otros = this.otros + 1;
       }
       return this;

@@ -35,14 +35,11 @@ public record RegistroPlenoDocument(
   int paginas,
   boolean provisional
 ) {
-  static final Logger LOG = LoggerFactory.getLogger(
-    RegistroPlenoDocument.class
-  );
+  static final Logger LOG = LoggerFactory.getLogger(RegistroPlenoDocument.class);
   static Pattern periodo = Pattern.compile("\\d\\d\\d\\d ?- ?\\d\\d\\d\\d$");
   public static StringBuilder csvHeader() {
     return new StringBuilder(
-      "periodo_parlamentario,periodo_anual,legislatura," +
-      "fecha,titulo,url,filename,paginas,provisional\n"
+      "periodo_parlamentario,periodo_anual,legislatura," + "fecha,titulo,url,filename,paginas,provisional\n"
     );
   }
 
@@ -63,10 +60,7 @@ public record RegistroPlenoDocument(
       v.get("url"),
       v.get("filename"),
       Integer.parseInt(v.get("paginas")),
-      Optional
-        .ofNullable(v.get("provisional"))
-        .map(Boolean::parseBoolean)
-        .orElse(Boolean.FALSE)
+      Optional.ofNullable(v.get("provisional")).map(Boolean::parseBoolean).orElse(Boolean.FALSE)
     );
   }
 
@@ -93,9 +87,7 @@ public record RegistroPlenoDocument(
   }
 
   String directory() {
-    return (
-      "out/pdf/" + periodoParlamentario + "/" + periodoAnual + "/" + legislatura
-    );
+    return ("out/pdf/" + periodoParlamentario + "/" + periodoAnual + "/" + legislatura);
   }
 
   String path() {
@@ -134,14 +126,10 @@ public record RegistroPlenoDocument(
     try {
       var dir = Path.of(directory());
       if (!Files.isDirectory(dir)) Files.createDirectories(dir);
-      var readableByteChannel = Channels.newChannel(
-        new URL(url()).openStream()
-      );
+      var readableByteChannel = Channels.newChannel(new URL(url()).openStream());
       var path = path();
       try (var fileOutputStream = new FileOutputStream(path)) {
-        fileOutputStream
-          .getChannel()
-          .transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
+        fileOutputStream.getChannel().transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
       }
       LOG.info("PDF downloaded: {}", path);
     } catch (IOException e) {
@@ -151,8 +139,7 @@ public record RegistroPlenoDocument(
 
   public static final String BASE_URL = "https://www2.congreso.gob.pe";
 
-  public static Map<String, String> collect(String url, int colspan)
-    throws IOException {
+  public static Map<String, String> collect(String url, int colspan) throws IOException {
     var root = new LinkedHashMap<String, String>();
     {
       var jsoup = Jsoup.connect(BASE_URL + url);
@@ -176,16 +163,10 @@ public record RegistroPlenoDocument(
     }
   }
 
-  private static final Pattern p = Pattern.compile(
-    "javascript:openWindow\\('(.+)'\\)"
-  );
+  private static final Pattern p = Pattern.compile("javascript:openWindow\\('(.+)'\\)");
 
-  public static Map<String, RegistroPlenoDocument> collectPleno(
-    String pp,
-    String pa,
-    String l,
-    String url
-  ) throws IOException {
+  public static Map<String, RegistroPlenoDocument> collectPleno(String pp, String pa, String l, String url)
+    throws IOException {
     var root = new LinkedHashMap<String, RegistroPlenoDocument>();
     {
       var jsoup = Jsoup.connect(BASE_URL + url);
@@ -207,8 +188,7 @@ public record RegistroPlenoDocument(
           var matcher = p.matcher(href);
           if (matcher.find()) {
             var u = matcher.group(1);
-            var fullUrl =
-              BASE_URL + "/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/" + u;
+            var fullUrl = BASE_URL + "/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/" + u;
             root.put(
               titulo,
               new RegistroPlenoDocument(
@@ -232,10 +212,7 @@ public record RegistroPlenoDocument(
 
   public RegistroPlenoDocument extract() throws IOException {
     download();
-    Files.writeString(
-      Path.of(path() + ".json"),
-      new ObjectMapper().writeValueAsString(this)
-    );
+    Files.writeString(Path.of(path() + ".json"), new ObjectMapper().writeValueAsString(this));
     var lines = extractRegistroPleno(Path.of(path()));
     var regPleno = processLines(this, lines);
     SaveRegistroPlenoToCsv.save(regPleno);

@@ -30,11 +30,7 @@ public class TextractVotacionV2 {
 
   public static void main(String[] args) throws IOException {
     try {
-      var lines = clean(
-        Files.readAllLines(
-          Path.of("./out/Asis_vot_OFICIAL_07-07-22/page_16.txt")
-        )
-      );
+      var lines = Files.readAllLines(Path.of("./out/pdf/2021-2026/2021-2022/Segunda Legislatura Ordinaria/Asis_vot_OFICIAL_14-07-22/page_26.txt"));
 
       var registro = load(65, lines);
 
@@ -44,14 +40,8 @@ public class TextractVotacionV2 {
     }
   }
 
-  static RegistroVotacion load(int quorum, List<String> lines)
-    throws IOException {
-    lines =
-      lines
-        .stream()
-        .map(s -> s.replace(" +++", ""))
-        .map(s -> s.replace("+++ ", ""))
-        .toList();
+  static RegistroVotacion load(int quorum, List<String> lines) throws IOException {
+    lines = lines.stream().map(s -> s.replace(" +++", "")).map(s -> s.replace("+++ ", "")).toList();
 
     var registroBuilder = RegistroVotacion.newBuilder().withQuorum(quorum);
     var plenoBuilder = Pleno.newBuilder();
@@ -76,9 +66,7 @@ public class TextractVotacionV2 {
           switch (i) {
             case 0 -> titulo = lines.get(i);
             case 1 -> plenoBuilder.withLegislatura(lines.get(i));
-            case 2 -> registroBuilder.withPresidente(
-              lines.get(i).substring("Presidente: ".length())
-            );
+            case 2 -> registroBuilder.withPresidente(lines.get(i).substring("Presidente: ".length()));
             case 3 -> plenoBuilder.withTitulo(lines.get(i));
             case 4 -> type = lines.get(i);
             case 5 -> {
@@ -102,9 +90,13 @@ public class TextractVotacionV2 {
           current.processVotacionLine(b);
           if (current.isReady()) {
             var build = current.build();
-            resultados.stream().filter(r -> r.congresista().equals(build.congresista())).findAny().ifPresent(votacionResultadoCongresista -> {
-              throw new IllegalStateException("Repeated congresista: " + build);
-            });
+            resultados
+              .stream()
+              .filter(r -> r.congresista().equals(build.congresista()))
+              .findAny()
+              .ifPresent(votacionResultadoCongresista -> {
+                throw new IllegalStateException("Repeated congresista: " + build);
+              });
             resultados.add(build);
             current = ResultadoCongresista.newBuilder();
             if (!b.isEmpty()) current.processVotacionLine(b);
@@ -399,7 +391,9 @@ public class TextractVotacionV2 {
       i++;
     }
 
-    if (resultados.size() < 130) LOG.error("Less than 130 congresistas at " + fechaHora + " pleno: " + plenoBuilder.build());
+    if (resultados.size() < 130) LOG.error(
+      "Less than 130 congresistas at " + fechaHora + " pleno: " + plenoBuilder.build()
+    );
 
     var allGrupos = GrupoParlamentarioUtil.all();
     var grupos = resultados

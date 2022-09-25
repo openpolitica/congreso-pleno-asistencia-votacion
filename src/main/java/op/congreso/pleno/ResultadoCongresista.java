@@ -5,11 +5,7 @@ import op.congreso.pleno.asistencia.Asistencia;
 import op.congreso.pleno.util.GrupoParlamentarioUtil;
 import op.congreso.pleno.votacion.Votacion;
 
-public record ResultadoCongresista<T>(
-  String grupoParlamentario,
-  String congresista,
-  T resultado
-) {
+public record ResultadoCongresista<T>(String grupoParlamentario, String congresista, T resultado) {
   public static <T> Builder<T> newBuilder() {
     return new Builder<>();
   }
@@ -40,23 +36,15 @@ public record ResultadoCongresista<T>(
     }
 
     boolean isEmpty() {
-      return (
-        grupoParlamentario == null && congresista == null && resultado == null
-      );
+      return (grupoParlamentario == null && congresista == null && resultado == null);
     }
 
     public boolean isReady() {
-      return (
-        grupoParlamentario != null && congresista != null && resultado != null
-      );
+      return (grupoParlamentario != null && congresista != null && resultado != null);
     }
 
     public ResultadoCongresista<T> build() {
-      return new ResultadoCongresista<>(
-        grupoParlamentario,
-        congresista,
-        resultado
-      );
+      return new ResultadoCongresista<>(grupoParlamentario, congresista, resultado);
     }
 
     public void processAsistenciaLine(String s) {
@@ -83,9 +71,7 @@ public record ResultadoCongresista<T>(
         if (grupoParlamentario == null) {
           if (GrupoParlamentarioUtil.isSimilar(word)) {
             withGrupoParlamentario(GrupoParlamentarioUtil.findSimilar(word));
-          } else throw new IllegalArgumentException(
-            "No GP! " + word + " at " + text
-          );
+          } else throw new IllegalArgumentException("No GP! " + word + " at " + text);
         } else {
           if (Asistencia.is(word)) {
             if (!c.isEmpty()) {
@@ -160,11 +146,11 @@ public record ResultadoCongresista<T>(
     b1.processVotacionLine("SI");
     b1.processVotacionLine("APP");
     b1.processVotacionLine("ACUÑA PERALTA, SEGUNDO HÉCTOR");
-//FP
-//BARBARÁN REYES, ROSANGELLA ANDREA
-//NO
-//RP
-//JÁUREGUI MARTÍNEZ DE AGUAYO, MARIA aus
-//CD-JPP
+    //FP
+    //BARBARÁN REYES, ROSANGELLA ANDREA
+    //NO
+    //RP
+    //JÁUREGUI MARTÍNEZ DE AGUAYO, MARIA aus
+    //CD-JPP
   }
 }

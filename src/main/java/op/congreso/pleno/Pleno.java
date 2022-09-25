@@ -15,11 +15,7 @@ public record Pleno(
   Map<String, String> gruposParlamentarios
 ) {
   public String id() {
-    return (
-      periodoParlamentario +
-      ":" +
-      fecha.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-    );
+    return (periodoParlamentario + ":" + fecha.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
   }
 
   public static Builder newBuilder() {
@@ -66,15 +62,7 @@ public record Pleno(
     }
 
     public Pleno build() {
-      return new Pleno(
-        periodoParlamentario,
-        periodoAnual,
-        legislatura,
-        titulo,
-        fecha,
-        url,
-        gruposParlamentarios
-      );
+      return new Pleno(periodoParlamentario, periodoAnual, legislatura, titulo, fecha, url, gruposParlamentarios);
     }
 
     public Builder withPeriodoParlamentario(String periodoParlamentario) {

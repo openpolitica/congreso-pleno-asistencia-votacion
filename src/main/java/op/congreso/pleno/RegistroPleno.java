@@ -38,14 +38,7 @@ public record RegistroPleno(
     String titulo,
     String url
   ) {
-    return new Builder(
-      periodoParlamentario,
-      periodoAnual,
-      legislatura,
-      fecha,
-      titulo,
-      url
-    );
+    return new Builder(periodoParlamentario, periodoAnual, legislatura, fecha, titulo, url);
   }
 
   public String printPlenoAsCsv() {
@@ -106,8 +99,7 @@ public record RegistroPleno(
       this.legislatura = document.legislatura();
       this.titulo = document.titulo();
       this.url = document.url();
-      this.fecha =
-        LocalDate.parse(document.fecha(), DateTimeFormatter.ISO_LOCAL_DATE);
+      this.fecha = LocalDate.parse(document.fecha(), DateTimeFormatter.ISO_LOCAL_DATE);
     }
 
     public Builder(
@@ -153,9 +145,7 @@ public record RegistroPleno(
       );
     }
 
-    public Builder withGruposParlamentarios(
-      Map<String, String> gruposParlamentarios
-    ) {
+    public Builder withGruposParlamentarios(Map<String, String> gruposParlamentarios) {
       this.gruposParlamentarios = gruposParlamentarios;
       return this;
     }
