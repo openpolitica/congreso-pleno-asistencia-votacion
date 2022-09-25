@@ -50,12 +50,20 @@ public class TextractAsistenciaV2 {
                             .replace("GLADYS M.", "GLADYS MARGOT")
                             // Wrong GP
                             .replace("AP PIS", "AP-PIS")
+                            .replace("CD- JPP", "CD-JPP")
+                            .replace("CD JPP", "CD-JPP")
                             .trim()
             )
             .map(s -> {
               if (s.endsWith(" EP")) return s.replace("EP", "FP");
               if (s.equals("EP")) return "FP";
               return s;
+            })
+            .map(s -> {
+              if (s.contains("CD-J") && !s.contains("CD-JPP"))
+                return s.replace("CD-J", "CD-JPP");
+              else
+                return s;
             })
             .map(s -> {
               if (s.contains("-JPP") && !s.contains("CD-JPP"))
