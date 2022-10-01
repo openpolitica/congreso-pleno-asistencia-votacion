@@ -30,3 +30,12 @@ serve:
 prepare_registro_plenos:
 	rm -f plenos.db
 	csvs-to-sqlite plenos.csv plenos.db
+
+new_pleno:
+	git add plenos.csv
+	git commit -m 'update plenos'
+	git push origin main
+	BRANCH=$(cat pr-branch.txt) && git checkout -b $BRANCH
+	git add data
+	COMMIT=$(cat pr-title.txt) && git commit -m $COMMIT
+	BRANCH=$(cat pr-branch.txt) && git push origin $BRANCH
