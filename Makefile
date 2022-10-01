@@ -35,7 +35,7 @@ new_pleno:
 	git add plenos.csv
 	git commit -m 'update plenos'
 	git push origin main
-	BRANCH=$(cat pr-branch.txt) && git checkout -b $(BRANCH)
+	BRANCH=$(cat pr-branch.txt) && git checkout -b ${BRANCH}
 	git add data
-	COMMIT=$(cat pr-title.txt) && git commit -m $(COMMIT)
-	BRANCH=$(cat pr-branch.txt) && git push origin $(BRANCH)
+	COMMIT=$(cat pr-title.txt) && git commit -m ${COMMIT}
+	BRANCH=$(cat pr-branch.txt) && git push origin ${BRANCH}
