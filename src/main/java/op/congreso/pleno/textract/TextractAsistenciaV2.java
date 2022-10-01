@@ -98,13 +98,13 @@ public class TextractAsistenciaV2 {
               if (text.equals(Constantes.ASISTENCIA)) {
                 type = text;
                 i++;
-                fechaHora = LocalDateTime.parse(lines.get(i), FECHA_HORA_PATTERN);
+                fechaHora = LocalDateTime.parse(lines.get(i).toUpperCase(), FECHA_HORA_PATTERN);
                 registroBuilder.withFechaHora(fechaHora);
                 plenoBuilder.withFecha(fechaHora.toLocalDate());
               } else if (text.startsWith(Constantes.ASISTENCIA)) {
                 type = Constantes.ASISTENCIA;
                 var fechaText = text.substring(Constantes.ASISTENCIA.length() + 1);
-                fechaHora = LocalDateTime.parse(fechaText, FECHA_HORA_PATTERN);
+                fechaHora = LocalDateTime.parse(fechaText.toUpperCase(), FECHA_HORA_PATTERN);
                 registroBuilder.withFechaHora(fechaHora);
                 plenoBuilder.withFecha(fechaHora.toLocalDate());
               }

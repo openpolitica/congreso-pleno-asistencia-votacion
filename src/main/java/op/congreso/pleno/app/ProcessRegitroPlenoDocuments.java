@@ -51,10 +51,10 @@ public class ProcessRegitroPlenoDocuments {
       ) {
         if (extractPleno) {
           LOG.info("Extracting Pleno: {}", pleno.fecha());
-          pleno = pleno.extract();
           Files.writeString(Path.of("pr-title.txt"), pleno.prTitle());
           Files.writeString(Path.of("pr-branch.txt"), pleno.prBranchName());
           Files.writeString(Path.of("pr-content.txt"), pleno.prContent());
+          pleno = pleno.extract();
           extractPleno = false;
         }
       }
