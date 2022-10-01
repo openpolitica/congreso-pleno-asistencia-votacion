@@ -94,7 +94,7 @@ public class TextractVotacionV2 {
             case 3 -> plenoBuilder.withTitulo(lines.get(i));
             case 4 -> type = lines.get(i);
             case 5 -> {
-              fechaHora = LocalDateTime.parse(lines.get(i).toUpperCase(), FECHA_HORA_PATTERN);
+              fechaHora = LocalDateTime.parse(lines.get(i).toLowerCase(), FECHA_HORA_PATTERN);
               registroBuilder.withFechaHora(fechaHora);
               plenoBuilder.withFecha(fechaHora.toLocalDate());
             }

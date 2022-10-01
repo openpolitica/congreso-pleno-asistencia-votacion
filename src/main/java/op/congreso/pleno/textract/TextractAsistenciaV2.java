@@ -98,13 +98,13 @@ public class TextractAsistenciaV2 {
               if (text.equals(Constantes.ASISTENCIA)) {
                 type = text;
                 i++;
-                fechaHora = LocalDateTime.parse(lines.get(i).toUpperCase(), FECHA_HORA_PATTERN);
+                fechaHora = LocalDateTime.parse(lines.get(i).toLowerCase(), FECHA_HORA_PATTERN);
                 registroBuilder.withFechaHora(fechaHora);
                 plenoBuilder.withFecha(fechaHora.toLocalDate());
               } else if (text.startsWith(Constantes.ASISTENCIA)) {
                 type = Constantes.ASISTENCIA;
                 var fechaText = text.substring(Constantes.ASISTENCIA.length() + 1);
-                fechaHora = LocalDateTime.parse(fechaText.toUpperCase(), FECHA_HORA_PATTERN);
+                fechaHora = LocalDateTime.parse(fechaText.toLowerCase(), FECHA_HORA_PATTERN);
                 registroBuilder.withFechaHora(fechaHora);
                 plenoBuilder.withFecha(fechaHora.toLocalDate());
               }
@@ -187,7 +187,9 @@ public class TextractAsistenciaV2 {
         } else { // Process resultados
           if (text.equals("Asistencia para Quórum") || text.equals("Asistencia para Quorum")) { // Finally get quorum
             i++;
-            registroBuilder.withQuorum(Integer.parseInt(lines.get(i)));
+            var s = lines.get(i);
+            if (s.contains(" ")) s = s.substring(0, s.indexOf(" "));
+            registroBuilder.withQuorum(Integer.parseInt(s));
           }
           // First: get resultado headers:
           // Resultados de la ASISTENCIA
