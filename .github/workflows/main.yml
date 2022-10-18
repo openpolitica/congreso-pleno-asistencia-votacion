@@ -78,6 +78,10 @@ jobs:
             --install datasette-block-robots \
             --install datasette-pretty-json
 
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3
+        with:
+          title: Cambios en Registro de Plenos
       #- name: Set
       #  id: set-pr
       #  run: |
