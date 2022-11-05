@@ -25,7 +25,7 @@ public class PlenoPdfToImages {
       int numberOfPages = document.getNumberOfPages();
       LOG.info("PDF {} with pages: {}", pdfPath, numberOfPages);
       for (int page = 0; page < numberOfPages; ++page) {
-        var pagePath = dir.resolve("page_" + (page + 1) + ".png");
+        var pagePath = dir.resolve("page_%02d.png".formatted(page + 1));
         pages.add(pagePath);
 
         if (!Files.exists(pagePath)) {

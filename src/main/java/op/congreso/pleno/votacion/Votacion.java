@@ -6,14 +6,14 @@ import java.util.Map;
 import op.congreso.pleno.Resultado;
 
 public enum Votacion implements Resultado {
-  SI(List.of("SI+++", "SI"), "SI"),
+  SI(List.of("SI+++", "SI", "5I"), "SI"),
   NO(List.of("NO-", "NO"), "NO"),
   ABSTENCION(List.of("ABST.", "ABST"), "ABSTENCION"),
   AUSENTE(List.of("AUS"), "AUSENTE"),
   LICENCIA_OFICIAL(List.of("LO"), "LICENCIA OFICIAL"),
   LICENCIA_POR_ENFERMEDAD(List.of("LE"), "LICENCIA POR ENFERMEDAD"),
   LICENCIA_PERSONAL(List.of("LP"), "LICENCIA PERSONAL"),
-  SIN_RESPONDER(List.of("SINRES", "SinRes", "***", "****"), "SIN RESPONDER"),
+  SIN_RESPONDER(List.of("SINRES", "SinRes", "***", "****", "text"), "SIN RESPONDER"),
   COMISION_ORDINARIA(List.of("COM"), "COMISION ORDINARIA"),
   COMISION_EXT_INTERNACIONAL(List.of("CEI"), "COMISION EXT. INTERNACIONAL"),
   JUNTA_DE_PORTAVOCES(List.of("JP"), "JUNTA DE PORTAVOCES"),
