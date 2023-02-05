@@ -10,7 +10,7 @@ public enum Votacion implements Resultado {
   NO(List.of("NO-", "NO"), "NO"),
   ABSTENCION(List.of("ABST.", "ABST"), "ABSTENCION"),
   AUSENTE(List.of("AUS"), "AUSENTE"),
-  LICENCIA_OFICIAL(List.of("LO"), "LICENCIA OFICIAL"),
+  LICENCIA_OFICIAL(List.of("LO", "L0"), "LICENCIA OFICIAL"),
   LICENCIA_POR_ENFERMEDAD(List.of("LE"), "LICENCIA POR ENFERMEDAD"),
   LICENCIA_PERSONAL(List.of("LP"), "LICENCIA PERSONAL"),
   SIN_RESPONDER(List.of("SINRES", "SinRes", "***", "****", "text"), "SIN RESPONDER"),
