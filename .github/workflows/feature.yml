@@ -39,12 +39,13 @@ jobs:
             datasette
             sqlite-utils
 
-      - name: Install vercel plugin
-        run: |
-          datasette install datasette-publish-vercel
-          sqlite-utils enable-fts *.db votacion_resultado asunto etiquetas
-          sqlite-utils enable-fts *.db votacion_grupo_parlamentario asunto etiquetas
-          sqlite-utils enable-fts *.db votacion_congresista asunto etiquetas
+      # Disabling to reduce the size of the image
+      #- name: Install vercel plugin
+      #  run: |
+      #    datasette install datasette-publish-vercel
+      #    sqlite-utils enable-fts *.db votacion_resultado asunto etiquetas
+      #    sqlite-utils enable-fts *.db votacion_grupo_parlamentario asunto etiquetas
+      #    sqlite-utils enable-fts *.db votacion_congresista asunto etiquetas
       - name: View context attributes
         uses: actions/github-script@v5
         with:

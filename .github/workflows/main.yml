@@ -55,11 +55,12 @@ jobs:
         run: |
           datasette install datasette-publish-vercel
 
-      - name: Prepare FTS
-        run: |
-          sqlite-utils enable-fts *.db votacion_resultado asunto etiquetas
-          sqlite-utils enable-fts *.db votacion_grupo_parlamentario asunto etiquetas
-          sqlite-utils enable-fts *.db votacion_congresista asunto etiquetas
+      # Disabling to reduce the size of the image
+      #- name: Prepare FTS
+      #  run: |
+      #    sqlite-utils enable-fts *.db votacion_resultado asunto etiquetas
+      #    sqlite-utils enable-fts *.db votacion_grupo_parlamentario asunto etiquetas
+      #    sqlite-utils enable-fts *.db votacion_congresista asunto etiquetas
 
       - name: Prepare Plenos DB
         run: |
@@ -77,7 +78,6 @@ jobs:
             --install datasette-copyable \
             --install datasette-block-robots \
             --install datasette-pretty-json \
-            --vercel-json vercel.json
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3
