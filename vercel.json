@@ -1,3 +1,5 @@
-"features": {
-  "cloud": "v1"
-},
+{
+  "features": {
+    "cloud": "v1"
+  }
+}
