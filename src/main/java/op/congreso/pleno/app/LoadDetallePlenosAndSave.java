@@ -250,6 +250,7 @@ public class LoadDetallePlenosAndSave {
   }
 
   private List<ResultadoCongresista<Votacion>> loadVotacionLista(Path path) throws IOException {
+    Map<String, String> map = new HashMap<>();
     try (
       final var it = mapper
         .readerFor(Map.class)
@@ -259,12 +260,14 @@ public class LoadDetallePlenosAndSave {
       // numero,grupo_parlamentario,congresista,asistencia
       var data = new ArrayList<ResultadoCongresista<Votacion>>();
       while (it.hasNext()) {
-        var m = it.next();
-        var grupo_parlamentario = m.get("grupo_parlamentario").trim();
-        var votacion = Votacion.of(m.get("votacion").trim());
-        data.add(new ResultadoCongresista<>(grupo_parlamentario, m.get("congresista").trim(), votacion));
+        map = it.next();
+        var grupo_parlamentario = map.get("grupo_parlamentario").trim();
+        var votacion = Votacion.of(map.get("votacion").trim());
+        data.add(new ResultadoCongresista<>(grupo_parlamentario, map.get("congresista").trim(), votacion));
       }
       return data;
+    } catch (Exception e) {
+      throw new RuntimeException("Error with path: " + path.toString() + " at " + map, e);
     }
   }
 

@@ -317,7 +317,7 @@ public class SaveVotacionPlenosToSqlite implements Consumer<VotacionPlenos> {
         ps.setString(11, v.grupoParlamentario());
         String gp = r.pleno().gruposParlamentarios().get(v.grupoParlamentario());
         if (gp == null) {
-          throw new IllegalStateException("null grupo descripcion - name: " + v.grupoParlamentario() + " Pleno: "+ r.pleno().fecha());
+          throw new IllegalStateException("null grupo descripcion for " + v.grupoParlamentario() + " at " + r.pleno().gruposParlamentarios());
         }
         ps.setString(12, gp);
 
