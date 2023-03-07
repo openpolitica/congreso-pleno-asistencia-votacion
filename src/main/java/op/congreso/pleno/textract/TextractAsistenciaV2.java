@@ -1,5 +1,6 @@
 package op.congreso.pleno.textract;
 
+import static java.util.Locale.UK;
 import static op.congreso.pleno.Constantes.FECHA_HORA_PATTERN;
 
 import java.io.IOException;
@@ -104,7 +105,7 @@ public class TextractAsistenciaV2 {
               } else if (text.startsWith(Constantes.ASISTENCIA)) {
                 type = Constantes.ASISTENCIA;
                 var fechaText = text.substring(Constantes.ASISTENCIA.length() + 1);
-                fechaHora = LocalDateTime.parse(fechaText.toLowerCase(), FECHA_HORA_PATTERN);
+                fechaHora = LocalDateTime.parse(fechaText.toLowerCase(UK), FECHA_HORA_PATTERN);
                 registroBuilder.withFechaHora(fechaHora);
                 plenoBuilder.withFecha(fechaHora.toLocalDate());
               }
