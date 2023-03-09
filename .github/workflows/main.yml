@@ -66,18 +66,18 @@ jobs:
         run: |
           csvs-to-sqlite plenos.csv plenos.db
 
-      - name: Deploy Datasette using Vercel
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-        run: |-
-          datasette publish vercel *.db \
-            --token $VERCEL_TOKEN \
-            --project congreso-pleno-asistencia-votacion \
-            --install datasette-vega \
-            --install datasette-export-notebook \
-            --install datasette-copyable \
-            --install datasette-block-robots \
-            --install datasette-pretty-json \
+#      - name: Deploy Datasette using Vercel
+#        env:
+#          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+#        run: |-
+#          datasette publish vercel *.db \
+#            --token $VERCEL_TOKEN \
+#            --project congreso-pleno-asistencia-votacion \
+#            --install datasette-vega \
+#            --install datasette-export-notebook \
+#            --install datasette-copyable \
+#            --install datasette-block-robots \
+#            --install datasette-pretty-json
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3
@@ -96,4 +96,7 @@ jobs:
       #    branch: ${{steps.set-pr.outputs.pr-branch}}
       #    body: ${{steps.set-pr.outputs.pr-content}}
 
-
+      - uses: actions/upload-artifact@v3
+        with:
+          name: db
+          path: "*.db"
