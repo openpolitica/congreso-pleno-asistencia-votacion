@@ -249,7 +249,6 @@ public record RegistroVotacion(
 
     void checkCongresistas() {
       var errores = Congresistas.checkCongresistas(votaciones.stream().map(ResultadoCongresista::congresista).toList());
-      errores.addAll(Congresistas.checkCongresistasBack(votaciones.stream().map(ResultadoCongresista::congresista).toList()));
       if (!errores.isEmpty()) {
         var map = errores.stream().collect(Collectors.toMap(c -> c, Congresistas::findSimilar));
         votaciones =
@@ -262,8 +261,7 @@ public record RegistroVotacion(
               return v;
             })
             .toList();
-        log.addAll(Congresistas.checkCongresistas(votaciones.stream().map(ResultadoCongresista::congresista).toList()));
-        log.addAll(Congresistas.checkCongresistasBack(votaciones.stream().map(ResultadoCongresista::congresista).toList()));
+        log = Congresistas.checkCongresistas(votaciones.stream().map(ResultadoCongresista::congresista).toList());
       }
     }
 
