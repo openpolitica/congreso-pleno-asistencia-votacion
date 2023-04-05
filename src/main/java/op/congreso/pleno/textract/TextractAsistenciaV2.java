@@ -53,7 +53,9 @@ public class TextractAsistenciaV2 {
             .replace("GLADYS M.", "GLADYS MARGOT")
             // Wrong GP
             .replace("AP PIS", "AP-PIS")
+            .replace("AP -PIS", "AP-PIS")
             .replace("CD- JPP", "CD-JPP")
+            .replace("CD -JPP", "CD-JPP")
             .replace("CD JPP", "CD-JPP")
             .replace("ID-JPP", "CD-JPP")
             .trim()
