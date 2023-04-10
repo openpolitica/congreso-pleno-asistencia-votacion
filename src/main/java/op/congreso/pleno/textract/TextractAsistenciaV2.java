@@ -54,9 +54,11 @@ public class TextractAsistenciaV2 {
             // Wrong GP
             .replace("AP PIS", "AP-PIS")
             .replace("AP -PIS", "AP-PIS")
+            .replace("P-PIS", "AP-PIS")
             .replace("CD- JPP", "CD-JPP")
             .replace("CD -JPP", "CD-JPP")
             .replace("CD JPP", "CD-JPP")
+            .replace("CD-JPF", "CD-JPP")
             .replace("ID-JPP", "CD-JPP")
             .trim()
         )
@@ -71,6 +73,7 @@ public class TextractAsistenciaV2 {
         .map(s -> {
           if (s.contains("-JPP") && !s.contains("CD-JPP")) return s.replace("-JPP", "CD-JPP"); else return s;
         })
+        .map(s -> s.replace("L0", "LO"))
         .toList();
 
     var registroBuilder = RegistroAsistencia.newBuilder();

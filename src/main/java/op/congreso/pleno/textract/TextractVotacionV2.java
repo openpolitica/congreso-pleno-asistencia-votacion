@@ -50,9 +50,11 @@ public class TextractVotacionV2 {
             // Wrong GP
             .replace("AP PIS", "AP-PIS")
             .replace("AP -PIS", "AP-PIS")
+            .replace("P-PIS", "AP-PIS")
             .replace("CD- JPP", "CD-JPP")
             .replace("CD -JPP", "CD-JPP")
             .replace("CD JPP", "CD-JPP")
+            .replace("CD-JPF", "CD-JPP")
             .replace("ID-JPP", "CD-JPP")
             .trim()
         )
@@ -68,6 +70,7 @@ public class TextractVotacionV2 {
         .map(s -> s.replace("+++ ", ""))
         .map(s -> s.replace("****", "SINRES"))
         .map(s -> s.replace("***", "SINRES"))
+        .map(s -> s.replace("L0", "LO"))
         .toList();
 
     var registroBuilder = RegistroVotacion.newBuilder().withQuorum(quorum);
