@@ -59,6 +59,7 @@ public class TextractAsistenciaV2 {
             .replace("CD -JPP", "CD-JPP")
             .replace("CD JPP", "CD-JPP")
             .replace("CD-JPF", "CD-JPP")
+            .replace("CD-JPI", "CD-JPP")
             .replace("ID-JPP", "CD-JPP")
             .trim()
         )
