@@ -56,6 +56,7 @@ public class TextractAsistenciaV2 {
             .replace("AP -PIS", "AP-PIS")
             .replace("P-PIS", "AP-PIS")
             .replace("CD- JPP", "CD-JPP")
+            .replace("D-JPP", "CD-JPP")
             .replace("CD -JPP", "CD-JPP")
             .replace("CD JPP", "CD-JPP")
             .replace("CD-JPF", "CD-JPP")
@@ -118,12 +119,16 @@ public class TextractAsistenciaV2 {
             }
           }
         } else if (asistencias.size() < 130) { // Process asistencia per congresistas
-          var b = new StringBuilder(text);
-          current.processAsistenciaLine(b);
-          if (current.isReady()) {
-            asistencias.add(current.build());
-            current = ResultadoCongresista.newBuilder();
-            if (!b.isEmpty()) current.processAsistenciaLine(b);
+          if (text.equals("Resultados de la ASISTENCIA")) {
+            LOG.warn("Faltan congresistas");
+          } else {
+            var b = new StringBuilder(text);
+            current.processAsistenciaLine(b);
+            if (current.isReady()) {
+              asistencias.add(current.build());
+              current = ResultadoCongresista.newBuilder();
+              if (!b.isEmpty()) current.processAsistenciaLine(b);
+            }
           }
         } else { // Process resultados
           if (text.equals("Asistencia para Quórum") || text.equals("Asistencia para Quorum")) { // Finally get quorum

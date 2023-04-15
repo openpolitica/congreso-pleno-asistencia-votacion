@@ -52,6 +52,7 @@ public class TextractVotacionV2 {
             .replace("AP -PIS", "AP-PIS")
             .replace("P-PIS", "AP-PIS")
             .replace("CD- JPP", "CD-JPP")
+            .replace("D-JPP", "CD-JPP")
             .replace("CD -JPP", "CD-JPP")
             .replace("CD JPP", "CD-JPP")
             .replace("CD-JPF", "CD-JPP")
