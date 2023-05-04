@@ -301,7 +301,7 @@ public class SaveAsistenciaPlenosToSqlite implements Consumer<AsistenciaPlenos> 
         ps.setString(7, a.congresista());
         ps.setString(8, a.grupoParlamentario());
         if (r.pleno().gruposParlamentarios().get(a.grupoParlamentario()) == null) {
-          throw new IllegalArgumentException("a.grupoParlamentarioDescripcion == null");
+          throw new IllegalArgumentException("a.grupoParlamentarioDescripcion == null when " + a.grupoParlamentario());
         }
         ps.setString(9, r.pleno().gruposParlamentarios().get(a.grupoParlamentario()));
         if (a.resultado() == null) throw new RuntimeException(
