@@ -19,7 +19,6 @@ import op.congreso.pleno.ResultadoCongresista;
 import op.congreso.pleno.asistencia.Asistencia;
 import op.congreso.pleno.asistencia.RegistroAsistencia;
 import op.congreso.pleno.asistencia.ResultadoAsistencia;
-import op.congreso.pleno.util.GrupoParlamentarioUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,51 +81,52 @@ public class TextractAsistencia {
           }
         } else if (asistencias.size() < 130) { // Process asistencia per congresistas
           // Process GP + Congresista + Asistencia
-          if (GrupoParlamentarioUtil.isSimilar(text.trim())) { // GP found, process next line
+          if (GrupoParlamentario.isSimilar(text.trim())) { // GP found, process next line
             i++;
             var congresista = lines.get(i);
             // Check Congresista text does not contain Asistencia
-            if (Asistencia.is(congresista.substring(congresista.lastIndexOf(" ") + 1))) { // if it contains Asistencia
-              var asistencia = congresista.substring(congresista.lastIndexOf(" ")); // get asistencia
+            if (Asistencia.is(
+                congresista.substring(
+                    congresista.lastIndexOf(" ") + 1))) { // if it contains Asistencia
+              var asistencia =
+                  congresista.substring(congresista.lastIndexOf(" ")); // get asistencia
               // and build resultado
               asistencias.add(
-                new ResultadoCongresista<>(
-                  GrupoParlamentarioUtil.findSimilar(text.trim()),
-                  congresista.substring(0, congresista.lastIndexOf(" ")),
-                  Asistencia.of(asistencia)
-                )
-              );
+                  new ResultadoCongresista<>(
+                      GrupoParlamentario.findSimilar(text.trim()),
+                      congresista.substring(0, congresista.lastIndexOf(" ")),
+                      Asistencia.of(asistencia)));
             } else { // if it does not contain asistencia
               i++;
               var asistencia = lines.get(i); // get asistencia from next line
               // and build resultado
               asistencias.add(
-                new ResultadoCongresista<>(
-                  GrupoParlamentarioUtil.findSimilar(text.trim()),
-                  congresista,
-                  Asistencia.of(asistencia)
-                )
-              );
+                  new ResultadoCongresista<>(
+                      GrupoParlamentario.findSimilar(text.trim()),
+                      congresista,
+                      Asistencia.of(asistencia)));
             }
           } else { // else GP is in the same line as congresista
             var gp = text.substring(0, text.indexOf(" ")); // get GP from first work
             // Check Congresista text does not contain Asistencia
             var congresista = text.substring(text.indexOf(" ") + 1);
-            if (Asistencia.is(congresista.substring(congresista.lastIndexOf(" ") + 1))) { // if it contains asistencia
-              var asistencia = congresista.substring(congresista.lastIndexOf(" ")); // get asistencia
+            if (Asistencia.is(
+                congresista.substring(
+                    congresista.lastIndexOf(" ") + 1))) { // if it contains asistencia
+              var asistencia =
+                  congresista.substring(congresista.lastIndexOf(" ")); // get asistencia
               // and build resultado
               asistencias.add(
-                new ResultadoCongresista<>(
-                  gp,
-                  congresista.substring(0, congresista.lastIndexOf(" ")),
-                  Asistencia.of(asistencia)
-                )
-              );
+                  new ResultadoCongresista<>(
+                      gp,
+                      congresista.substring(0, congresista.lastIndexOf(" ")),
+                      Asistencia.of(asistencia)));
             } else { // if it does not contain asistencia
               i++;
               var asistencia = lines.get(i); // get asistencia from next line
               // and build resultado
-              asistencias.add(new ResultadoCongresista<>(gp, congresista, Asistencia.of(asistencia)));
+              asistencias.add(
+                  new ResultadoCongresista<>(gp, congresista, Asistencia.of(asistencia)));
             }
           }
         } else { // Process resultados
@@ -161,9 +161,11 @@ public class TextractAsistencia {
                     previous = result.substring(result.indexOf(" ") + 1);
                     result = result.substring(0, result.indexOf(" "));
                   }
-                  resultadosBuilder.with(Asistencia.of(asis), Integer.parseInt(result.replace(".", "")));
+                  resultadosBuilder.with(
+                      Asistencia.of(asis), Integer.parseInt(result.replace(".", "")));
                 }
-              } else if (text.contains("(") && text.contains(")")) { // Or get Asistencia from within ()
+              } else if (text.contains("(")
+                  && text.contains(")")) { // Or get Asistencia from within ()
                 if (Asistencia.isDescripcion(text.substring(0, text.lastIndexOf("(") - 1))) {
                   var matcher = ASISTENCIA_GROUP.matcher(text.substring(text.lastIndexOf("(")));
                   if (matcher.find()) {
@@ -174,13 +176,14 @@ public class TextractAsistencia {
                       previous = result.substring(result.indexOf(" ") + 1);
                       result = result.substring(0, result.indexOf(" "));
                     }
-                    resultadosBuilder.with(Asistencia.of(asis), Integer.parseInt(result.replace(".", "")));
+                    resultadosBuilder.with(
+                        Asistencia.of(asis), Integer.parseInt(result.replace(".", "")));
                   }
                 }
               } else { // Or get resulados per GP
-                if (GrupoParlamentarioUtil.isSimilar(previous)) {
+                if (GrupoParlamentario.isSimilar(previous)) {
                   //                i++;
-                  grupos.put(GrupoParlamentarioUtil.findSimilar(previous), text);
+                  grupos.put(GrupoParlamentario.findSimilar(previous), text);
                   i++;
                   var presentes = Integer.parseInt(lines.get(i).replace(".", ""));
                   i++;
@@ -192,13 +195,13 @@ public class TextractAsistencia {
                   i++;
                   var otros = Integer.parseInt(lines.get(i).replace(".", ""));
                   resultadosGrupos.put(
-                    new GrupoParlamentario(text, grupos.get(text)),
-                    ResultadoAsistencia.create(presentes, ausentes, licencias, suspendidos, otros)
-                  );
+                      new GrupoParlamentario(text, grupos.get(text)),
+                      ResultadoAsistencia.create(
+                          presentes, ausentes, licencias, suspendidos, otros));
                   previous = "";
-                } else if (GrupoParlamentarioUtil.isSimilar(text)) {
+                } else if (GrupoParlamentario.isSimilar(text)) {
                   i++;
-                  grupos.put(GrupoParlamentarioUtil.findSimilar(text), lines.get(i));
+                  grupos.put(GrupoParlamentario.findSimilar(text), lines.get(i));
                   i++;
                   var presentes = Integer.parseInt(lines.get(i).replace(".", ""));
                   i++;
@@ -210,13 +213,15 @@ public class TextractAsistencia {
                   i++;
                   var otros = Integer.parseInt(lines.get(i).replace(".", ""));
                   resultadosGrupos.put(
-                    new GrupoParlamentario(text, grupos.get(text)),
-                    ResultadoAsistencia.create(presentes, ausentes, licencias, suspendidos, otros)
-                  );
+                      new GrupoParlamentario(text, grupos.get(text)),
+                      ResultadoAsistencia.create(
+                          presentes, ausentes, licencias, suspendidos, otros));
                 } else if (!text.isBlank() && text.contains(" ")) {
-                  if (GrupoParlamentarioUtil.isSimilar(text.substring(0, text.indexOf(" ")))) {
+                  if (GrupoParlamentario.isSimilar(text.substring(0, text.indexOf(" ")))) {
                     String grupo = text.substring(0, text.indexOf(" "));
-                    grupos.put(GrupoParlamentarioUtil.findSimilar(grupo), text.substring(text.indexOf(" ") + 1));
+                    grupos.put(
+                        GrupoParlamentario.findSimilar(grupo),
+                        text.substring(text.indexOf(" ") + 1));
                     i++;
                     var presentes = Integer.parseInt(lines.get(i));
                     i++;
@@ -228,9 +233,9 @@ public class TextractAsistencia {
                     i++;
                     var otros = Integer.parseInt(lines.get(i));
                     resultadosGrupos.put(
-                      new GrupoParlamentario(grupo, grupos.get(grupo)),
-                      ResultadoAsistencia.create(presentes, ausentes, licencias, suspendidos, otros)
-                    );
+                        new GrupoParlamentario(grupo, grupos.get(grupo)),
+                        ResultadoAsistencia.create(
+                            presentes, ausentes, licencias, suspendidos, otros));
                   } else if (text.equals("Asistencia para Quórum")) { // Finally get quorum
                     i++;
                     registroBuilder.withQuorum(Integer.parseInt(lines.get(i)));
@@ -250,67 +255,69 @@ public class TextractAsistencia {
     if (fechaHora == null) errors++;
 
     return registroBuilder
-      .withPleno(plenoBuilder.withGruposParlamentarios(grupos).build())
-      .withAsistencias(grupos, asistencias)
-      .withResultadosPorPartido(resultadosGrupos)
-      .withResultados(resultadosBuilder.build())
-      .build();
+        .withPleno(plenoBuilder.withGruposParlamentarios(grupos).build())
+        .withAsistencias(grupos, asistencias)
+        .withResultadosPorPartido(resultadosGrupos)
+        .withResultados(resultadosBuilder.build())
+        .build();
   }
 
   static List<String> clean(List<String> list) {
-    return list
-      .stream()
-      .map(s ->
-        s
-          .replace("+++ ", "")
-          .replace("+++", "")
-          .replace(" +++", "")
-          .replace("***", "")
-          .replace("NO---", "NO")
-          .replace("NO-", "NO")
-          // Wrong GP
-          .trim()
-      )
-      .flatMap(s -> {
-        var ss = s.split(" ");
-        if (ss.length > 1 && Arrays.stream(ss).anyMatch(Asistencia::is)) {
-          var t = "";
-          for (int i = 0; i < ss.length; i++) {
-            if (Asistencia.is(ss[i])) {
-              var as = ss[i];
-              var after = "";
-              while (i < ss.length) {
-                after = after + " " + ss[i];
-                i++;
-              }
-              return Stream.of(t, as, after);
-            } else {
-              t = t + " " + ss[i];
-            }
-          }
-          return Stream.of(ss[0], s.substring(s.indexOf(" ") + 1));
-        } else return Stream.of(s);
-      })
-      .flatMap(s -> {
-        var ss = s.split(" ");
-        if (ss.length > 1 && GrupoParlamentarioUtil.isSimilar(ss[0])) {
-          return Stream.of(ss[0], s.substring(s.indexOf(" ") + 1));
-        } else return Stream.of(s);
-      })
-      .flatMap(s -> {
-        var ss = s.split(" ");
-        if (ss.length > 1 && Asistencia.is(ss[0])) {
-          return Stream.of(ss[0], s.substring(s.indexOf(" ") + 1));
-        } else return Stream.of(s);
-      })
-      .flatMap(s -> {
-        var ss = s.split(" ");
-        if (ss.length > 1 && isInteger(ss[0])) {
-          return Stream.of(ss[0], s.substring(s.indexOf(" ") + 1));
-        } else return Stream.of(s);
-      })
-      .filter(s -> !s.isBlank())
-      .toList();
+    return list.stream()
+        .map(
+            s ->
+                s.replace("+++ ", "")
+                    .replace("+++", "")
+                    .replace(" +++", "")
+                    .replace("***", "")
+                    .replace("NO---", "NO")
+                    .replace("NO-", "NO")
+                    // Wrong GP
+                    .trim())
+        .flatMap(
+            s -> {
+              var ss = s.split(" ");
+              if (ss.length > 1 && Arrays.stream(ss).anyMatch(Asistencia::is)) {
+                var t = "";
+                for (int i = 0; i < ss.length; i++) {
+                  if (Asistencia.is(ss[i])) {
+                    var as = ss[i];
+                    var after = "";
+                    while (i < ss.length) {
+                      after = after + " " + ss[i];
+                      i++;
+                    }
+                    return Stream.of(t, as, after);
+                  } else {
+                    t = t + " " + ss[i];
+                  }
+                }
+                return Stream.of(ss[0], s.substring(s.indexOf(" ") + 1));
+              } else return Stream.of(s);
+            })
+        .flatMap(
+            s -> {
+              var ss = s.split(" ");
+              if (ss.length > 1 && GrupoParlamentario.isSimilar(ss[0])) {
+                return Stream.of(ss[0], s.substring(s.indexOf(" ") + 1));
+              } else return Stream.of(s);
+            })
+        .flatMap(
+            s -> {
+              var ss = s.split(" ");
+              if (ss.length > 1 && Asistencia.is(ss[0])) {
+                return Stream.of(ss[0], s.substring(s.indexOf(" ") + 1));
+              } else return Stream.of(s);
+            })
+        .flatMap(
+            s -> {
+              var ss = s.split(" ");
+              if (ss.length > 1 && isInteger(ss[0])) {
+                return Stream.of(ss[0], s.substring(s.indexOf(" ") + 1));
+              } else return Stream.of(s);
+            })
+        .filter(s -> !s.isBlank())
+        .toList();
   }
 
   private static boolean isInteger(String s) {

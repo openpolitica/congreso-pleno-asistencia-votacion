@@ -6,16 +6,15 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 public record Pleno(
-  String periodoParlamentario,
-  String periodoAnual,
-  String legislatura,
-  String titulo,
-  LocalDate fecha,
-  String url,
-  Map<String, String> gruposParlamentarios
-) {
+    Periodo periodo,
+    String titulo,
+    LocalDate fecha,
+    String url,
+    Map<String, String> gruposParlamentarios) {
   public String id() {
-    return (periodoParlamentario + ":" + fecha.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+    return (periodo.periodoParlamentario()
+        + ":"
+        + fecha.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
   }
 
   public static Builder newBuilder() {
@@ -62,7 +61,12 @@ public record Pleno(
     }
 
     public Pleno build() {
-      return new Pleno(periodoParlamentario, periodoAnual, legislatura, titulo, fecha, url, gruposParlamentarios);
+      return new Pleno(
+          new Periodo(periodoParlamentario, periodoAnual, legislatura),
+          titulo,
+          fecha,
+          url,
+          gruposParlamentarios);
     }
 
     public Builder withPeriodoParlamentario(String periodoParlamentario) {

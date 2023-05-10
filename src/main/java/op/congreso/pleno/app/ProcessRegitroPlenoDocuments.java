@@ -27,16 +27,15 @@ public class ProcessRegitroPlenoDocuments {
 
     var existing = new HashMap<String, RegistroPlenoDocument>();
 
-    try (
-      final var it = mapper
-        .readerFor(Map.class)
-        .with(CsvSchema.emptySchema().withHeader())
-        .<Map<String, String>>readValues(plenosCsvPath.toFile())
-    ) {
+    try (final var it =
+        mapper
+            .readerFor(Map.class)
+            .with(CsvSchema.emptySchema().withHeader())
+            .<Map<String, String>>readValues(plenosCsvPath.toFile())) {
       while (it.hasNext()) {
         var v = it.next();
         var pleno = RegistroPlenoDocument.parse(v);
-        if (pleno.periodoParlamentario().equals(CURRENT)) existing.put(pleno.id(), pleno);
+        if (pleno.periodo().periodoParlamentario().equals(CURRENT)) existing.put(pleno.id(), pleno);
       }
     }
 
@@ -46,9 +45,10 @@ public class ProcessRegitroPlenoDocuments {
     for (var p : existing.values()) {
       var pleno = existing.getOrDefault(p.id(), p);
       if (
-        //        pleno.fecha().equals("2022-07-07")
-        !pleno.provisional() && pleno.paginas() < 1 && pleno.periodoParlamentario().equals(CURRENT)
-      ) {
+      //        pleno.fecha().equals("2022-07-07")
+      !pleno.provisional()
+          && pleno.paginas() < 1
+          && pleno.periodo().periodoParlamentario().equals(CURRENT)) {
         if (extractPleno) {
           LOG.info("Extracting Pleno: {}", pleno.fecha());
           Files.writeString(Path.of("pr-title.txt"), pleno.prTitle());
@@ -61,7 +61,10 @@ public class ProcessRegitroPlenoDocuments {
       updated.add(pleno);
     }
 
-    var registroPlenos = updated.stream().sorted(Comparator.comparing(RegistroPlenoDocument::id).reversed()).toList();
+    var registroPlenos =
+        updated.stream()
+            .sorted(Comparator.comparing(RegistroPlenoDocument::id).reversed())
+            .toList();
 
     LOG.info("Writing CSV to file");
     var content = csvHeader();

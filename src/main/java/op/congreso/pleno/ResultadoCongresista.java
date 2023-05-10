@@ -2,7 +2,6 @@ package op.congreso.pleno;
 
 import java.util.List;
 import op.congreso.pleno.asistencia.Asistencia;
-import op.congreso.pleno.util.GrupoParlamentarioUtil;
 import op.congreso.pleno.votacion.Votacion;
 
 public record ResultadoCongresista<T>(String grupoParlamentario, String congresista, T resultado) {
@@ -11,7 +10,7 @@ public record ResultadoCongresista<T>(String grupoParlamentario, String congresi
   }
 
   public ResultadoCongresista<T> replaceCongresista(String s) {
-    return new ResultadoCongresista<T>(grupoParlamentario, s, resultado);
+    return new ResultadoCongresista<>(grupoParlamentario, s, resultado);
   }
 
   public static class Builder<T> {
@@ -20,23 +19,16 @@ public record ResultadoCongresista<T>(String grupoParlamentario, String congresi
     String congresista;
     T resultado;
 
-    Builder<T> withGrupoParlamentario(String gp) {
+    void withGrupoParlamentario(String gp) {
       this.grupoParlamentario = gp;
-      return this;
     }
 
-    Builder<T> withCongresista(String congresista) {
+    void withCongresista(String congresista) {
       this.congresista = congresista;
-      return this;
     }
 
-    Builder<T> withResultado(T resultado) {
+    void withResultado(T resultado) {
       this.resultado = resultado;
-      return this;
-    }
-
-    boolean isEmpty() {
-      return (grupoParlamentario == null && congresista == null && resultado == null);
     }
 
     public boolean isReady() {
@@ -52,15 +44,8 @@ public record ResultadoCongresista<T>(String grupoParlamentario, String congresi
     }
 
     /**
-     * Text either contain:
-     * GP or
-     * GP+Congresista or
-     * GP+Congresista+Result or
-     * Congresista or
-     * Congresista+Result or
-     * Congresista+Result+GP or
-     * Result or
-     * Result+GP
+     * Text either contain: GP or GP+Congresista or GP+Congresista+Result or Congresista or
+     * Congresista+Result or Congresista+Result+GP or Result or Result+GP
      */
     @SuppressWarnings("unchecked")
     public void processAsistenciaLine(StringBuilder text) {
@@ -69,8 +54,8 @@ public record ResultadoCongresista<T>(String grupoParlamentario, String congresi
         int idx = text.indexOf(" ");
         var word = text.substring(0, idx > 0 ? idx : text.length()).trim();
         if (grupoParlamentario == null) {
-          if (GrupoParlamentarioUtil.isSimilar(word)) {
-            withGrupoParlamentario(GrupoParlamentarioUtil.findSimilar(word));
+          if (GrupoParlamentario.isSimilar(word)) {
+            withGrupoParlamentario(GrupoParlamentario.findSimilar(word));
           } else throw new IllegalArgumentException("No GP! " + word + " at " + text);
         } else {
           if (Asistencia.is(word)) {
@@ -101,8 +86,8 @@ public record ResultadoCongresista<T>(String grupoParlamentario, String congresi
         var word = text.substring(0, idx > 0 ? idx : text.length());
         if (!List.of("+++", "---").contains(word)) {
           if (grupoParlamentario == null) {
-            if (GrupoParlamentarioUtil.isSimilar(word)) {
-              withGrupoParlamentario(GrupoParlamentarioUtil.findSimilar(word));
+            if (GrupoParlamentario.isSimilar(word)) {
+              withGrupoParlamentario(GrupoParlamentario.findSimilar(word));
             } else throw new IllegalArgumentException("No GP! " + word);
           } else {
             if (Votacion.is(word)) {
@@ -146,11 +131,11 @@ public record ResultadoCongresista<T>(String grupoParlamentario, String congresi
     b1.processVotacionLine("SI");
     b1.processVotacionLine("APP");
     b1.processVotacionLine("ACUÑA PERALTA, SEGUNDO HÉCTOR");
-    //FP
-    //BARBARÁN REYES, ROSANGELLA ANDREA
-    //NO
-    //RP
-    //JÁUREGUI MARTÍNEZ DE AGUAYO, MARIA aus
-    //CD-JPP
+    // FP
+    // BARBARÁN REYES, ROSANGELLA ANDREA
+    // NO
+    // RP
+    // JÁUREGUI MARTÍNEZ DE AGUAYO, MARIA aus
+    // CD-JPP
   }
 }

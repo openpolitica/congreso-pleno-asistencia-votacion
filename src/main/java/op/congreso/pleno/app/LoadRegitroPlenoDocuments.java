@@ -29,16 +29,15 @@ public class LoadRegitroPlenoDocuments {
 
     var existing = new HashMap<String, RegistroPlenoDocument>();
 
-    try (
-      final var it = mapper
-        .readerFor(Map.class)
-        .with(CsvSchema.emptySchema().withHeader())
-        .<Map<String, String>>readValues(plenosCsvPath.toFile())
-    ) {
+    try (final var it =
+        mapper
+            .readerFor(Map.class)
+            .with(CsvSchema.emptySchema().withHeader())
+            .<Map<String, String>>readValues(plenosCsvPath.toFile())) {
       while (it.hasNext()) {
         var v = it.next();
         var pleno = RegistroPlenoDocument.parse(v);
-        if (pleno.periodoParlamentario().equals(CURRENT)) existing.put(pleno.id(), pleno);
+        if (pleno.periodo().periodoParlamentario().equals(CURRENT)) existing.put(pleno.id(), pleno);
       }
     }
     LOG.info("Starting to collect plenos");
@@ -55,8 +54,12 @@ public class LoadRegitroPlenoDocuments {
         for (var legislatura : periodo.entrySet()) {
           LOG.debug("Legislatura: {}", legislatura.getKey());
 
-          var p = collectPleno(periodos.getKey(), anual.getKey(), legislatura.getKey(), legislatura.getValue());
-          p.values().stream().filter(p1 -> p1.periodoParlamentario().equals("2021-2026")).forEach(plenos::add);
+          var p =
+              collectPleno(
+                  periodos.getKey(), anual.getKey(), legislatura.getKey(), legislatura.getValue());
+          p.values().stream()
+              .filter(p1 -> p1.periodo().periodoParlamentario().equals("2021-2026"))
+              .forEach(plenos::add);
         }
       }
     }
@@ -68,7 +71,10 @@ public class LoadRegitroPlenoDocuments {
       updated.add(pleno);
     }
 
-    var registroPlenos = updated.stream().sorted(Comparator.comparing(RegistroPlenoDocument::id).reversed()).toList();
+    var registroPlenos =
+        updated.stream()
+            .sorted(Comparator.comparing(RegistroPlenoDocument::id).reversed())
+            .toList();
 
     LOG.info("Writing CSV to file");
     var content = csvHeader();

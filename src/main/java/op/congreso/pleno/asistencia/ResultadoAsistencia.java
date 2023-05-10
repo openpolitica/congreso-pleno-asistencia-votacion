@@ -1,19 +1,20 @@
 package op.congreso.pleno.asistencia;
 
-public record ResultadoAsistencia(int presentes, int ausentes, int licencias, int suspendidos, int otros, int total) {
+public record ResultadoAsistencia(
+    int presentes, int ausentes, int licencias, int suspendidos, int otros, int total) {
   public static Builder newBuilder() {
     return new Builder();
   }
 
-  public static ResultadoAsistencia create(int presentes, int ausentes, int licencias, int suspendidos, int otros) {
+  public static ResultadoAsistencia create(
+      int presentes, int ausentes, int licencias, int suspendidos, int otros) {
     return new ResultadoAsistencia(
-      presentes,
-      ausentes,
-      licencias,
-      suspendidos,
-      otros,
-      presentes + ausentes + licencias + suspendidos + otros
-    );
+        presentes,
+        ausentes,
+        licencias,
+        suspendidos,
+        otros,
+        presentes + ausentes + licencias + suspendidos + otros);
   }
 
   public static class Builder {
@@ -29,7 +30,7 @@ public record ResultadoAsistencia(int presentes, int ausentes, int licencias, in
         case PRESENTE -> this.presentes = resultado;
         case AUSENTE -> this.ausentes = resultado;
         case LICENCIA_OFICIAL, LICENCIA_PERSONAL, LICENCIA_POR_ENFERMEDAD -> this.licencias =
-          this.licencias + resultado;
+            this.licencias + resultado;
         case SUSPENDIDO -> this.suspendidos = resultado;
         default -> this.otros = resultado;
       }
@@ -43,7 +44,8 @@ public record ResultadoAsistencia(int presentes, int ausentes, int licencias, in
       switch (asistencia) {
         case PRESENTE -> this.presentes = this.presentes + 1;
         case AUSENTE -> this.ausentes = this.ausentes + 1;
-        case LICENCIA_OFICIAL, LICENCIA_PERSONAL, LICENCIA_POR_ENFERMEDAD -> this.licencias = this.licencias + 1;
+        case LICENCIA_OFICIAL, LICENCIA_PERSONAL, LICENCIA_POR_ENFERMEDAD -> this.licencias =
+            this.licencias + 1;
         case SUSPENDIDO -> this.suspendidos = this.suspendidos + 1;
         default -> this.otros = this.otros + 1;
       }

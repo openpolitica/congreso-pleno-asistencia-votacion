@@ -54,12 +54,10 @@ public class TextractToText {
   }
 
   static List<String> imageLines(Path path) {
-    try (
-      TextractClient textractClient = TextractClient
-        .builder()
-        .credentialsProvider(EnvironmentVariableCredentialsProvider.create())
-        .build()
-    ) {
+    try (TextractClient textractClient =
+        TextractClient.builder()
+            .credentialsProvider(EnvironmentVariableCredentialsProvider.create())
+            .build()) {
       byte[] bytes = Files.readAllBytes(path);
       final var document = Document.builder().bytes(SdkBytes.fromByteArray(bytes)).build();
       final var request = DetectDocumentTextRequest.builder().document(document).build();
@@ -92,9 +90,8 @@ public class TextractToText {
     final var path = Path.of("./out/pdf-9.png");
     var lines = imageLines(path);
     Files.writeString(
-      Path.of(path.toString().replace(".png", ".txt")),
-      String.join("\n", lines),
-      StandardOpenOption.CREATE_NEW
-    );
+        Path.of(path.toString().replace(".png", ".txt")),
+        String.join("\n", lines),
+        StandardOpenOption.CREATE_NEW);
   }
 }

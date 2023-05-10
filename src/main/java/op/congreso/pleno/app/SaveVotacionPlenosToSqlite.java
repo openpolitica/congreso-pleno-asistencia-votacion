@@ -1,17 +1,19 @@
 package op.congreso.pleno.app;
 
+import static op.congreso.pleno.Constantes.*;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
-import op.congreso.pleno.VotacionPlenos;
 import op.congreso.pleno.votacion.RegistroVotacion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SaveVotacionPlenosToSqlite implements Consumer<VotacionPlenos> {
+public class SaveVotacionPlenosToSqlite implements Consumer<Set<RegistroVotacion>> {
 
   static final Logger LOG = LoggerFactory.getLogger(SaveVotacionPlenosToSqlite.class);
   static final ObjectMapper jsonMapper = new ObjectMapper();
@@ -19,15 +21,15 @@ public class SaveVotacionPlenosToSqlite implements Consumer<VotacionPlenos> {
   public static final String YYYY_MM_DD = "yyyy-MM-dd";
   public static final String HH_MM = "HH:mm";
 
-  static List<TableLoad> tableLoadList = List.of(
-    new VotacionCongresistaLoad(),
-    new VotacionGrupoParlamentarioLoad(),
-    new VotacionResultadoLoad()
-  );
+  static List<TableLoad> tableLoadList =
+      List.of(
+          new VotacionCongresistaLoad(),
+          new VotacionGrupoParlamentarioLoad(),
+          new VotacionResultadoLoad());
 
   @Override
-  public void accept(VotacionPlenos votacionPlenos) {
-    var jdbcUrl = "jdbc:sqlite:%s-asistencias-votaciones.db".formatted(votacionPlenos.periodo());
+  public void accept(Set<RegistroVotacion> votaciones) {
+    var jdbcUrl = "jdbc:sqlite:%s-asistencias-votaciones.db".formatted(PERIODO);
     try (var connection = DriverManager.getConnection(jdbcUrl)) {
       var statement = connection.createStatement();
       statement.executeUpdate("pragma journal_mode = WAL");
@@ -47,7 +49,7 @@ public class SaveVotacionPlenosToSqlite implements Consumer<VotacionPlenos> {
         var ps = connection.prepareStatement(tableLoad.prepareStatement());
         LOG.debug("Statement for {} prepared", tableLoad.tableName);
 
-        for (var m : votacionPlenos.registros()) {
+        for (var m : votaciones) {
           tableLoad.addBatch(ps, m);
         }
 
@@ -57,8 +59,8 @@ public class SaveVotacionPlenosToSqlite implements Consumer<VotacionPlenos> {
       }
       statement.executeUpdate("pragma vacuum;");
       statement.executeUpdate("pragma optimize;");
-    } catch (Exception throwables) {
-      throwables.printStackTrace();
+    } catch (Exception e) {
+      e.printStackTrace();
     }
   }
 
@@ -75,7 +77,8 @@ public class SaveVotacionPlenosToSqlite implements Consumer<VotacionPlenos> {
     abstract List<String> createIndexesStatement();
 
     String index(String field) {
-      return "CREATE INDEX IF NOT EXISTS %s_%s ON %s(\"%s\");\n".formatted(tableName, field, tableName, field);
+      return "CREATE INDEX IF NOT EXISTS %s_%s ON %s(\"%s\");\n"
+          .formatted(tableName, field, tableName, field);
     }
 
     abstract String prepareStatement();
@@ -99,11 +102,11 @@ public class SaveVotacionPlenosToSqlite implements Consumer<VotacionPlenos> {
             legislatura text not null,
             fecha text not null,
             hora text not null,
-            
+
             asunto text not null,
             presidente text not null,
             etiquetas text not null,
-            
+
             quorum integer not null,
             si integer not null,
             no integer not null,
@@ -111,9 +114,8 @@ public class SaveVotacionPlenosToSqlite implements Consumer<VotacionPlenos> {
             sin_responder integer not null,
             total integer not null
           )
-          """.formatted(
-          tableName
-        );
+          """
+          .formatted(tableName);
     }
 
     @Override
@@ -128,17 +130,16 @@ public class SaveVotacionPlenosToSqlite implements Consumer<VotacionPlenos> {
             ?, ?, ?, ?, ?, ?, ?, ?,
             ?, ?, ?, ?, ?, ?, ?
           )
-          """.formatted(
-          tableName
-        );
+          """
+          .formatted(tableName);
     }
 
     @Override
     void addBatch(PreparedStatement ps, RegistroVotacion r) throws Exception {
       ps.setString(1, r.pleno().id());
-      ps.setString(2, r.pleno().periodoParlamentario());
-      ps.setString(3, r.pleno().periodoAnual());
-      ps.setString(4, r.pleno().legislatura());
+      ps.setString(2, r.pleno().periodo().periodoParlamentario());
+      ps.setString(3, r.pleno().periodo().periodoAnual());
+      ps.setString(4, r.pleno().periodo().legislatura());
       ps.setString(5, r.pleno().fecha().format(DateTimeFormatter.ofPattern(YYYY_MM_DD)));
       ps.setString(6, r.fechaHora().format(DateTimeFormatter.ofPattern(HH_MM)));
 
@@ -176,29 +177,27 @@ public class SaveVotacionPlenosToSqlite implements Consumer<VotacionPlenos> {
             asunto text not null,
             presidente text not null,
             etiquetas text not null,
-            
+
             grupo_parlamentario text not null,
             grupo_parlamentario_descripcion text not null,
-          
+
             si integer not null,
             no integer not null,
             abstenciones integer not null,
             sin_responder integer not null,
             total integer not null
           )
-          """.formatted(
-          tableName
-        );
+          """
+          .formatted(tableName);
     }
 
     @Override
     List<String> createIndexesStatement() {
       return List.of(
-        index("periodo_parlamentario"),
-        index("periodo_anual"),
-        index("legislatura"),
-        index("grupo_parlamentario")
-      );
+          index("periodo_parlamentario"),
+          index("periodo_anual"),
+          index("legislatura"),
+          index("grupo_parlamentario"));
     }
 
     @Override
@@ -208,18 +207,17 @@ public class SaveVotacionPlenosToSqlite implements Consumer<VotacionPlenos> {
             ?, ?, ?, ?, ?, ?, ?, ?,
             ?, ?, ?, ?, ?, ?, ?, ?
           )
-          """.formatted(
-          tableName
-        );
+          """
+          .formatted(tableName);
     }
 
     @Override
     void addBatch(PreparedStatement ps, RegistroVotacion r) throws Exception {
       for (var a : r.resultadosPorGrupo().entrySet()) {
         ps.setString(1, r.pleno().id());
-        ps.setString(2, r.pleno().periodoParlamentario());
-        ps.setString(3, r.pleno().periodoAnual());
-        ps.setString(4, r.pleno().legislatura());
+        ps.setString(2, r.pleno().periodo().periodoParlamentario());
+        ps.setString(3, r.pleno().periodo().periodoAnual());
+        ps.setString(4, r.pleno().periodo().legislatura());
         ps.setString(5, r.pleno().fecha().format(DateTimeFormatter.ofPattern(YYYY_MM_DD)));
         ps.setString(6, r.fechaHora().format(DateTimeFormatter.ofPattern(HH_MM)));
         ps.setString(7, r.asunto());
@@ -256,9 +254,8 @@ public class SaveVotacionPlenosToSqlite implements Consumer<VotacionPlenos> {
             ?, ?, ?, ?, ?, ?, ?,
             ?, ?, ?, ?, ?, ?, ?
           )
-          """.formatted(
-          tableName
-        );
+          """
+          .formatted(tableName);
     }
 
     @Override
@@ -274,39 +271,37 @@ public class SaveVotacionPlenosToSqlite implements Consumer<VotacionPlenos> {
             asunto text not null,
             presidente text not null,
             etiquetas text not null,
-            
+
             congresista text not null,
             grupo_parlamentario text not null,
             grupo_parlamentario_descripcion text not null,
             resultado text not null,
             resultado_descripcion text not null
           )
-          """.formatted(
-          tableName
-        );
+          """
+          .formatted(tableName);
     }
 
     @Override
     List<String> createIndexesStatement() {
       return List.of(
-        index("periodo_parlamentario"),
-        index("periodo_anual"),
-        index("legislatura"),
-        index("congresista"),
-        index("grupo_parlamentario"),
-        index("grupo_parlamentario_descripcion"),
-        index("resultado"),
-        index("resultado_descripcion")
-      );
+          index("periodo_parlamentario"),
+          index("periodo_anual"),
+          index("legislatura"),
+          index("congresista"),
+          index("grupo_parlamentario"),
+          index("grupo_parlamentario_descripcion"),
+          index("resultado"),
+          index("resultado_descripcion"));
     }
 
     @Override
     void addBatch(PreparedStatement ps, RegistroVotacion r) throws Exception {
       for (var v : r.votaciones()) {
         ps.setString(1, r.pleno().id());
-        ps.setString(2, r.pleno().periodoParlamentario());
-        ps.setString(3, r.pleno().periodoAnual());
-        ps.setString(4, r.pleno().legislatura());
+        ps.setString(2, r.pleno().periodo().periodoParlamentario());
+        ps.setString(3, r.pleno().periodo().periodoAnual());
+        ps.setString(4, r.pleno().periodo().legislatura());
         ps.setString(5, r.pleno().fecha().format(DateTimeFormatter.ofPattern(YYYY_MM_DD)));
         ps.setString(6, r.fechaHora().format(DateTimeFormatter.ofPattern(HH_MM)));
         ps.setString(7, r.asunto());
@@ -317,7 +312,11 @@ public class SaveVotacionPlenosToSqlite implements Consumer<VotacionPlenos> {
         ps.setString(11, v.grupoParlamentario());
         String gp = r.pleno().gruposParlamentarios().get(v.grupoParlamentario());
         if (gp == null) {
-          throw new IllegalStateException("null grupo descripcion for " + v.grupoParlamentario() + " at " + r.pleno().gruposParlamentarios());
+          throw new IllegalStateException(
+              "null grupo descripcion for "
+                  + v.grupoParlamentario()
+                  + " at "
+                  + r.pleno().gruposParlamentarios());
         }
         ps.setString(12, gp);
 

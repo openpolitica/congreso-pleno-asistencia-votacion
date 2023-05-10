@@ -9,7 +9,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
@@ -25,43 +24,42 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public record RegistroPlenoDocument(
-  String periodoParlamentario,
-  String periodoAnual,
-  String legislatura,
-  String fecha,
-  String titulo,
-  String url,
-  String filename,
-  int paginas,
-  boolean provisional
-) {
+    Periodo periodo,
+    String fecha,
+    String titulo,
+    String url,
+    String filename,
+    int paginas,
+    boolean provisional) {
   static final Logger LOG = LoggerFactory.getLogger(RegistroPlenoDocument.class);
-  static Pattern periodo = Pattern.compile("\\d\\d\\d\\d ?- ?\\d\\d\\d\\d$");
+  static Pattern periodoPattern = Pattern.compile("\\d\\d\\d\\d ?- ?\\d\\d\\d\\d$");
+  private static final ObjectMapper jsonMapper = new ObjectMapper();
+
   public static StringBuilder csvHeader() {
     return new StringBuilder(
-      "periodo_parlamentario,periodo_anual,legislatura," + "fecha,titulo,url,filename,paginas,provisional\n"
-    );
+        "periodo_parlamentario,periodo_anual,legislatura,"
+            + "fecha,titulo,url,filename,paginas,provisional\n");
   }
 
   public static String parsePeriodo(String text) {
     String val = text;
-    var m1 = periodo.matcher(text);
+    var m1 = periodoPattern.matcher(text);
     if (m1.find()) val = m1.group().replace(" ", "");
     return val;
   }
 
   public static RegistroPlenoDocument parse(Map<String, String> v) {
     return new RegistroPlenoDocument(
-      parsePeriodo(v.get("periodo_parlamentario")),
-      parsePeriodo(v.get("periodo_anual")),
-      v.get("legislatura"),
-      v.get("fecha"),
-      v.get("titulo"),
-      v.get("url"),
-      v.get("filename"),
-      Integer.parseInt(v.get("paginas")),
-      Optional.ofNullable(v.get("provisional")).map(Boolean::parseBoolean).orElse(Boolean.FALSE)
-    );
+        new Periodo(
+            parsePeriodo(v.get("periodo_parlamentario")),
+            parsePeriodo(v.get("periodo_anual")),
+            v.get("legislatura")),
+        v.get("fecha"),
+        v.get("titulo"),
+        v.get("url"),
+        v.get("filename"),
+        Integer.parseInt(v.get("paginas")),
+        Optional.ofNullable(v.get("provisional")).map(Boolean::parseBoolean).orElse(Boolean.FALSE));
   }
 
   public static RegistroPlenoDocument parseJson(String s) {
@@ -73,21 +71,26 @@ public record RegistroPlenoDocument(
   }
 
   public String csvEntry() {
-    return "%s,%s,%s,%s,\"%s\",%s,%s,%s,%s%n".formatted(
-        periodoParlamentario,
-        periodoAnual,
-        legislatura,
-        fecha,
-        titulo,
-        url,
-        filename,
-        paginas,
-        provisional
-      );
+    return "%s,%s,%s,%s,\"%s\",%s,%s,%s,%s%n"
+        .formatted(
+            periodo.periodoParlamentario(),
+            periodo.periodoAnual(),
+            periodo.legislatura(),
+            fecha,
+            titulo,
+            url,
+            filename,
+            paginas,
+            provisional);
   }
 
   String directory() {
-    return ("out/pdf/" + periodoParlamentario + "/" + periodoAnual + "/" + legislatura);
+    return ("out/pdf/"
+        + periodo.periodoParlamentario()
+        + "/"
+        + periodo.periodoAnual()
+        + "/"
+        + periodo.legislatura());
   }
 
   String path() {
@@ -96,16 +99,7 @@ public record RegistroPlenoDocument(
 
   public RegistroPlenoDocument withPaginas() {
     return new RegistroPlenoDocument(
-      periodoParlamentario,
-      periodoAnual,
-      legislatura,
-      fecha,
-      titulo,
-      url,
-      filename,
-      countPages(),
-      provisional
-    );
+        periodo, fecha, titulo, url, filename, countPages(), provisional);
   }
 
   public String id() {
@@ -165,8 +159,8 @@ public record RegistroPlenoDocument(
 
   private static final Pattern p = Pattern.compile("javascript:openWindow\\('(.+)'\\)");
 
-  public static Map<String, RegistroPlenoDocument> collectPleno(String pp, String pa, String l, String url)
-    throws IOException {
+  public static Map<String, RegistroPlenoDocument> collectPleno(
+      String pp, String pa, String l, String url) throws IOException {
     var root = new LinkedHashMap<String, RegistroPlenoDocument>();
     {
       var jsoup = Jsoup.connect(BASE_URL + url);
@@ -178,9 +172,9 @@ public record RegistroPlenoDocument(
         if (tr.children().size() == 6) {
           var fonts = tr.select("font[size=4]");
           var fecha = fonts.get(0).text();
-          var date = LocalDate
-            .parse(fecha, DateTimeFormatter.ofPattern("MM/dd/yyyy"))
-            .format(DateTimeFormatter.ISO_LOCAL_DATE);
+          var date =
+              LocalDate.parse(fecha, DateTimeFormatter.ofPattern("MM/dd/yyyy"))
+                  .format(DateTimeFormatter.ISO_LOCAL_DATE);
           var second = fonts.get(2).children().first();
           assert second != null;
           var titulo = second.text();
@@ -190,19 +184,15 @@ public record RegistroPlenoDocument(
             var u = matcher.group(1);
             var fullUrl = BASE_URL + "/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/" + u;
             root.put(
-              titulo,
-              new RegistroPlenoDocument(
-                parsePeriodo(pp),
-                parsePeriodo(pa),
-                l,
-                date,
                 titulo,
-                fullUrl,
-                fullUrl.split("/")[9],
-                0,
-                titulo.contains("PROVISIONAL")
-              )
-            );
+                new RegistroPlenoDocument(
+                    new Periodo(parsePeriodo(pp), parsePeriodo(pa), l),
+                    date,
+                    titulo,
+                    fullUrl,
+                    fullUrl.split("/")[9],
+                    0,
+                    titulo.contains("PROVISIONAL")));
           }
         }
       }
@@ -228,21 +218,19 @@ public record RegistroPlenoDocument(
   }
 
   public String prContent() {
-    return (
-      "Periodo parlamentario: " +
-      periodoParlamentario +
-      " | " +
-      "Periodo anual: " +
-      periodoAnual +
-      " | " +
-      "Titulo: " +
-      titulo +
-      " | " +
-      "URL: <" +
-      url +
-      "> | " +
-      "Paginas: " +
-      paginas
-    );
+    return ("Periodo parlamentario: "
+        + periodo.periodoParlamentario()
+        + " | "
+        + "Periodo anual: "
+        + periodo.periodoAnual()
+        + " | "
+        + "Titulo: "
+        + titulo
+        + " | "
+        + "URL: <"
+        + url
+        + "> | "
+        + "Paginas: "
+        + paginas);
   }
 }
