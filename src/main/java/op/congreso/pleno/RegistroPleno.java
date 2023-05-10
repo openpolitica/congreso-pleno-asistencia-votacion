@@ -11,71 +11,61 @@ import java.util.stream.Collectors;
 import op.congreso.pleno.asistencia.RegistroAsistencia;
 import op.congreso.pleno.votacion.RegistroVotacion;
 
-//TODO add provisional flag and test new PDFs
+// TODO add provisional flag and test new PDFs
 public record RegistroPleno(
-  String periodoParlamentario,
-  String periodoAnual,
-  String legislatura,
-  LocalDate fecha,
-  String titulo,
-  String url,
-  Map<String, String> gruposParlamentarios,
-  List<LocalDateTime> sesiones,
-  Map<LocalDateTime, RegistroAsistencia> asistencias,
-  Map<LocalDateTime, RegistroVotacion> votaciones,
-  int potentialErrors,
-  List<String> comments
-) {
+    Periodo periodo,
+    LocalDate fecha,
+    String titulo,
+    String url,
+    Map<String, String> gruposParlamentarios,
+    List<LocalDateTime> sesiones,
+    Map<LocalDateTime, RegistroAsistencia> asistencias,
+    Map<LocalDateTime, RegistroVotacion> votaciones,
+    int potentialErrors,
+    List<String> comments) {
   public static Builder newBuilder(RegistroPlenoDocument document) {
     return new Builder(document);
   }
 
   public static Builder newBuilder(
-    String periodoParlamentario,
-    String periodoAnual,
-    String legislatura,
-    LocalDate fecha,
-    String titulo,
-    String url
-  ) {
+      String periodoParlamentario,
+      String periodoAnual,
+      String legislatura,
+      LocalDate fecha,
+      String titulo,
+      String url) {
     return new Builder(periodoParlamentario, periodoAnual, legislatura, fecha, titulo, url);
   }
 
   public String printPlenoAsCsv() {
-    return (
-      "metadato,valor" +
-      "\n" +
-      "periodo_parlamentario," +
-      periodoParlamentario +
-      "\n" +
-      "periodo_anual," +
-      periodoAnual +
-      "\n" +
-      "legislatura," +
-      legislatura +
-      "\n" +
-      "sesion," +
-      titulo +
-      "\n" +
-      "url_pdf," +
-      url +
-      "\n" +
-      "dia," +
-      fecha.format(DateTimeFormatter.ISO_LOCAL_DATE)
-    );
+    return ("metadato,valor"
+        + "\n"
+        + "periodo_parlamentario,"
+        + periodo.periodoParlamentario()
+        + "\n"
+        + "periodo_anual,"
+        + periodo.periodoAnual()
+        + "\n"
+        + "legislatura,"
+        + periodo.legislatura()
+        + "\n"
+        + "sesion,"
+        + titulo
+        + "\n"
+        + "url_pdf,"
+        + url
+        + "\n"
+        + "dia,"
+        + fecha.format(DateTimeFormatter.ISO_LOCAL_DATE));
   }
 
   public String printGruposParlametariosAsCsv() {
-    return (
-      "grupo_parlamentario,descripcion" +
-      "\n" +
-      gruposParlamentarios
-        .keySet()
-        .stream()
-        .sorted()
-        .map(k -> k + "," + gruposParlamentarios.get(k))
-        .collect(Collectors.joining("\n"))
-    );
+    return ("grupo_parlamentario,descripcion"
+        + "\n"
+        + gruposParlamentarios.keySet().stream()
+            .sorted()
+            .map(k -> k + "," + gruposParlamentarios.get(k))
+            .collect(Collectors.joining("\n")));
   }
 
   public static class Builder {
@@ -94,22 +84,21 @@ public record RegistroPleno(
     List<String> comments = new ArrayList<>();
 
     public Builder(RegistroPlenoDocument document) {
-      this.periodoParlamentario = document.periodoParlamentario();
-      this.periodoAnual = document.periodoAnual();
-      this.legislatura = document.legislatura();
+      this.periodoParlamentario = document.periodo().periodoParlamentario();
+      this.periodoAnual = document.periodo().periodoAnual();
+      this.legislatura = document.periodo().legislatura();
       this.titulo = document.titulo();
       this.url = document.url();
       this.fecha = LocalDate.parse(document.fecha(), DateTimeFormatter.ISO_LOCAL_DATE);
     }
 
     public Builder(
-      String periodoParlamentario,
-      String periodoAnual,
-      String legislatura,
-      LocalDate fecha,
-      String titulo,
-      String url
-    ) {
+        String periodoParlamentario,
+        String periodoAnual,
+        String legislatura,
+        LocalDate fecha,
+        String titulo,
+        String url) {
       this.periodoParlamentario = periodoParlamentario;
       this.periodoAnual = periodoAnual;
       this.legislatura = legislatura;
@@ -130,19 +119,16 @@ public record RegistroPleno(
 
     public RegistroPleno build() {
       return new RegistroPleno(
-        periodoParlamentario,
-        periodoAnual,
-        legislatura,
-        fecha,
-        titulo,
-        url,
-        gruposParlamentarios,
-        sesiones,
-        asistencias,
-        votaciones,
-        potentialErrors,
-        comments
-      );
+          new Periodo(periodoParlamentario, periodoAnual, legislatura),
+          fecha,
+          titulo,
+          url,
+          gruposParlamentarios,
+          sesiones,
+          asistencias,
+          votaciones,
+          potentialErrors,
+          comments);
     }
 
     public Builder withGruposParlamentarios(Map<String, String> gruposParlamentarios) {
@@ -151,16 +137,15 @@ public record RegistroPleno(
     }
 
     public Pleno pleno() {
-      return Pleno
-        .newBuilder()
-        .withPeriodoParlamentario(periodoParlamentario)
-        .withPeriodoAnual(periodoAnual)
-        .withLegislatura(legislatura)
-        .withTitulo(titulo)
-        .withFecha(fecha)
-        .withUrl(url)
-        .withGruposParlamentarios(gruposParlamentarios)
-        .build();
+      return Pleno.newBuilder()
+          .withPeriodoParlamentario(periodoParlamentario)
+          .withPeriodoAnual(periodoAnual)
+          .withLegislatura(legislatura)
+          .withTitulo(titulo)
+          .withFecha(fecha)
+          .withUrl(url)
+          .withGruposParlamentarios(gruposParlamentarios)
+          .build();
     }
   }
 }

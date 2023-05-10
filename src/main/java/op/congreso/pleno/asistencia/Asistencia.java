@@ -28,13 +28,13 @@ public enum Asistencia implements Resultado {
     this.descripcion = description;
   }
 
-  static final Map<String, Asistencia> map = Arrays
-    .stream(Asistencia.values())
-    .collect(Collectors.toMap(a -> a.codigo, a -> a));
+  static final Map<String, Asistencia> map =
+      Arrays.stream(Asistencia.values()).collect(Collectors.toMap(a -> a.codigo, a -> a));
 
   public static Asistencia of(String asistencia) {
     var a1 = map.get(asistencia.toUpperCase().trim());
-    if (a1 != null) return a1; else return Asistencia.valueOf(asistencia);
+    if (a1 != null) return a1;
+    else return Asistencia.valueOf(asistencia);
   }
 
   public static boolean is(String text) {
@@ -42,7 +42,9 @@ public enum Asistencia implements Resultado {
   }
 
   public static boolean isDescripcion(String text) {
-    return map.values().stream().map(Asistencia::descripcion).anyMatch(s -> s.equals(text.toUpperCase()));
+    return map.values().stream()
+        .map(Asistencia::descripcion)
+        .anyMatch(s -> s.equals(text.toUpperCase()));
   }
 
   @Override
