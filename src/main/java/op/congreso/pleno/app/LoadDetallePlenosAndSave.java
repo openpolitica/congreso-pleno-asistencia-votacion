@@ -82,7 +82,7 @@ public class LoadDetallePlenosAndSave {
                     registroPleno.votaciones().forEach((fechaHora, registroVotacion) -> {
                         final List<ResultadoCongresista<Votacion>> votaciones = registroVotacion.votaciones();
                         final int votacionesTotal = votaciones.size();
-                        if (votacionesTotal != 130) {
+                        if (votacionesTotal != primeraAsistencia.size()) {
                             var congresistas = votaciones.stream().map(ResultadoCongresista::congresista).toList();
                             LOG.error("Sesion {}: Votacion incompleta {}", fechaHora, votacionesTotal);
                             for (var c : primeraAsistencia.keySet()) {
