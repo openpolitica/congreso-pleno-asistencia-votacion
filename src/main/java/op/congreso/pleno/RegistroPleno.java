@@ -3,10 +3,7 @@ package op.congreso.pleno;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import op.congreso.pleno.asistencia.RegistroAsistencia;
 import op.congreso.pleno.votacion.RegistroVotacion;
@@ -78,8 +75,8 @@ public record RegistroPleno(
     final String url;
     Map<String, String> gruposParlamentarios = new HashMap<>();
     List<LocalDateTime> sesiones = new ArrayList<>();
-    Map<LocalDateTime, RegistroAsistencia> asistencias = new HashMap<>();
-    Map<LocalDateTime, RegistroVotacion> votaciones = new HashMap<>();
+    Map<LocalDateTime, RegistroAsistencia> asistencias = new LinkedHashMap<>();
+    Map<LocalDateTime, RegistroVotacion> votaciones = new LinkedHashMap<>();
     int potentialErrors = 0;
     List<String> comments = new ArrayList<>();
 
