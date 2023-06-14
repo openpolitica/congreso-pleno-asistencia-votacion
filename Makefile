@@ -22,7 +22,7 @@ extraer_csv:
 	./mvnw clean compile exec:java -Dexec.mainClass="op.congreso.pleno.util.ExtraeCsvs" -Dexec.args="${HOME}/Downloads/"
 
 registro_plenos:
-	./mvnw exec:java -Dexec.mainClass="op.congreso.pleno.app.LoadRegitroPlenos"
+	./mvnw exec:java -Dexec.mainClass="op.congreso.pleno.app.LoadRegitroPlenoDocuments"
 
 serve:
 	datasette *.db
