@@ -68,7 +68,6 @@ public class LoadDetallePlenosAndSave {
                     .map(p -> loadVotacion(p, registroPlenoBuilder.pleno(), grupos))
                     .peek(registroPlenoBuilder::addVotacion)
                     .collect(Collectors.toSet());
-            //            var votacionesPleno = new Votaciones(votaciones);
             new SaveVotacionPlenosToSqlite().accept(votaciones);
           }
 
@@ -78,8 +77,10 @@ public class LoadDetallePlenosAndSave {
               registroPleno
                   .asistencias()
                   .entrySet()
-                  .iterator()
-                  .next()
+                  .stream()
+                  .filter(p -> p.getValue().asistencias().size() == 130)
+                  .findFirst()
+                  .get()
                   .getValue()
                   .asistencias()
                   .stream()
