@@ -74,10 +74,7 @@ public class LoadDetallePlenosAndSave {
           var registroPleno = registroPlenoBuilder.withGruposParlamentarios(grupos).build();
 
           var primeraAsistencia =
-              registroPleno
-                  .asistencias()
-                  .entrySet()
-                  .stream()
+              registroPleno.asistencias().entrySet().stream()
                   .filter(p -> p.getValue().asistencias().size() == 130)
                   .findFirst()
                   .get()
