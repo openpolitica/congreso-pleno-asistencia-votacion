@@ -35,7 +35,8 @@ public class SaveRegistroPlenoToCsv {
           asistenciaDir.resolve("resultados_grupo.csv"), a.printResultadosPorGrupoAsCsv());
       Files.writeString(asistenciaDir.resolve("resultados.csv"), a.printResultadosAsCsv());
       Files.writeString(asistenciaDir.resolve("log.txt"), a.printLog());
-      Files.writeString(asistenciaDir.resolve("notas.csv"), "hora,nota\n");
+      final var pathNotas = asistenciaDir.resolve("notas.csv");
+      if (!Files.exists(pathNotas)) Files.writeString(pathNotas, "hora,nota\n");
     }
     // write votaciones
     for (var v : registroPleno.votaciones().values()) {
@@ -51,7 +52,8 @@ public class SaveRegistroPlenoToCsv {
       Files.writeString(votacionDir.resolve("resultados.csv"), v.printResultadosAsCsv());
       Files.writeString(votacionDir.resolve("etiquetas.csv"), v.printEtiquetasAsCsv());
       Files.writeString(votacionDir.resolve("log.txt"), v.printLog());
-      Files.writeString(votacionDir.resolve("notas.csv"), "hora,nota\n");
+      final var pathNotas = votacionDir.resolve("notas.csv");
+      if (!Files.exists(pathNotas)) Files.writeString(pathNotas, "hora,nota\n");
     }
   }
 }
