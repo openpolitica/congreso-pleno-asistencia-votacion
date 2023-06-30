@@ -43,6 +43,32 @@ public class LoadDetallePlenosAndSave {
     try (final var ls = Files.list(data)) {
       var periodos = ls.toList();
       for (var periodo : periodos) {
+        var cambios = new HashMap<LocalDate, List<Map<String, String>>>();
+        try (final var iter =
+            mapper
+                .readerFor(Map.class)
+                .with(CsvSchema.emptySchema().withHeader())
+                .<Map<String, String>>readValues(periodo.resolve("cambios.csv").toFile())) {
+          while (iter.hasNext()) {
+            final var map = iter.next();
+            final var fecha =
+                LocalDate.parse(map.get("pleno"), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            cambios.computeIfPresent(
+                fecha,
+                (localDate, maps) -> {
+                  maps.add(map);
+                  return maps;
+                });
+            cambios.computeIfAbsent(
+                fecha,
+                localDate -> {
+                  final var maps = new ArrayList<Map<String, String>>();
+                  maps.add(map);
+                  return maps;
+                });
+          }
+        }
+
         var plenos =
             paths(periodo) // periodo anual
                 .flatMap(this::paths) // mes
@@ -114,12 +140,24 @@ public class LoadDetallePlenosAndSave {
                                 votacion.congresista(),
                                 votacion.grupoParlamentario());
                           } else if (!grupo.equals(votacion.grupoParlamentario())) {
-                            LOG.error(
-                                "Sesion {}: Grupo {} de Congresista {} errado, debe ser {}",
-                                fechaHora,
-                                votacion.grupoParlamentario(),
-                                votacion.congresista(),
-                                grupo);
+                            var found = false;
+                            if (cambios.containsKey(registroPleno.fecha())) {
+                              for (final var map : cambios.get(registroPleno.fecha())) {
+                                if (map.get("congresista").equals(votacion.congresista())
+                                    && map.get("grupo_nuevo")
+                                        .equals(votacion.grupoParlamentario())) {
+                                  found = true;
+                                }
+                              }
+                            }
+                            if (!found) {
+                              LOG.error(
+                                  "Sesion {}: Congresista {} en grupo errado {}, debe ser {}",
+                                  fechaHora,
+                                  votacion.congresista(),
+                                  votacion.grupoParlamentario(),
+                                  grupo);
+                            }
                           }
                         });
                   });
@@ -156,8 +194,11 @@ public class LoadDetallePlenosAndSave {
 
   private Stream<Path> paths(Path p) {
     try {
-      if (Files.isDirectory(p)) return Files.list(p);
-      else return Stream.of();
+      if (Files.isDirectory(p)) {
+        return Files.list(p);
+      } else {
+        return Stream.of();
+      }
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
