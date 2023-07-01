@@ -71,6 +71,7 @@ public class TextractVotacionV2 {
                   else return s;
                 })
             .map(s -> s.replace(" +++", ""))
+            .map(s -> s.replace(" ++", ""))
             .map(s -> s.replace("+++ ", ""))
             .map(s -> s.replace("****", "SINRES"))
             .map(s -> s.replace("***", "SINRES"))
