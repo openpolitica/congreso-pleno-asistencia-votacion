@@ -122,7 +122,8 @@ public class LoadDetallePlenosAndSave {
                     if (asistenciaTotal != primeraAsistencia.size()) {
                       var congresistas =
                           asistencias.stream().map(ResultadoCongresista::congresista).toList();
-                      LOG.error("[Asistencia] {}: Votacion incompleta {}", fechaHora, asistenciaTotal);
+                      LOG.error(
+                          "[Asistencia] {}: Votacion incompleta {}", fechaHora, asistenciaTotal);
                       for (var c : primeraAsistencia.keySet()) {
                         if (!congresistas.contains(c)) {
                           LOG.error("[Asistencia] {}: Congresista faltante: {}", fechaHora, c);
@@ -145,7 +146,7 @@ public class LoadDetallePlenosAndSave {
                               for (final var map : cambios.get(registroPleno.fecha())) {
                                 if (map.get("congresista").equals(asistencia.congresista())
                                     && map.get("grupo_nuevo")
-                                    .equals(asistencia.grupoParlamentario())) {
+                                        .equals(asistencia.grupoParlamentario())) {
                                   found = true;
                                 }
                               }
@@ -171,7 +172,8 @@ public class LoadDetallePlenosAndSave {
                     if (votacionesTotal != primeraAsistencia.size()) {
                       var congresistas =
                           votaciones.stream().map(ResultadoCongresista::congresista).toList();
-                      LOG.error("[Votacion] {}: Votacion incompleta {}", fechaHora, votacionesTotal);
+                      LOG.error(
+                          "[Votacion] {}: Votacion incompleta {}", fechaHora, votacionesTotal);
                       for (var c : primeraAsistencia.keySet()) {
                         if (!congresistas.contains(c)) {
                           LOG.error("[Votacion] {}: Congresista faltante: {}", fechaHora, c);
