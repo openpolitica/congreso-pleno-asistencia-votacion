@@ -113,6 +113,55 @@ public class LoadDetallePlenosAndSave {
                           ResultadoCongresista::grupoParlamentario));
 
           registroPleno
+              .asistencias()
+              .forEach(
+                  (fechaHora, registroVotacion) -> {
+                    final List<ResultadoCongresista<Asistencia>> asistencias =
+                        registroVotacion.asistencias();
+                    final int asistenciaTotal = asistencias.size();
+                    if (asistenciaTotal != primeraAsistencia.size()) {
+                      var congresistas =
+                          asistencias.stream().map(ResultadoCongresista::congresista).toList();
+                      LOG.error("[Asistencia] {}: Votacion incompleta {}", fechaHora, asistenciaTotal);
+                      for (var c : primeraAsistencia.keySet()) {
+                        if (!congresistas.contains(c)) {
+                          LOG.error("[Asistencia] {}: Congresista faltante: {}", fechaHora, c);
+                        }
+                      }
+                    }
+
+                    asistencias.forEach(
+                        asistencia -> {
+                          final String grupo = primeraAsistencia.get(asistencia.congresista());
+                          if (grupo == null) {
+                            LOG.warn(
+                                "[Asistencia] {}: Votacion de Congresista {} Grupo {} no coincide con Asistencia",
+                                fechaHora,
+                                asistencia.congresista(),
+                                asistencia.grupoParlamentario());
+                          } else if (!grupo.equals(asistencia.grupoParlamentario())) {
+                            var found = false;
+                            if (cambios.containsKey(registroPleno.fecha())) {
+                              for (final var map : cambios.get(registroPleno.fecha())) {
+                                if (map.get("congresista").equals(asistencia.congresista())
+                                    && map.get("grupo_nuevo")
+                                    .equals(asistencia.grupoParlamentario())) {
+                                  found = true;
+                                }
+                              }
+                            }
+                            if (!found) {
+                              LOG.error(
+                                  "[Asistencia] {}: Congresista {} en grupo {}, debe ser {}",
+                                  fechaHora,
+                                  asistencia.congresista(),
+                                  asistencia.grupoParlamentario(),
+                                  grupo);
+                            }
+                          }
+                        });
+                  });
+          registroPleno
               .votaciones()
               .forEach(
                   (fechaHora, registroVotacion) -> {
@@ -122,10 +171,10 @@ public class LoadDetallePlenosAndSave {
                     if (votacionesTotal != primeraAsistencia.size()) {
                       var congresistas =
                           votaciones.stream().map(ResultadoCongresista::congresista).toList();
-                      LOG.error("Sesion {}: Votacion incompleta {}", fechaHora, votacionesTotal);
+                      LOG.error("[Votacion] {}: Votacion incompleta {}", fechaHora, votacionesTotal);
                       for (var c : primeraAsistencia.keySet()) {
                         if (!congresistas.contains(c)) {
-                          LOG.error("Sesion {}: Congresista faltante: {}", fechaHora, c);
+                          LOG.error("[Votacion] {}: Congresista faltante: {}", fechaHora, c);
                         }
                       }
                     }
@@ -135,7 +184,7 @@ public class LoadDetallePlenosAndSave {
                           final String grupo = primeraAsistencia.get(votacion.congresista());
                           if (grupo == null) {
                             LOG.warn(
-                                "Sesion {}: Votacion de Congresista {} Grupo {} no coincide con Asistencia",
+                                "[Votacion]   {}: Votacion de Congresista {} Grupo {} no coincide con Asistencia",
                                 fechaHora,
                                 votacion.congresista(),
                                 votacion.grupoParlamentario());
@@ -152,7 +201,7 @@ public class LoadDetallePlenosAndSave {
                             }
                             if (!found) {
                               LOG.error(
-                                  "Sesion {}: Congresista {} en grupo errado {}, debe ser {}",
+                                  "[Votacion]   {}: Congresista {} en grupo {}, debe ser {}",
                                   fechaHora,
                                   votacion.congresista(),
                                   votacion.grupoParlamentario(),
