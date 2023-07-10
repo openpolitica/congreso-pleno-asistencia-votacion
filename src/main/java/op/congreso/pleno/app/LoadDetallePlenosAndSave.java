@@ -122,8 +122,7 @@ public class LoadDetallePlenosAndSave {
                     if (asistenciaTotal != primeraAsistencia.size()) {
                       var congresistas =
                           asistencias.stream().map(ResultadoCongresista::congresista).toList();
-                      LOG.error(
-                          "[A] {}: Votacion incompleta {}", fechaHora, asistenciaTotal);
+                      LOG.error("[A] {}: Votacion incompleta {}", fechaHora, asistenciaTotal);
                       for (var c : primeraAsistencia.keySet()) {
                         if (!congresistas.contains(c)) {
                           LOG.error("[A] {}: Congresista faltante: {}", fechaHora, c);
@@ -172,8 +171,7 @@ public class LoadDetallePlenosAndSave {
                     if (votacionesTotal != primeraAsistencia.size()) {
                       var congresistas =
                           votaciones.stream().map(ResultadoCongresista::congresista).toList();
-                      LOG.error(
-                          "[V] {}: Votacion incompleta {}", fechaHora, votacionesTotal);
+                      LOG.error("[V] {}: Votacion incompleta {}", fechaHora, votacionesTotal);
                       for (var c : primeraAsistencia.keySet()) {
                         if (!congresistas.contains(c)) {
                           LOG.error("[V] {}: Congresista faltante: {}", fechaHora, c);
