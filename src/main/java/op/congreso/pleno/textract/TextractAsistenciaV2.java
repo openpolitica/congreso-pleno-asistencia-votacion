@@ -125,7 +125,8 @@ public class TextractAsistenciaV2 {
               }
             }
           }
-        } else if (asistencias.size() < 130 && !congresistasCompletados) { // Process asistencia per congresistas
+        } else if (asistencias.size() < 130
+            && !congresistasCompletados) { // Process asistencia per congresistas
           if (text.equals("Resultados de la ASISTENCIA")) {
             LOG.warn("Faltan congresistas");
             congresistasCompletados = true;
