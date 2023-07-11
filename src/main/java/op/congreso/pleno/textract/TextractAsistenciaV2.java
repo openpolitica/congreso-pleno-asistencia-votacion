@@ -99,6 +99,7 @@ public class TextractAsistenciaV2 {
     var previous = "";
 
     var current = ResultadoCongresista.<Asistencia>newBuilder();
+    var congresistasCompletados = false;
 
     while (i < lines.size()) {
       final var text = lines.get(i);
@@ -124,9 +125,10 @@ public class TextractAsistenciaV2 {
               }
             }
           }
-        } else if (asistencias.size() < 130) { // Process asistencia per congresistas
+        } else if (asistencias.size() < 130 && !congresistasCompletados) { // Process asistencia per congresistas
           if (text.equals("Resultados de la ASISTENCIA")) {
             LOG.warn("Faltan congresistas");
+            congresistasCompletados = true;
           } else {
             var b = new StringBuilder(text);
             current.processAsistenciaLine(b);
