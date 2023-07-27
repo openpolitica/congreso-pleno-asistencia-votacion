@@ -8,7 +8,8 @@ import java.util.Locale;
 public class Constantes {
 
   public static final Path DATA = Path.of("./data");
-  public static final String PERIODO = "2021-2026";
+  public static final String PERIODO_ACTUAL = "2021-2026";
+  public static final Path DATA_PERIODO_ACTUAL = DATA.resolve(PERIODO_ACTUAL);
   public static final DateTimeFormatter FECHA_HORA_PATTERN =
       DateTimeFormatter.ofPattern("'fecha: 'd/MM/yyyy' hora: 'hh:mm' 'a", Locale.UK);
 

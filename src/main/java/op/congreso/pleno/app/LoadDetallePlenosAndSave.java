@@ -20,11 +20,14 @@ import op.congreso.pleno.Pleno;
 import op.congreso.pleno.RegistroPleno;
 import op.congreso.pleno.ResultadoCongresista;
 import op.congreso.pleno.asistencia.Asistencia;
-import op.congreso.pleno.asistencia.RegistroAsistencia;
-import op.congreso.pleno.asistencia.ResultadoAsistencia;
-import op.congreso.pleno.votacion.RegistroVotacion;
-import op.congreso.pleno.votacion.ResultadoVotacion;
+import op.congreso.pleno.asistencia.AsistenciaAgregada;
+import op.congreso.pleno.asistencia.AsistenciaSesion;
+import op.congreso.pleno.db.SaveAsistenciaPlenosToSqlite;
+import op.congreso.pleno.db.SaveRegistroPlenoToCsv;
+import op.congreso.pleno.db.SaveVotacionPlenosToSqlite;
 import op.congreso.pleno.votacion.Votacion;
+import op.congreso.pleno.votacion.VotacionAgregada;
+import op.congreso.pleno.votacion.VotacionSesion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -99,13 +102,13 @@ public class LoadDetallePlenosAndSave {
 
           var registroPleno = registroPlenoBuilder.withGruposParlamentarios(grupos).build();
 
-          var primeraAsistencia =
-              registroPleno.asistencias().entrySet().stream()
-                  .findFirst()
-                  .get()
-                  .getValue()
-                  .asistencias()
-                  .stream()
+          final var primeraSesionAsistencia =
+              registroPleno.asistencias().entrySet().stream().findFirst();
+          if (primeraSesionAsistencia.isEmpty())
+            throw new RuntimeException("Error: no existe primera asistencia");
+
+          var asistenciasPrimeraSesion =
+              primeraSesionAsistencia.get().getValue().asistencias().stream()
                   .collect(
                       Collectors.toMap(
                           ResultadoCongresista::congresista,
@@ -118,11 +121,11 @@ public class LoadDetallePlenosAndSave {
                     final List<ResultadoCongresista<Asistencia>> asistencias =
                         registroVotacion.asistencias();
                     final int asistenciaTotal = asistencias.size();
-                    if (asistenciaTotal != primeraAsistencia.size()) {
+                    if (asistenciaTotal != asistenciasPrimeraSesion.size()) {
                       var congresistas =
                           asistencias.stream().map(ResultadoCongresista::congresista).toList();
                       LOG.error("[A] {}: Votacion incompleta {}", fechaHora, asistenciaTotal);
-                      for (var c : primeraAsistencia.keySet()) {
+                      for (var c : asistenciasPrimeraSesion.keySet()) {
                         if (!congresistas.contains(c)) {
                           LOG.error("[A] {}: Congresista faltante: {}", fechaHora, c);
                         }
@@ -131,7 +134,8 @@ public class LoadDetallePlenosAndSave {
 
                     asistencias.forEach(
                         asistencia -> {
-                          final String grupo = primeraAsistencia.get(asistencia.congresista());
+                          final String grupo =
+                              asistenciasPrimeraSesion.get(asistencia.congresista());
                           if (grupo == null) {
                             LOG.warn(
                                 "[A] {}: Votacion de Congresista {} Grupo {} no coincide con Asistencia",
@@ -167,11 +171,11 @@ public class LoadDetallePlenosAndSave {
                     final List<ResultadoCongresista<Votacion>> votaciones =
                         registroVotacion.votaciones();
                     final int votacionesTotal = votaciones.size();
-                    if (votacionesTotal != primeraAsistencia.size()) {
+                    if (votacionesTotal != asistenciasPrimeraSesion.size()) {
                       var congresistas =
                           votaciones.stream().map(ResultadoCongresista::congresista).toList();
                       LOG.error("[V] {}: Votacion incompleta {}", fechaHora, votacionesTotal);
-                      for (var c : primeraAsistencia.keySet()) {
+                      for (var c : asistenciasPrimeraSesion.keySet()) {
                         if (!congresistas.contains(c)) {
                           LOG.error("[V] {}: Congresista faltante: {}", fechaHora, c);
                         }
@@ -180,7 +184,7 @@ public class LoadDetallePlenosAndSave {
 
                     votaciones.forEach(
                         votacion -> {
-                          final String grupo = primeraAsistencia.get(votacion.congresista());
+                          final String grupo = asistenciasPrimeraSesion.get(votacion.congresista());
                           if (grupo == null) {
                             LOG.warn(
                                 "[V] {}: Votacion de Congresista {} Grupo {} no coincide con Asistencia",
@@ -252,7 +256,7 @@ public class LoadDetallePlenosAndSave {
     }
   }
 
-  private RegistroVotacion loadVotacion(Path path, Pleno pleno, Map<String, String> grupos) {
+  private VotacionSesion loadVotacion(Path path, Pleno pleno, Map<String, String> grupos) {
     try {
       var builder = loadVotacionMetadatos(path.resolve("metadatos.csv"), pleno);
       loadVotacionEtiquetas(path.resolve("etiquetas.csv")).forEach(builder::addEtiqueta);
@@ -271,7 +275,7 @@ public class LoadDetallePlenosAndSave {
     }
   }
 
-  private RegistroAsistencia loadAsistencia(Path path, Pleno pleno, Map<String, String> grupos) {
+  private AsistenciaSesion loadAsistencia(Path path, Pleno pleno, Map<String, String> grupos) {
     try {
       var builder = loadAsistenciaMetadatos(path.resolve("metadatos.csv"), pleno);
       var asistencias = loadAsistenciaLista(path.resolve("asistencias.csv"));
@@ -304,8 +308,7 @@ public class LoadDetallePlenosAndSave {
     }
   }
 
-  private RegistroVotacion.Builder loadVotacionMetadatos(Path path, Pleno pleno)
-      throws IOException {
+  private VotacionSesion.Builder loadVotacionMetadatos(Path path, Pleno pleno) throws IOException {
     try (final var it =
         mapper
             .readerFor(Map.class)
@@ -317,7 +320,7 @@ public class LoadDetallePlenosAndSave {
         f.put(v.get("metadato"), v.get("valor"));
       }
       LocalDate fecha = LocalDate.parse(f.get("dia"), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-      return RegistroVotacion.newBuilder()
+      return VotacionSesion.newBuilder()
           .withPleno(pleno)
           .withQuorum(Integer.parseInt(f.get("quorum")))
           .withFechaHora(fecha, f.get("hora"))
@@ -343,7 +346,7 @@ public class LoadDetallePlenosAndSave {
     }
   }
 
-  private RegistroAsistencia.Builder loadAsistenciaMetadatos(Path path, Pleno pleno)
+  private AsistenciaSesion.Builder loadAsistenciaMetadatos(Path path, Pleno pleno)
       throws IOException {
     try (final var it =
         mapper
@@ -356,7 +359,7 @@ public class LoadDetallePlenosAndSave {
         f.put(v.get("metadato"), v.get("valor"));
       }
       LocalDate fecha = LocalDate.parse(f.get("dia"), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-      return RegistroAsistencia.newBuilder()
+      return AsistenciaSesion.newBuilder()
           .withPleno(pleno)
           .withQuorum(Integer.parseInt(f.get("quorum")))
           .withFechaHora(fecha, f.get("hora"));
@@ -406,7 +409,7 @@ public class LoadDetallePlenosAndSave {
     }
   }
 
-  private Map<GrupoParlamentario, ResultadoAsistencia> loadAsistenciaResultadoPorPartido(
+  private Map<GrupoParlamentario, AsistenciaAgregada> loadAsistenciaResultadoPorPartido(
       Path path, Map<String, String> grupos) throws IOException {
     try (final var it =
         mapper
@@ -414,7 +417,7 @@ public class LoadDetallePlenosAndSave {
             .with(CsvSchema.emptySchema().withHeader())
             .<Map<String, String>>readValues(path.toFile())) {
       // grupo_parlamentario,numero_legal,presentes,ausentes,licencias,otros
-      var data = new HashMap<GrupoParlamentario, ResultadoAsistencia>();
+      var data = new HashMap<GrupoParlamentario, AsistenciaAgregada>();
       while (it.hasNext()) {
         var v = it.next();
         var partido = v.get("grupo_parlamentario");
@@ -422,7 +425,7 @@ public class LoadDetallePlenosAndSave {
           assert grupos.containsKey(partido);
           data.put(
               new GrupoParlamentario(partido, grupos.get(partido)),
-              new ResultadoAsistencia(
+              new AsistenciaAgregada(
                   Integer.parseInt(v.get("presentes")),
                   Integer.parseInt(v.get("ausentes")),
                   Integer.parseInt(v.get("licencias")),
@@ -435,7 +438,7 @@ public class LoadDetallePlenosAndSave {
     }
   }
 
-  private Map<GrupoParlamentario, ResultadoVotacion> loadVotacionResultadoPorPartido(
+  private Map<GrupoParlamentario, VotacionAgregada> loadVotacionResultadoPorPartido(
       Path path, Map<String, String> gruposParlamentarios) throws IOException {
     try (final var it =
         mapper
@@ -443,7 +446,7 @@ public class LoadDetallePlenosAndSave {
             .with(CsvSchema.emptySchema().withHeader())
             .<Map<String, String>>readValues(path.toFile())) {
       // grupo_parlamentario,numero_legal,presentes,ausentes,licencias,otros
-      var data = new HashMap<GrupoParlamentario, ResultadoVotacion>();
+      var data = new HashMap<GrupoParlamentario, VotacionAgregada>();
       while (it.hasNext()) {
         var v = it.next();
         var partido = v.get("grupo_parlamentario");
@@ -451,7 +454,7 @@ public class LoadDetallePlenosAndSave {
           if (gruposParlamentarios.containsKey(partido)) {
             data.put(
                 new GrupoParlamentario(partido, gruposParlamentarios.get(partido)),
-                new ResultadoVotacion(
+                new VotacionAgregada(
                     Integer.parseInt(v.get("si")),
                     Integer.parseInt(v.get("no")),
                     Integer.parseInt(v.get("abstenciones")),
@@ -467,7 +470,7 @@ public class LoadDetallePlenosAndSave {
     }
   }
 
-  private ResultadoAsistencia loadAsistenciaResultado(Path path) throws IOException {
+  private AsistenciaAgregada loadAsistenciaResultado(Path path) throws IOException {
     try (final var it =
         mapper
             .readerFor(Map.class)
@@ -479,7 +482,7 @@ public class LoadDetallePlenosAndSave {
         var v = it.next();
         t.put(v.get("resultado"), Integer.parseInt(v.get("total")));
       }
-      return new ResultadoAsistencia(
+      return new AsistenciaAgregada(
           t.get("presentes"),
           t.get("ausentes"),
           t.get("licencias"),
@@ -489,7 +492,7 @@ public class LoadDetallePlenosAndSave {
     }
   }
 
-  private ResultadoVotacion loadVotacionResultado(Path path) throws IOException {
+  private VotacionAgregada loadVotacionResultado(Path path) throws IOException {
     try (final var it =
         mapper
             .readerFor(Map.class)
@@ -501,7 +504,7 @@ public class LoadDetallePlenosAndSave {
         var v = it.next();
         t.put(v.get("resultado"), Integer.parseInt(v.get("total")));
       }
-      return new ResultadoVotacion(
+      return new VotacionAgregada(
           t.get("si"),
           t.get("no"),
           t.get("abstenciones"),

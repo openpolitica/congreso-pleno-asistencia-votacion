@@ -5,6 +5,7 @@ import static op.congreso.pleno.textract.TextractRegistroPleno.processLines;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import op.congreso.pleno.db.SaveRegistroPlenoToCsv;
 import op.congreso.pleno.textract.TextractRegistroPleno;
 
 public class RetryProcessRegistroPleno {

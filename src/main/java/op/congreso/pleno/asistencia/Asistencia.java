@@ -6,6 +6,12 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import op.congreso.pleno.Resultado;
 
+/**
+ * Posibles resultados de asistencia de un Congresista durante una Sesion.
+ *
+ * @see AsistenciaAgregada para ver los resultados agregados
+ * @see AsistenciaSesion para ver la sesion de asistencia
+ */
 public enum Asistencia implements Resultado {
   PRESENTE("PRE", "PRESENTES"),
   AUSENTE("AUS", "AUSENTES"),
@@ -20,7 +26,9 @@ public enum Asistencia implements Resultado {
   FALLECIDO("F", "FALLECIDOS"),
   FALTO("FA", "FALTO");
 
+  /** Siglas utilizadas en los documentos de sesion */
   final String codigo;
+  /** Descripcion del tipo de asistencia */
   final String descripcion;
 
   Asistencia(String codigo, String description) {
@@ -28,21 +36,21 @@ public enum Asistencia implements Resultado {
     this.descripcion = description;
   }
 
-  static final Map<String, Asistencia> map =
+  static final Map<String, Asistencia> all =
       Arrays.stream(Asistencia.values()).collect(Collectors.toMap(a -> a.codigo, a -> a));
 
   public static Asistencia of(String asistencia) {
-    var a1 = map.get(asistencia.toUpperCase().trim());
+    var a1 = all.get(asistencia.toUpperCase().trim());
     if (a1 != null) return a1;
     else return Asistencia.valueOf(asistencia);
   }
 
   public static boolean is(String text) {
-    return map.containsKey(text.toUpperCase().trim());
+    return all.containsKey(text.toUpperCase().trim());
   }
 
   public static boolean isDescripcion(String text) {
-    return map.values().stream()
+    return all.values().stream()
         .map(Asistencia::descripcion)
         .anyMatch(s -> s.equals(text.toUpperCase()));
   }

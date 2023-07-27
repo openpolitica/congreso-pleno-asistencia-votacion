@@ -1,14 +1,15 @@
 package op.congreso.pleno.asistencia;
 
-public record ResultadoAsistencia(
+/** Resultados de asistencia agregados por Sesion */
+public record AsistenciaAgregada(
     int presentes, int ausentes, int licencias, int suspendidos, int otros, int total) {
   public static Builder newBuilder() {
     return new Builder();
   }
 
-  public static ResultadoAsistencia create(
+  public static AsistenciaAgregada create(
       int presentes, int ausentes, int licencias, int suspendidos, int otros) {
-    return new ResultadoAsistencia(
+    return new AsistenciaAgregada(
         presentes,
         ausentes,
         licencias,
@@ -36,8 +37,8 @@ public record ResultadoAsistencia(
       }
     }
 
-    public ResultadoAsistencia build() {
-      return ResultadoAsistencia.create(presentes, ausentes, licencias, suspendidos, otros);
+    public AsistenciaAgregada build() {
+      return AsistenciaAgregada.create(presentes, ausentes, licencias, suspendidos, otros);
     }
 
     public Builder increase(Asistencia asistencia) {

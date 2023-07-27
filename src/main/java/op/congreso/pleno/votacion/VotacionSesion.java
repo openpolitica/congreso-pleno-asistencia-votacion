@@ -14,35 +14,31 @@ import op.congreso.pleno.Congresistas;
 import op.congreso.pleno.GrupoParlamentario;
 import op.congreso.pleno.Pleno;
 import op.congreso.pleno.ResultadoCongresista;
+import op.congreso.pleno.Sesion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public record RegistroVotacion(
-    Pleno pleno,
-    int quorum,
-    LocalDateTime fechaHora,
+/** Votacion durante sesion de pleno */
+public record VotacionSesion(
+    Sesion sesion,
     String presidente,
     String asunto,
     Map<String, String> etiquetas,
     List<ResultadoCongresista<Votacion>> votaciones,
-    Map<GrupoParlamentario, ResultadoVotacion> resultadosPorGrupo,
-    ResultadoVotacion resultados,
+    Map<GrupoParlamentario, VotacionAgregada> resultadosPorGrupo,
+    VotacionAgregada resultados,
     List<String> log) {
   public static Builder newBuilder() {
     return new Builder();
   }
 
   public String printMetadatosAsCsv() {
-    //
-    // asunto,"MOCIÓN 1486, QUE PROPONE LA CENSURA AL MINISTRO DE EDUCACIÓN, SEÑOR CARLOS ALFONSO
-    // GALLARDO GÓMEZ."
-    // presidente,"ALVA PRIETO, MARÍA DEL CARMEN"
     return ("metadato,valor\n"
         + "dia,"
-        + fechaHora.format(DateTimeFormatter.ISO_LOCAL_DATE)
+        + sesion.fechaHora().format(DateTimeFormatter.ISO_LOCAL_DATE)
         + "\n"
         + "hora,"
-        + fechaHora.format(DateTimeFormatter.ofPattern("HH:mm"))
+        + sesion.fechaHora().format(DateTimeFormatter.ofPattern("HH:mm"))
         + "\n"
         + "asunto,\""
         + asunto.replace("\"", "'")
@@ -51,7 +47,7 @@ public record RegistroVotacion(
         + presidente
         + "\"\n"
         + "quorum,"
-        + quorum);
+        + sesion.quorum());
   }
 
   public String printVotacionesAsCsv() {
@@ -132,10 +128,7 @@ public record RegistroVotacion(
         + resultados.licencias()
         + "\n"
         + "otros,"
-        + resultados
-            .otros()); //            "otros," + resultados.otros() //            "sin_responder," +
-    // resultados.sinResponder() + "\n" + //            "ausentes," +
-    // resultados.ausentes() + "\n" + // + "\n" +
+        + resultados.otros());
   }
 
   public String printEtiquetasAsCsv() {
@@ -159,8 +152,8 @@ public record RegistroVotacion(
     String presidente, asunto;
     Map<String, String> etiquetas = new HashMap<>();
     List<ResultadoCongresista<Votacion>> votaciones;
-    Map<GrupoParlamentario, ResultadoVotacion> resultadosPorGrupo;
-    ResultadoVotacion resultados;
+    Map<GrupoParlamentario, VotacionAgregada> resultadosPorGrupo;
+    VotacionAgregada resultados;
     Map<String, String> grupos = new HashMap<>();
     List<String> log = new ArrayList<>();
 
@@ -206,28 +199,28 @@ public record RegistroVotacion(
       return this;
     }
 
-    public Builder withResultados(ResultadoVotacion resultados) {
+    public Builder withResultados(VotacionAgregada resultados) {
       this.resultados = resultados;
       return this;
     }
 
     public Builder withResultadosPorPartido(
-        Map<GrupoParlamentario, ResultadoVotacion> resultadosPorPartido) {
+        Map<GrupoParlamentario, VotacionAgregada> resultadosPorPartido) {
       this.resultadosPorGrupo = resultadosPorPartido;
       return this;
     }
 
-    public ResultadoVotacion calculateResultados() {
-      var b = ResultadoVotacion.newBuilder();
+    public VotacionAgregada calculateResultados() {
+      var b = VotacionAgregada.newBuilder();
       for (var votacion : votaciones) {
         b.increase(votacion.resultado());
       }
       return b.build();
     }
 
-    public Map<GrupoParlamentario, ResultadoVotacion> calculateResultadosPorGrupoParlamentario(
+    public Map<GrupoParlamentario, VotacionAgregada> calculateResultadosPorGrupoParlamentario(
         Map<String, String> grupos) {
-      var results = new HashMap<GrupoParlamentario, ResultadoVotacion.Builder>();
+      var results = new HashMap<GrupoParlamentario, VotacionAgregada.Builder>();
       for (var votacion : votaciones) {
         var grupoParlamentario =
             new GrupoParlamentario(
@@ -235,8 +228,7 @@ public record RegistroVotacion(
         results.computeIfPresent(
             grupoParlamentario, (gp, resultado) -> resultado.increase(votacion.resultado()));
         results.computeIfAbsent(
-            grupoParlamentario,
-            gp -> ResultadoVotacion.newBuilder().increase(votacion.resultado()));
+            grupoParlamentario, gp -> VotacionAgregada.newBuilder().increase(votacion.resultado()));
       }
       return results.keySet().stream()
           .collect(Collectors.toMap(k -> k, k -> results.get(k).build()));
@@ -264,7 +256,7 @@ public record RegistroVotacion(
       }
     }
 
-    public RegistroVotacion build() {
+    public VotacionSesion build() {
       var calcResultsPerGroup = calculateResultadosPorGrupoParlamentario(grupos);
       var calcResults = calculateResultados();
       if (!calcResultsPerGroup.equals(resultadosPorGrupo)) {
@@ -280,10 +272,8 @@ public record RegistroVotacion(
       }
       checkResultsMatch(resultados, resultadosPorGrupo);
       checkCongresistas();
-      return new RegistroVotacion(
-          pleno,
-          quorum,
-          fechaHora,
+      return new VotacionSesion(
+          new Sesion(pleno, quorum, fechaHora),
           presidente,
           asunto,
           etiquetas,
@@ -294,8 +284,7 @@ public record RegistroVotacion(
     }
 
     private void checkResultsMatch(
-        ResultadoVotacion resultados,
-        Map<GrupoParlamentario, ResultadoVotacion> resultadosPorGrupo) {
+        VotacionAgregada resultados, Map<GrupoParlamentario, VotacionAgregada> resultadosPorGrupo) {
       var si = 0;
       var no = 0;
       var abstenciones = 0;

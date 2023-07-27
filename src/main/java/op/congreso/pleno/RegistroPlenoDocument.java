@@ -17,7 +17,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
-import op.congreso.pleno.app.SaveRegistroPlenoToCsv;
+import op.congreso.pleno.db.SaveRegistroPlenoToCsv;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.jsoup.Jsoup;
 import org.slf4j.Logger;
@@ -33,7 +33,6 @@ public record RegistroPlenoDocument(
     boolean provisional) {
   static final Logger LOG = LoggerFactory.getLogger(RegistroPlenoDocument.class);
   static Pattern periodoPattern = Pattern.compile("\\d\\d\\d\\d ?- ?\\d\\d\\d\\d$");
-  private static final ObjectMapper jsonMapper = new ObjectMapper();
 
   public static StringBuilder csvHeader() {
     return new StringBuilder(
@@ -110,8 +109,7 @@ public record RegistroPlenoDocument(
     try (PDDocument doc = PDDocument.load(Path.of(path()).toFile())) {
       return doc.getNumberOfPages();
     } catch (Exception | NoClassDefFoundError e) {
-      System.out.println("ERROR with path: " + path());
-      e.printStackTrace();
+      LOG.error("ERROR with path: {}", path(), e);
       return -1;
     }
   }
@@ -127,7 +125,7 @@ public record RegistroPlenoDocument(
       }
       LOG.info("PDF downloaded: {}", path);
     } catch (IOException e) {
-      e.printStackTrace();
+      LOG.error("Error downloading {}", path(), e);
     }
   }
 

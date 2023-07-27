@@ -18,11 +18,8 @@ prepare:
 carga_plenos:
 	./mvnw clean compile exec:java -Dexec.mainClass="op.congreso.pleno.app.LoadDetallePlenosAndSave" -T1C
 
-extraer_csv:
-	./mvnw clean compile exec:java -Dexec.mainClass="op.congreso.pleno.util.ExtraeCsvs" -Dexec.args="${HOME}/Downloads/"
-
 registro_plenos:
-	./mvnw exec:java -Dexec.mainClass="op.congreso.pleno.app.LoadRegitroPlenoDocuments"
+	./mvnw exec:java -Dexec.mainClass="op.congreso.pleno.app.LoadRegistroPlenoDocuments"
 
 serve:
 	datasette *.db

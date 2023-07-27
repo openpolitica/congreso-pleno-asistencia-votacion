@@ -1,7 +1,6 @@
 package op.congreso.pleno;
 
-import static op.congreso.pleno.Constantes.DATA;
-import static op.congreso.pleno.Constantes.PERIODO;
+import static op.congreso.pleno.Constantes.DATA_PERIODO_ACTUAL;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -11,6 +10,7 @@ import java.util.stream.Collectors;
 import me.xdrop.fuzzywuzzy.FuzzySearch;
 import me.xdrop.fuzzywuzzy.model.ExtractedResult;
 
+/** Grupos parlamentarios del actual periodo */
 public record GrupoParlamentario(String nombre, String descripcion) {
   public static final Set<String> VALID_GP;
 
@@ -48,7 +48,7 @@ public record GrupoParlamentario(String nombre, String descripcion) {
   }
 
   public static Map<String, String> all() throws IOException {
-    return Files.readAllLines(DATA.resolve(PERIODO).resolve("grupos_parlamentarios.csv")).stream()
+    return Files.readAllLines(DATA_PERIODO_ACTUAL.resolve("grupos_parlamentarios.csv")).stream()
         .dropWhile(s -> s.startsWith("grupo_parlamentario"))
         .map(a -> a.split(","))
         .filter(a -> a.length == 2)

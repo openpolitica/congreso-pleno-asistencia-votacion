@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+/** Pleno del congreso */
 public record Pleno(
     Periodo periodo,
     String titulo,

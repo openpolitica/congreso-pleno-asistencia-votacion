@@ -14,23 +14,21 @@ import op.congreso.pleno.Congresistas;
 import op.congreso.pleno.GrupoParlamentario;
 import op.congreso.pleno.Pleno;
 import op.congreso.pleno.ResultadoCongresista;
+import op.congreso.pleno.Sesion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public record RegistroAsistencia(
-    Pleno pleno,
-    int quorum,
-    LocalDateTime fechaHora,
+public record AsistenciaSesion(
+    Sesion sesion,
     List<ResultadoCongresista<Asistencia>> asistencias,
-    Map<GrupoParlamentario, ResultadoAsistencia> resultadosPorGrupo,
-    ResultadoAsistencia resultados,
+    Map<GrupoParlamentario, AsistenciaAgregada> resultadosPorGrupo,
+    AsistenciaAgregada resultados,
     List<String> log) {
   public static Builder newBuilder() {
     return new Builder();
   }
 
   public String printAsistenciasAsCsv() {
-    // ignore numero column
     return ("grupo_parlamentario,congresista,asistencia\n"
         + asistencias.stream()
             .sorted(Comparator.comparing(ResultadoCongresista::congresista))
@@ -38,18 +36,6 @@ public record RegistroAsistencia(
                 a ->
                     a.grupoParlamentario() + ",\"" + a.congresista() + "\"," + a.resultado().name())
             .collect(Collectors.joining("\n")));
-  }
-
-  public String printMetadatosAsCsv() {
-    return ("metadato,valor\n"
-        + "dia,"
-        + fechaHora.format(DateTimeFormatter.ISO_LOCAL_DATE)
-        + "\n"
-        + "hora,"
-        + fechaHora.format(DateTimeFormatter.ofPattern("HH:mm"))
-        + "\n"
-        + "quorum,"
-        + quorum);
   }
 
   public String printResultadosAsCsv() {
@@ -139,8 +125,8 @@ public record RegistroAsistencia(
     int quorum;
     LocalDateTime fechaHora;
     List<ResultadoCongresista<Asistencia>> asistencias;
-    Map<GrupoParlamentario, ResultadoAsistencia> resultadosPorGrupo;
-    ResultadoAsistencia resultados;
+    Map<GrupoParlamentario, AsistenciaAgregada> resultadosPorGrupo;
+    AsistenciaAgregada resultados;
     Map<String, String> grupos = new HashMap<>();
     List<String> log = new ArrayList<>();
 
@@ -172,17 +158,17 @@ public record RegistroAsistencia(
       return this;
     }
 
-    public ResultadoAsistencia calculateResultados() {
-      var b = ResultadoAsistencia.newBuilder();
+    public AsistenciaAgregada calculateResultados() {
+      var b = AsistenciaAgregada.newBuilder();
       for (var asistencia : asistencias) {
         b.increase(asistencia.resultado());
       }
       return b.build();
     }
 
-    public Map<GrupoParlamentario, ResultadoAsistencia> calculateResultadosPorGrupoParlamentario(
+    public Map<GrupoParlamentario, AsistenciaAgregada> calculateResultadosPorGrupoParlamentario(
         Map<String, String> grupos) {
-      var results = new HashMap<GrupoParlamentario, ResultadoAsistencia.Builder>();
+      var results = new HashMap<GrupoParlamentario, AsistenciaAgregada.Builder>();
       for (var asistencia : asistencias) {
         var grupoParlamentario =
             new GrupoParlamentario(
@@ -192,19 +178,19 @@ public record RegistroAsistencia(
             (gp, resultadoAsistencia) -> resultadoAsistencia.increase(asistencia.resultado()));
         results.computeIfAbsent(
             grupoParlamentario,
-            gp -> ResultadoAsistencia.newBuilder().increase(asistencia.resultado()));
+            gp -> AsistenciaAgregada.newBuilder().increase(asistencia.resultado()));
       }
       return results.keySet().stream()
           .collect(Collectors.toMap(k -> k, k -> results.get(k).build()));
     }
 
-    public Builder withResultados(ResultadoAsistencia resultados) {
+    public Builder withResultados(AsistenciaAgregada resultados) {
       this.resultados = resultados;
       return this;
     }
 
     public Builder withResultadosPorPartido(
-        Map<GrupoParlamentario, ResultadoAsistencia> resultadosPorPartido) {
+        Map<GrupoParlamentario, AsistenciaAgregada> resultadosPorPartido) {
       this.resultadosPorGrupo = resultadosPorPartido;
       return this;
     }
@@ -231,7 +217,7 @@ public record RegistroAsistencia(
       }
     }
 
-    public RegistroAsistencia build() {
+    public AsistenciaSesion build() {
       var calcResultsPerGroup = calculateResultadosPorGrupoParlamentario(grupos);
       var calcResults = calculateResultados();
       if (!calcResultsPerGroup.equals(resultadosPorGrupo)) {
@@ -247,13 +233,13 @@ public record RegistroAsistencia(
       }
       checkResultsMatch(resultados, resultadosPorGrupo);
       checkCongresistas();
-      return new RegistroAsistencia(
-          pleno, quorum, fechaHora, asistencias, resultadosPorGrupo, resultados, log);
+      return new AsistenciaSesion(
+          new Sesion(pleno, quorum, fechaHora), asistencias, resultadosPorGrupo, resultados, log);
     }
 
     private void checkResultsMatch(
-        ResultadoAsistencia resultados,
-        Map<GrupoParlamentario, ResultadoAsistencia> resultadosPorGrupo) {
+        AsistenciaAgregada resultados,
+        Map<GrupoParlamentario, AsistenciaAgregada> resultadosPorGrupo) {
       var presentes = 0;
       var ausentes = 0;
       var otros = 0;

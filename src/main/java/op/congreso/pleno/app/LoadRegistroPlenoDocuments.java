@@ -1,5 +1,8 @@
 package op.congreso.pleno.app;
 
+import static op.congreso.pleno.Constantes.PERIODO_ACTUAL;
+import static op.congreso.pleno.RegistroPlenoDocument.collect;
+import static op.congreso.pleno.RegistroPlenoDocument.collectPleno;
 import static op.congreso.pleno.RegistroPlenoDocument.csvHeader;
 
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
@@ -15,10 +18,9 @@ import op.congreso.pleno.RegistroPlenoDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ProcessRegitroPlenoDocuments {
+public class LoadRegistroPlenoDocuments {
 
-  static final Logger LOG = LoggerFactory.getLogger(ProcessRegitroPlenoDocuments.class);
-  public static final String CURRENT = "2021-2026";
+  static final Logger LOG = LoggerFactory.getLogger(LoadRegistroPlenoDocuments.class);
 
   public static void main(String[] args) throws IOException {
     LOG.info("Load existing plenos");
@@ -35,29 +37,38 @@ public class ProcessRegitroPlenoDocuments {
       while (it.hasNext()) {
         var v = it.next();
         var pleno = RegistroPlenoDocument.parse(v);
-        if (pleno.periodo().periodoParlamentario().equals(CURRENT)) existing.put(pleno.id(), pleno);
+        if (pleno.periodo().periodoParlamentario().equals(PERIODO_ACTUAL))
+          existing.put(pleno.id(), pleno);
       }
     }
+    LOG.info("Starting to collect plenos");
+    var root = collect("/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/new_asistenciavotacion", 5);
 
-    boolean extractPleno = true; // opt-out to do this manually yet
+    var plenos = new HashSet<RegistroPlenoDocument>();
 
-    var updated = new HashSet<RegistroPlenoDocument>();
-    for (var p : existing.values()) {
-      var pleno = existing.getOrDefault(p.id(), p);
-      if (
-      //        pleno.fecha().equals("2022-07-07")
-      !pleno.provisional()
-          && pleno.paginas() < 1
-          && pleno.periodo().periodoParlamentario().equals(CURRENT)) {
-        if (extractPleno) {
-          LOG.info("Extracting Pleno: {}", pleno.fecha());
-          Files.writeString(Path.of("pr-title.txt"), pleno.prTitle());
-          Files.writeString(Path.of("pr-branch.txt"), pleno.prBranchName());
-          Files.writeString(Path.of("pr-content.txt"), pleno.prContent());
-          pleno = pleno.extract();
-          extractPleno = false;
+    for (var periodos : root.entrySet()) {
+      LOG.debug("Periodo: {}", periodos.getKey());
+      var year = collect(periodos.getValue(), 4);
+      for (var anual : year.entrySet()) {
+        LOG.debug("Periodo Anual: {}", anual.getKey());
+        var periodo = collect(anual.getValue(), 3);
+        for (var legislatura : periodo.entrySet()) {
+          LOG.debug("Legislatura: {}", legislatura.getKey());
+
+          var p =
+              collectPleno(
+                  periodos.getKey(), anual.getKey(), legislatura.getKey(), legislatura.getValue());
+          p.values().stream()
+              .filter(p1 -> p1.periodo().periodoParlamentario().equals("2021-2026"))
+              .forEach(plenos::add);
         }
       }
+    }
+    LOG.info("Plenos collected: {}", plenos.size());
+
+    var updated = new HashSet<RegistroPlenoDocument>();
+    for (var p : plenos) {
+      var pleno = existing.getOrDefault(p.id(), p);
       updated.add(pleno);
     }
 

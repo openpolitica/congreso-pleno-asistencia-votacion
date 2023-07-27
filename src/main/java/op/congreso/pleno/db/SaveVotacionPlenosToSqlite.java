@@ -1,4 +1,4 @@
-package op.congreso.pleno.app;
+package op.congreso.pleno.db;
 
 import static op.congreso.pleno.Constantes.*;
 
@@ -9,11 +9,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
-import op.congreso.pleno.votacion.RegistroVotacion;
+import op.congreso.pleno.votacion.VotacionSesion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SaveVotacionPlenosToSqlite implements Consumer<Set<RegistroVotacion>> {
+public class SaveVotacionPlenosToSqlite implements Consumer<Set<VotacionSesion>> {
 
   static final Logger LOG = LoggerFactory.getLogger(SaveVotacionPlenosToSqlite.class);
   static final ObjectMapper jsonMapper = new ObjectMapper();
@@ -28,8 +28,8 @@ public class SaveVotacionPlenosToSqlite implements Consumer<Set<RegistroVotacion
           new VotacionResultadoLoad());
 
   @Override
-  public void accept(Set<RegistroVotacion> votaciones) {
-    var jdbcUrl = "jdbc:sqlite:%s-asistencias-votaciones.db".formatted(PERIODO);
+  public void accept(Set<VotacionSesion> votaciones) {
+    var jdbcUrl = "jdbc:sqlite:%s-asistencias-votaciones.db".formatted(PERIODO_ACTUAL);
     try (var connection = DriverManager.getConnection(jdbcUrl)) {
       var statement = connection.createStatement();
       statement.executeUpdate("pragma journal_mode = WAL");
@@ -60,7 +60,7 @@ public class SaveVotacionPlenosToSqlite implements Consumer<Set<RegistroVotacion
       statement.executeUpdate("pragma vacuum;");
       statement.executeUpdate("pragma optimize;");
     } catch (Exception e) {
-      e.printStackTrace();
+      LOG.error("Error saving to db", e);
     }
   }
 
@@ -83,7 +83,7 @@ public class SaveVotacionPlenosToSqlite implements Consumer<Set<RegistroVotacion
 
     abstract String prepareStatement();
 
-    abstract void addBatch(PreparedStatement ps, RegistroVotacion pl) throws Exception;
+    abstract void addBatch(PreparedStatement ps, VotacionSesion pl) throws Exception;
   }
 
   static class VotacionResultadoLoad extends TableLoad {
@@ -135,19 +135,19 @@ public class SaveVotacionPlenosToSqlite implements Consumer<Set<RegistroVotacion
     }
 
     @Override
-    void addBatch(PreparedStatement ps, RegistroVotacion r) throws Exception {
-      ps.setString(1, r.pleno().id());
-      ps.setString(2, r.pleno().periodo().periodoParlamentario());
-      ps.setString(3, r.pleno().periodo().periodoAnual());
-      ps.setString(4, r.pleno().periodo().legislatura());
-      ps.setString(5, r.pleno().fecha().format(DateTimeFormatter.ofPattern(YYYY_MM_DD)));
-      ps.setString(6, r.fechaHora().format(DateTimeFormatter.ofPattern(HH_MM)));
+    void addBatch(PreparedStatement ps, VotacionSesion r) throws Exception {
+      ps.setString(1, r.sesion().pleno().id());
+      ps.setString(2, r.sesion().pleno().periodo().periodoParlamentario());
+      ps.setString(3, r.sesion().pleno().periodo().periodoAnual());
+      ps.setString(4, r.sesion().pleno().periodo().legislatura());
+      ps.setString(5, r.sesion().pleno().fecha().format(DateTimeFormatter.ofPattern(YYYY_MM_DD)));
+      ps.setString(6, r.sesion().fechaHora().format(DateTimeFormatter.ofPattern(HH_MM)));
 
       ps.setString(7, r.asunto());
       ps.setString(8, r.presidente());
       ps.setString(9, jsonMapper.writeValueAsString(r.etiquetas()));
 
-      ps.setInt(10, r.quorum());
+      ps.setInt(10, r.sesion().quorum());
       ps.setInt(11, r.resultados().si());
       ps.setInt(12, r.resultados().no());
       ps.setInt(13, r.resultados().abstenciones());
@@ -212,14 +212,14 @@ public class SaveVotacionPlenosToSqlite implements Consumer<Set<RegistroVotacion
     }
 
     @Override
-    void addBatch(PreparedStatement ps, RegistroVotacion r) throws Exception {
+    void addBatch(PreparedStatement ps, VotacionSesion r) throws Exception {
       for (var a : r.resultadosPorGrupo().entrySet()) {
-        ps.setString(1, r.pleno().id());
-        ps.setString(2, r.pleno().periodo().periodoParlamentario());
-        ps.setString(3, r.pleno().periodo().periodoAnual());
-        ps.setString(4, r.pleno().periodo().legislatura());
-        ps.setString(5, r.pleno().fecha().format(DateTimeFormatter.ofPattern(YYYY_MM_DD)));
-        ps.setString(6, r.fechaHora().format(DateTimeFormatter.ofPattern(HH_MM)));
+        ps.setString(1, r.sesion().pleno().id());
+        ps.setString(2, r.sesion().pleno().periodo().periodoParlamentario());
+        ps.setString(3, r.sesion().pleno().periodo().periodoAnual());
+        ps.setString(4, r.sesion().pleno().periodo().legislatura());
+        ps.setString(5, r.sesion().pleno().fecha().format(DateTimeFormatter.ofPattern(YYYY_MM_DD)));
+        ps.setString(6, r.sesion().fechaHora().format(DateTimeFormatter.ofPattern(HH_MM)));
         ps.setString(7, r.asunto());
         ps.setString(8, r.presidente());
         ps.setString(9, jsonMapper.writeValueAsString(r.etiquetas()));
@@ -296,27 +296,27 @@ public class SaveVotacionPlenosToSqlite implements Consumer<Set<RegistroVotacion
     }
 
     @Override
-    void addBatch(PreparedStatement ps, RegistroVotacion r) throws Exception {
+    void addBatch(PreparedStatement ps, VotacionSesion r) throws Exception {
       for (var v : r.votaciones()) {
-        ps.setString(1, r.pleno().id());
-        ps.setString(2, r.pleno().periodo().periodoParlamentario());
-        ps.setString(3, r.pleno().periodo().periodoAnual());
-        ps.setString(4, r.pleno().periodo().legislatura());
-        ps.setString(5, r.pleno().fecha().format(DateTimeFormatter.ofPattern(YYYY_MM_DD)));
-        ps.setString(6, r.fechaHora().format(DateTimeFormatter.ofPattern(HH_MM)));
+        ps.setString(1, r.sesion().pleno().id());
+        ps.setString(2, r.sesion().pleno().periodo().periodoParlamentario());
+        ps.setString(3, r.sesion().pleno().periodo().periodoAnual());
+        ps.setString(4, r.sesion().pleno().periodo().legislatura());
+        ps.setString(5, r.sesion().pleno().fecha().format(DateTimeFormatter.ofPattern(YYYY_MM_DD)));
+        ps.setString(6, r.sesion().fechaHora().format(DateTimeFormatter.ofPattern(HH_MM)));
         ps.setString(7, r.asunto());
         ps.setString(8, r.presidente());
         ps.setString(9, jsonMapper.writeValueAsString(r.etiquetas()));
 
         ps.setString(10, v.congresista());
         ps.setString(11, v.grupoParlamentario());
-        String gp = r.pleno().gruposParlamentarios().get(v.grupoParlamentario());
+        String gp = r.sesion().pleno().gruposParlamentarios().get(v.grupoParlamentario());
         if (gp == null) {
           throw new IllegalStateException(
               "null grupo descripcion for "
                   + v.grupoParlamentario()
                   + " at "
-                  + r.pleno().gruposParlamentarios());
+                  + r.sesion().pleno().gruposParlamentarios());
         }
         ps.setString(12, gp);
 
