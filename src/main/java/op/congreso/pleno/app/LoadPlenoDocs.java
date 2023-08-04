@@ -1,33 +1,39 @@
 package op.congreso.pleno.app;
 
-import static op.congreso.pleno.Constantes.PERIODO_ACTUAL;
-import static op.congreso.pleno.RegistroPlenoDocument.collect;
-import static op.congreso.pleno.RegistroPlenoDocument.collectPleno;
-import static op.congreso.pleno.RegistroPlenoDocument.csvHeader;
+import static op.congreso.pleno.DocumentoPleno.collect;
+import static op.congreso.pleno.DocumentoPleno.collectPleno;
+import static op.congreso.pleno.DocumentoPleno.csvHeader;
+import static op.congreso.pleno.Rutas.DATA_PERIODO_ACTUAL;
+import static op.congreso.pleno.Rutas.PERIODO_ACTUAL;
 
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import op.congreso.pleno.RegistroPlenoDocument;
+import op.congreso.pleno.DocumentoPleno;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class LoadRegistroPlenoDocuments {
+/**
+ * Carga documentos de plenos desde la pagina del congreso y guarda resultados en CSV. Registro de
+ * documentos de plenos son el paso inicial para procesar los PDF.
+ *
+ * @see ProcessDocumentoPleno
+ */
+public class LoadPlenoDocs {
 
-  static final Logger LOG = LoggerFactory.getLogger(LoadRegistroPlenoDocuments.class);
+  static final Logger LOG = LoggerFactory.getLogger(LoadPlenoDocs.class);
 
   public static void main(String[] args) throws IOException {
     LOG.info("Load existing plenos");
     var mapper = new CsvMapper();
-    var plenosCsvPath = Path.of("plenos.csv");
+    var plenosCsvPath = DATA_PERIODO_ACTUAL.resolve("plenos.csv");
 
-    var existing = new HashMap<String, RegistroPlenoDocument>();
+    var existing = new HashMap<String, DocumentoPleno>();
 
     try (final var it =
         mapper
@@ -36,7 +42,7 @@ public class LoadRegistroPlenoDocuments {
             .<Map<String, String>>readValues(plenosCsvPath.toFile())) {
       while (it.hasNext()) {
         var v = it.next();
-        var pleno = RegistroPlenoDocument.parse(v);
+        var pleno = DocumentoPleno.parse(v);
         if (pleno.periodo().periodoParlamentario().equals(PERIODO_ACTUAL))
           existing.put(pleno.id(), pleno);
       }
@@ -44,7 +50,7 @@ public class LoadRegistroPlenoDocuments {
     LOG.info("Starting to collect plenos");
     var root = collect("/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/new_asistenciavotacion", 5);
 
-    var plenos = new HashSet<RegistroPlenoDocument>();
+    var plenos = new HashSet<DocumentoPleno>();
 
     for (var periodos : root.entrySet()) {
       LOG.debug("Periodo: {}", periodos.getKey());
@@ -66,16 +72,14 @@ public class LoadRegistroPlenoDocuments {
     }
     LOG.info("Plenos collected: {}", plenos.size());
 
-    var updated = new HashSet<RegistroPlenoDocument>();
+    var updated = new HashSet<DocumentoPleno>();
     for (var p : plenos) {
       var pleno = existing.getOrDefault(p.id(), p);
       updated.add(pleno);
     }
 
     var registroPlenos =
-        updated.stream()
-            .sorted(Comparator.comparing(RegistroPlenoDocument::id).reversed())
-            .toList();
+        updated.stream().sorted(Comparator.comparing(DocumentoPleno::id).reversed()).toList();
 
     LOG.info("Writing CSV to file");
     var content = csvHeader();

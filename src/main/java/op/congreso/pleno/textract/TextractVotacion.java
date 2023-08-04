@@ -1,6 +1,6 @@
 package op.congreso.pleno.textract;
 
-import static op.congreso.pleno.Constantes.FECHA_HORA_PATTERN;
+import static op.congreso.pleno.Rutas.FECHA_HORA_PATTERN;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -23,7 +23,7 @@ public class TextractVotacion {
 
   public static Logger LOG = LoggerFactory.getLogger(TextractVotacion.class);
 
-  //  public static final Pattern VOTACION_GROUP = Pattern.compile("(\\w+)");
+  public static final String VOTACION = "VOTACIÓN:";
 
   public static void main(String[] args) throws IOException {
     try {
@@ -86,7 +86,7 @@ public class TextractVotacion {
     var resultadosGrupos = new HashMap<GrupoParlamentario, VotacionAgregada>();
 
     int i = 0;
-    LocalDateTime fechaHora = null;
+    LocalDateTime fechaHora;
 
     var current = ResultadoCongresista.<Votacion>newBuilder();
 

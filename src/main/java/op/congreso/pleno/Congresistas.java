@@ -1,6 +1,6 @@
 package op.congreso.pleno;
 
-import static op.congreso.pleno.Constantes.DATA_PERIODO_ACTUAL;
+import static op.congreso.pleno.Rutas.DATA_PERIODO_ACTUAL;
 
 import java.io.IOException;
 import java.nio.file.Files;

@@ -1,7 +1,7 @@
 package op.congreso.pleno.textract;
 
 import static java.util.Locale.UK;
-import static op.congreso.pleno.Constantes.FECHA_HORA_PATTERN;
+import static op.congreso.pleno.Rutas.FECHA_HORA_PATTERN;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import op.congreso.pleno.Constantes;
 import op.congreso.pleno.GrupoParlamentario;
 import op.congreso.pleno.Pleno;
 import op.congreso.pleno.ResultadoCongresista;
@@ -26,8 +25,7 @@ import org.slf4j.LoggerFactory;
 public class TextractAsistencia {
 
   public static Logger LOG = LoggerFactory.getLogger(TextractAsistencia.class);
-
-  //  public static final Pattern ASISTENCIA_GROUP = Pattern.compile("(\\w+)");
+  public static final String ASISTENCIA = "ASISTENCIA:";
 
   public static void main(String[] args) throws IOException {
     try {
@@ -91,12 +89,7 @@ public class TextractAsistencia {
     var resultadosGrupos = new HashMap<GrupoParlamentario, AsistenciaAgregada>();
 
     int i = 0;
-    int errors = 0;
-    var titulo = "";
-    var type = "";
-    LocalDateTime fechaHora = null;
-    boolean headersReady = false;
-    var previous = "";
+    LocalDateTime fechaHora;
 
     var current = ResultadoCongresista.<Asistencia>newBuilder();
     var congresistasCompletados = false;
@@ -106,19 +99,17 @@ public class TextractAsistencia {
       try {
         if (i < 4) { // Process headers metadata
           switch (i) {
-            case 0 -> titulo = text;
+            case 0 -> {}
             case 1 -> plenoBuilder.withLegislatura(text);
             case 2 -> plenoBuilder.withTitulo(text);
             case 3 -> {
-              if (text.equals(Constantes.ASISTENCIA)) {
-                type = text;
+              if (text.equals(ASISTENCIA)) {
                 i++;
                 fechaHora = LocalDateTime.parse(lines.get(i).toLowerCase(), FECHA_HORA_PATTERN);
                 registroBuilder.withFechaHora(fechaHora);
                 plenoBuilder.withFecha(fechaHora.toLocalDate());
-              } else if (text.startsWith(Constantes.ASISTENCIA)) {
-                type = Constantes.ASISTENCIA;
-                var fechaText = text.substring(Constantes.ASISTENCIA.length() + 1);
+              } else if (text.startsWith(ASISTENCIA)) {
+                var fechaText = text.substring(ASISTENCIA.length() + 1);
                 fechaHora = LocalDateTime.parse(fechaText.toLowerCase(UK), FECHA_HORA_PATTERN);
                 registroBuilder.withFechaHora(fechaHora);
                 plenoBuilder.withFecha(fechaHora.toLocalDate());

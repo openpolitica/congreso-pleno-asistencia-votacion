@@ -1,6 +1,6 @@
 package op.congreso.pleno;
 
-import static op.congreso.pleno.Constantes.DATA_PERIODO_ACTUAL;
+import static op.congreso.pleno.Rutas.DATA_PERIODO_ACTUAL;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -40,11 +40,6 @@ public record GrupoParlamentario(String nombre, String descripcion) {
 
   private static boolean similar(String gp, ExtractedResult result) {
     return (result.getScore() >= 50 && Math.abs(result.getString().length() - gp.length()) < 4);
-  }
-
-  public static void main(String[] args) {
-    System.out.println(isSimilar("EP"));
-    System.out.println(findSimilar("PIS"));
   }
 
   public static Map<String, String> all() throws IOException {

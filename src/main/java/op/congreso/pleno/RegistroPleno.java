@@ -20,7 +20,7 @@ public record RegistroPleno(
     Map<LocalDateTime, VotacionSesion> votaciones,
     int potentialErrors,
     List<String> comments) {
-  public static Builder newBuilder(RegistroPlenoDocument document) {
+  public static Builder newBuilder(DocumentoPleno document) {
     return new Builder(document);
   }
 
@@ -80,7 +80,7 @@ public record RegistroPleno(
     int potentialErrors = 0;
     List<String> comments = new ArrayList<>();
 
-    public Builder(RegistroPlenoDocument document) {
+    public Builder(DocumentoPleno document) {
       this.periodoParlamentario = document.periodo().periodoParlamentario();
       this.periodoAnual = document.periodo().periodoAnual();
       this.legislatura = document.periodo().legislatura();

@@ -29,7 +29,7 @@ public class SaveRegistroPlenoToCsv {
               a.sesion().fechaHora().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH-mm"))
                   + "-asistencia");
       Files.createDirectories(asistenciaDir);
-      Files.writeString(asistenciaDir.resolve("metadatos.csv"), a.sesion().printMetadatosAsCsv());
+      Files.writeString(asistenciaDir.resolve("metadatos.csv"), a.printMetadatosAsCsv());
       Files.writeString(asistenciaDir.resolve("asistencias.csv"), a.printAsistenciasAsCsv());
       Files.writeString(
           asistenciaDir.resolve("resultados_grupo.csv"), a.printResultadosPorGrupoAsCsv());

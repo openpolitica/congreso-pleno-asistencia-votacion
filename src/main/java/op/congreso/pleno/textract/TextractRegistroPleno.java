@@ -1,5 +1,8 @@
 package op.congreso.pleno.textract;
 
+import static op.congreso.pleno.textract.TextractAsistencia.ASISTENCIA;
+import static op.congreso.pleno.textract.TextractVotacion.VOTACION;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -10,9 +13,8 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import op.congreso.pleno.Constantes;
+import op.congreso.pleno.DocumentoPleno;
 import op.congreso.pleno.RegistroPleno;
-import op.congreso.pleno.RegistroPlenoDocument;
 import op.congreso.pleno.asistencia.AsistenciaSesion;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.ImageType;
@@ -107,7 +109,7 @@ public class TextractRegistroPleno {
     }
   }
 
-  public static RegistroPlenoDocument plenoToRetry(Path base) throws IOException {
+  public static DocumentoPleno plenoToRetry(Path base) throws IOException {
     try (final var paths = Files.list(base)) {
       return paths
           .flatMap(listDir()) // pp
@@ -123,7 +125,7 @@ public class TextractRegistroPleno {
                   throw new RuntimeException(e);
                 }
               })
-          .map(RegistroPlenoDocument::parseJson)
+          .map(DocumentoPleno::parseJson)
           .orElse(null);
     }
   }
@@ -160,8 +162,7 @@ public class TextractRegistroPleno {
     };
   }
 
-  public static RegistroPleno processLines(
-      RegistroPlenoDocument document, Map<Path, List<String>> list) {
+  public static RegistroPleno processLines(DocumentoPleno document, Map<Path, List<String>> list) {
     var builder = RegistroPleno.newBuilder(document);
     AsistenciaSesion latestAsistencia = null;
     var errors = 0;
@@ -170,12 +171,11 @@ public class TextractRegistroPleno {
       LOG.info("Processing page: {}", key);
       try {
         var lines = list.get(key);
-        if (lines.contains(Constantes.ASISTENCIA)
-            || lines.get(3).startsWith(Constantes.ASISTENCIA)) {
+        if (lines.contains(ASISTENCIA) || lines.get(3).startsWith(ASISTENCIA)) {
           var asistencia = TextractAsistencia.load(lines);
           builder.addAsistencia(asistencia);
           latestAsistencia = asistencia;
-        } else if (lines.contains(Constantes.VOTACION)) {
+        } else if (lines.contains(VOTACION)) {
           var quorum = -1;
           if (latestAsistencia != null) {
             // TODO potential error

@@ -1,6 +1,6 @@
 package op.congreso.pleno.db;
 
-import static op.congreso.pleno.Constantes.*;
+import static op.congreso.pleno.Rutas.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.sql.DriverManager;

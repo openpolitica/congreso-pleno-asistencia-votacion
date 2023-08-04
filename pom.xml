@@ -99,6 +99,18 @@
             <artifactId>pdfbox-tools</artifactId>
             <version>2.0.26</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.9.3</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>3.24.2</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -124,29 +136,39 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>3.1.0</version>
-                <configuration>
-                    <mainClass>op.congreso.pleno.app.LoadDetallePlenosAndSave</mainClass>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>load-docs</id>
-                        <configuration>
-                            <mainClass>op.congreso.pleno.app.LoadRegistroPlenoDocuments</mainClass>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>load-detalle-and-save</id>
-                        <configuration>
-                            <mainClass>op.congreso.pleno.app.LoadDetallePlenosAndSave</mainClass>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
 
+    <profiles>
+        <profile>
+            <!-- Secuencia requerida por https://github.com/openpolitica/open-tracker-devops -->
+            <id>tracker</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>3.1.0</version>
+                        <configuration>
+                            <mainClass>op.congreso.pleno.app.ProcessRegistroPlenos</mainClass>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>load-docs</id>
+                                <configuration>
+                                    <mainClass>op.congreso.pleno.app.LoadPlenoDocs</mainClass>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>load-detalle-and-save</id>
+                                <configuration>
+                                    <mainClass>op.congreso.pleno.app.ProcessRegistroPlenos</mainClass>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

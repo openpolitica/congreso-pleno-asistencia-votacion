@@ -1,6 +1,6 @@
 package op.congreso.pleno.db;
 
-import static op.congreso.pleno.Constantes.PERIODO_ACTUAL;
+import static op.congreso.pleno.Rutas.PERIODO_ACTUAL;
 
 import java.io.IOException;
 import java.sql.DriverManager;

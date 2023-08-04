@@ -31,13 +31,14 @@ import op.congreso.pleno.votacion.VotacionSesion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class LoadDetallePlenosAndSave {
+/** Carga registros de plenos desde CSV hacia SQLite. */
+public class ProcessRegistroPlenos {
 
-  static final Logger LOG = LoggerFactory.getLogger(LoadDetallePlenosAndSave.class);
+  static final Logger LOG = LoggerFactory.getLogger(ProcessRegistroPlenos.class);
   final ObjectMapper mapper = new CsvMapper();
 
   public static void main(String[] args) throws IOException {
-    new LoadDetallePlenosAndSave().load();
+    new ProcessRegistroPlenos().load();
   }
 
   void load() throws IOException {
@@ -82,17 +83,18 @@ public class LoadDetallePlenosAndSave {
           var registroPlenoBuilder =
               loadRegistroPleno(pleno.resolve("pleno.csv")).withGruposParlamentarios(grupos);
 
-          try (var list = Files.list(pleno)) {
-            var lsPleno = list.toList();
+          // Guardar plenos en sqlite
+          try (var paths = Files.list(pleno)) {
+            var pathsList = paths.toList();
             var asistencias =
-                lsPleno.stream()
+                pathsList.stream()
                     .filter(s -> s.toString().endsWith("-asistencia"))
                     .map(p -> loadAsistencia(p, registroPlenoBuilder.pleno(), grupos))
                     .peek(registroPlenoBuilder::addAsistencia)
                     .collect(Collectors.toSet());
             new SaveAsistenciaPlenosToSqlite().accept(asistencias);
             var votaciones =
-                lsPleno.stream()
+                pathsList.stream()
                     .filter(s -> s.toString().endsWith("-votacion"))
                     .map(p -> loadVotacion(p, registroPlenoBuilder.pleno(), grupos))
                     .peek(registroPlenoBuilder::addVotacion)
@@ -114,6 +116,7 @@ public class LoadDetallePlenosAndSave {
                           ResultadoCongresista::congresista,
                           ResultadoCongresista::grupoParlamentario));
 
+          // Validaciones contra primera sesion
           registroPleno
               .asistencias()
               .forEach(
@@ -213,8 +216,8 @@ public class LoadDetallePlenosAndSave {
                           }
                         });
                   });
+          // Actualizar CSVs
           SaveRegistroPlenoToCsv.save(registroPleno);
-          // TODO save registro plenos to DB
         }
       }
     }
@@ -405,7 +408,7 @@ public class LoadDetallePlenosAndSave {
       }
       return data;
     } catch (Exception e) {
-      throw new RuntimeException("Error with path: " + path.toString() + " at " + map, e);
+      throw new RuntimeException("Error with path: " + path + " at " + map, e);
     }
   }
 

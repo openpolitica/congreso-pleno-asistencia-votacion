@@ -28,6 +28,18 @@ public record AsistenciaSesion(
     return new Builder();
   }
 
+  public String printMetadatosAsCsv() {
+    return ("metadato,valor\n"
+        + "dia,"
+        + sesion.fechaHora().format(DateTimeFormatter.ISO_LOCAL_DATE)
+        + "\n"
+        + "hora,"
+        + sesion.fechaHora().format(DateTimeFormatter.ofPattern("HH:mm"))
+        + "\n"
+        + "quorum,"
+        + sesion.quorum());
+  }
+
   public String printAsistenciasAsCsv() {
     return ("grupo_parlamentario,congresista,asistencia\n"
         + asistencias.stream()

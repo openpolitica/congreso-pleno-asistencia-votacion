@@ -64,7 +64,7 @@ jobs:
 
       - name: Prepare Plenos DB
         run: |
-          csvs-to-sqlite plenos.csv plenos.db
+          csvs-to-sqlite data/2021-2026/plenos.csv plenos.db
 
 #      - name: Deploy Datasette using Vercel
 #        env:
