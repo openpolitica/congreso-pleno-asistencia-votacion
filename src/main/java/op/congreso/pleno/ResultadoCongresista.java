@@ -60,7 +60,9 @@ public record ResultadoCongresista<T>(String grupoParlamentario, String congresi
         if (grupoParlamentario == null) {
           if (GrupoParlamentario.isSimilar(word)) {
             withGrupoParlamentario(GrupoParlamentario.findSimilar(word));
-          } else throw new IllegalArgumentException("Grupo no encontrado! Grupo [" + word + "] en texto: [" + text + "]");
+          } else
+            throw new IllegalArgumentException(
+                "Grupo no encontrado! Grupo [" + word + "] en texto: [" + text + "]");
         } else {
           if (Asistencia.is(word)) {
             if (!c.isEmpty()) {
