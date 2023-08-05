@@ -4,6 +4,10 @@ import java.util.List;
 import op.congreso.pleno.asistencia.Asistencia;
 import op.congreso.pleno.votacion.Votacion;
 
+/**
+ * Resultado de Congresista (e.g. Votacion o Asistencia). Cada Sesion tiene una lista de resultados
+ * por congresista.
+ */
 public record ResultadoCongresista<T>(String grupoParlamentario, String congresista, T resultado) {
   public static <T> Builder<T> newBuilder() {
     return new Builder<>();
@@ -44,8 +48,8 @@ public record ResultadoCongresista<T>(String grupoParlamentario, String congresi
     }
 
     /**
-     * Text either contain: GP or GP+Congresista or GP+Congresista+Result or Congresista or
-     * Congresista+Result or Congresista+Result+GP or Result or Result+GP
+     * Text either contain: GP, or GP+Congresista, or GP+Congresista+Result, or Congresista, or
+     * Congresista+Result, or Congresista+Result+GP, or Result, or Result+GP
      */
     @SuppressWarnings("unchecked")
     public void processAsistenciaLine(StringBuilder text) {
@@ -56,7 +60,9 @@ public record ResultadoCongresista<T>(String grupoParlamentario, String congresi
         if (grupoParlamentario == null) {
           if (GrupoParlamentario.isSimilar(word)) {
             withGrupoParlamentario(GrupoParlamentario.findSimilar(word));
-          } else throw new IllegalArgumentException("No GP! " + word + " at " + text);
+          } else
+            throw new IllegalArgumentException(
+                "Grupo no encontrado! Grupo [" + word + "] en texto: [" + text + "]");
         } else {
           if (Asistencia.is(word)) {
             if (!c.isEmpty()) {
@@ -106,36 +112,5 @@ public record ResultadoCongresista<T>(String grupoParlamentario, String congresi
         withCongresista(Congresistas.findSimilar(c.toString().trim()));
       }
     }
-  }
-
-  public static void main(String[] args) {
-    var b = new Builder<Asistencia>();
-    b.processAsistenciaLine("RP");
-    b.processAsistenciaLine("JÁUREGUI MARTÍNEZ DE AGUAYO, MARIA PRE");
-    System.out.println(b.isReady());
-    System.out.println(b.build());
-
-    var b1 = new Builder<Votacion>();
-    b1.processVotacionLine("FP");
-    b1.processVotacionLine("BARBARÁN REYES, ROSANGELLA ANDREA");
-    StringBuilder sinRes_sp = new StringBuilder("NO");
-    b1.processVotacionLine(sinRes_sp);
-    System.out.println(b1.isReady());
-    System.out.println(b1.build());
-    b1 = new Builder<>();
-    b1.processVotacionLine("RP");
-    b1.processVotacionLine("JÁUREGUI MARTÍNEZ DE AGUAYO, MARIA aus");
-    System.out.println(b1.isReady());
-    System.out.println(b1.build());
-    b1.processVotacionLine("PAREDES CASTRO, FRANCIS JHASMINA");
-    b1.processVotacionLine("SI");
-    b1.processVotacionLine("APP");
-    b1.processVotacionLine("ACUÑA PERALTA, SEGUNDO HÉCTOR");
-    // FP
-    // BARBARÁN REYES, ROSANGELLA ANDREA
-    // NO
-    // RP
-    // JÁUREGUI MARTÍNEZ DE AGUAYO, MARIA aus
-    // CD-JPP
   }
 }

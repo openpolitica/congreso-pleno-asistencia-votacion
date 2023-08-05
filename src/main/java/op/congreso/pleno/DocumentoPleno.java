@@ -17,13 +17,14 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
-import op.congreso.pleno.app.SaveRegistroPlenoToCsv;
+import op.congreso.pleno.db.SaveRegistroPlenoToCsv;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public record RegistroPlenoDocument(
+/** Documento de Registro de Pleno, incluyendo asistencias y votaciones */
+public record DocumentoPleno(
     Periodo periodo,
     String fecha,
     String titulo,
@@ -31,9 +32,8 @@ public record RegistroPlenoDocument(
     String filename,
     int paginas,
     boolean provisional) {
-  static final Logger LOG = LoggerFactory.getLogger(RegistroPlenoDocument.class);
+  static final Logger LOG = LoggerFactory.getLogger(DocumentoPleno.class);
   static Pattern periodoPattern = Pattern.compile("\\d\\d\\d\\d ?- ?\\d\\d\\d\\d$");
-  private static final ObjectMapper jsonMapper = new ObjectMapper();
 
   public static StringBuilder csvHeader() {
     return new StringBuilder(
@@ -48,8 +48,8 @@ public record RegistroPlenoDocument(
     return val;
   }
 
-  public static RegistroPlenoDocument parse(Map<String, String> v) {
-    return new RegistroPlenoDocument(
+  public static DocumentoPleno parse(Map<String, String> v) {
+    return new DocumentoPleno(
         new Periodo(
             parsePeriodo(v.get("periodo_parlamentario")),
             parsePeriodo(v.get("periodo_anual")),
@@ -62,9 +62,9 @@ public record RegistroPlenoDocument(
         Optional.ofNullable(v.get("provisional")).map(Boolean::parseBoolean).orElse(Boolean.FALSE));
   }
 
-  public static RegistroPlenoDocument parseJson(String s) {
+  public static DocumentoPleno parseJson(String s) {
     try {
-      return new ObjectMapper().readValue(s, RegistroPlenoDocument.class);
+      return new ObjectMapper().readValue(s, DocumentoPleno.class);
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }
@@ -84,22 +84,12 @@ public record RegistroPlenoDocument(
             provisional);
   }
 
-  String directory() {
-    return ("out/pdf/"
-        + periodo.periodoParlamentario()
-        + "/"
-        + periodo.periodoAnual()
-        + "/"
-        + periodo.legislatura());
+  Path path() {
+    return periodo.path(Rutas.TMP_DIR).resolve(filename);
   }
 
-  String path() {
-    return directory() + "/" + filename;
-  }
-
-  public RegistroPlenoDocument withPaginas() {
-    return new RegistroPlenoDocument(
-        periodo, fecha, titulo, url, filename, countPages(), provisional);
+  public DocumentoPleno withPaginas() {
+    return new DocumentoPleno(periodo, fecha, titulo, url, filename, countPages(), provisional);
   }
 
   public String id() {
@@ -107,27 +97,26 @@ public record RegistroPlenoDocument(
   }
 
   int countPages() {
-    try (PDDocument doc = PDDocument.load(Path.of(path()).toFile())) {
+    try (PDDocument doc = PDDocument.load(path().toFile())) {
       return doc.getNumberOfPages();
     } catch (Exception | NoClassDefFoundError e) {
-      System.out.println("ERROR with path: " + path());
-      e.printStackTrace();
+      LOG.error("ERROR with path: {}", path(), e);
       return -1;
     }
   }
 
   public void download() {
     try {
-      var dir = Path.of(directory());
+      var dir = periodo.path(Rutas.TMP_DIR);
       if (!Files.isDirectory(dir)) Files.createDirectories(dir);
       var readableByteChannel = Channels.newChannel(new URL(url()).openStream());
       var path = path();
-      try (var fileOutputStream = new FileOutputStream(path)) {
+      try (var fileOutputStream = new FileOutputStream(path.toFile())) {
         fileOutputStream.getChannel().transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
       }
       LOG.info("PDF downloaded: {}", path);
     } catch (IOException e) {
-      e.printStackTrace();
+      LOG.error("Error downloading {}", path(), e);
     }
   }
 
@@ -159,9 +148,9 @@ public record RegistroPlenoDocument(
 
   private static final Pattern p = Pattern.compile("javascript:openWindow\\('(.+)'\\)");
 
-  public static Map<String, RegistroPlenoDocument> collectPleno(
-      String pp, String pa, String l, String url) throws IOException {
-    var root = new LinkedHashMap<String, RegistroPlenoDocument>();
+  public static Map<String, DocumentoPleno> collectPleno(String pp, String pa, String l, String url)
+      throws IOException {
+    var root = new LinkedHashMap<String, DocumentoPleno>();
     {
       var jsoup = Jsoup.connect(BASE_URL + url);
       var doc = jsoup.get();
@@ -185,7 +174,7 @@ public record RegistroPlenoDocument(
             var fullUrl = BASE_URL + "/Sicr/RelatAgenda/PlenoComiPerm20112016.nsf/" + u;
             root.put(
                 titulo,
-                new RegistroPlenoDocument(
+                new DocumentoPleno(
                     new Periodo(parsePeriodo(pp), parsePeriodo(pa), l),
                     date,
                     titulo,
@@ -200,10 +189,10 @@ public record RegistroPlenoDocument(
     }
   }
 
-  public RegistroPlenoDocument extract() throws IOException {
+  public DocumentoPleno extract() throws IOException {
     download();
     Files.writeString(Path.of(path() + ".json"), new ObjectMapper().writeValueAsString(this));
-    var lines = extractRegistroPleno(Path.of(path()));
+    var lines = extractRegistroPleno(path());
     var regPleno = processLines(this, lines);
     SaveRegistroPlenoToCsv.save(regPleno);
     return this.withPaginas();

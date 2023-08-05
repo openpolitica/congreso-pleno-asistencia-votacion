@@ -13,10 +13,10 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <java.version>17</java.version>
-        <jackson.version>2.14.1</jackson.version>
-        <aws.version>2.17.256</aws.version>
+        <jackson.version>2.15.2</jackson.version>
+        <aws.version>2.20.38</aws.version>
         <sqlite.version>3.41.2.2</sqlite.version>
-        <jsoup.version>1.15.3</jsoup.version>
+        <jsoup.version>1.16.1</jsoup.version>
     </properties>
 
     <dependencyManagement>
@@ -80,7 +80,7 @@
         <dependency>
             <groupId>io.github.resilience4j</groupId>
             <artifactId>resilience4j-retry</artifactId>
-            <version>1.7.1</version>
+            <version>2.1.0</version>
         </dependency>
         <dependency>
             <groupId>me.xdrop</groupId>
@@ -96,23 +96,20 @@
 
         <dependency>
             <groupId>org.apache.pdfbox</groupId>
-            <artifactId>pdfbox</artifactId>
-            <version>2.0.26</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi-ooxml</artifactId>
-            <version>5.2.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.itextpdf</groupId>
-            <artifactId>itextpdf</artifactId>
-            <version>5.5.13.3</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.pdfbox</groupId>
             <artifactId>pdfbox-tools</artifactId>
             <version>2.0.26</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.9.3</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>3.24.2</version>
         </dependency>
     </dependencies>
 
@@ -139,7 +136,47 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <mainClass>op.congreso.pleno.app.ProcessRegistroPlenos</mainClass>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
+    <profiles>
+        <profile>
+            <!-- Secuencia requerida por https://github.com/openpolitica/open-tracker-devops -->
+            <id>tracker</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>3.1.0</version>
+                        <configuration>
+                            <mainClass>op.congreso.pleno.app.ProcessRegistroPlenos</mainClass>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>load-docs</id>
+                                <configuration>
+                                    <mainClass>op.congreso.pleno.app.LoadPlenoDocs</mainClass>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>load-detalle-and-save</id>
+                                <configuration>
+                                    <mainClass>op.congreso.pleno.app.ProcessRegistroPlenos</mainClass>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

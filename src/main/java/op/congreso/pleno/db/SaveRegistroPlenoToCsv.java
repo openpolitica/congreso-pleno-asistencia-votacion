@@ -1,4 +1,4 @@
-package op.congreso.pleno.app;
+package op.congreso.pleno.db;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -26,7 +26,7 @@ public class SaveRegistroPlenoToCsv {
     for (var a : registroPleno.asistencias().values()) {
       var asistenciaDir =
           plenoDir.resolve(
-              a.fechaHora().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH-mm"))
+              a.sesion().fechaHora().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH-mm"))
                   + "-asistencia");
       Files.createDirectories(asistenciaDir);
       Files.writeString(asistenciaDir.resolve("metadatos.csv"), a.printMetadatosAsCsv());
@@ -42,7 +42,7 @@ public class SaveRegistroPlenoToCsv {
     for (var v : registroPleno.votaciones().values()) {
       var votacionDir =
           plenoDir.resolve(
-              v.fechaHora().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH-mm"))
+              v.sesion().fechaHora().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH-mm"))
                   + "-votacion");
       Files.createDirectories(votacionDir);
       Files.writeString(votacionDir.resolve("metadatos.csv"), v.printMetadatosAsCsv());

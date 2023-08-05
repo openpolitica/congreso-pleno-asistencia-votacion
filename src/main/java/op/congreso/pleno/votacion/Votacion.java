@@ -5,6 +5,12 @@ import java.util.List;
 import java.util.Map;
 import op.congreso.pleno.Resultado;
 
+/**
+ * Posibles resultados de votacion de un Congresista durante una Sesion.
+ *
+ * @see VotacionAgregada para ver los resultados agregados
+ * @see VotacionSesion para ver la sesion de asistencia
+ */
 public enum Votacion implements Resultado {
   SI(List.of("SI+++", "SI", "5I"), "SI"),
   NO(List.of("NO-", "NO"), "NO"),
@@ -22,7 +28,9 @@ public enum Votacion implements Resultado {
   FALLECIDO(List.of("F"), "FALLECIDO"),
   FALTO(List.of("FA"), "FALTO");
 
+  /** Siglas utilizadas en los documentos de sesion */
   final List<String> codigos;
+  /** Descripcion del tipo de votacion */
   final String descripcion;
 
   Votacion(List<String> codigos, String descripcion) {

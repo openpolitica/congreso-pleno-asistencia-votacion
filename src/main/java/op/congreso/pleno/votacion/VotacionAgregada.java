@@ -1,6 +1,7 @@
 package op.congreso.pleno.votacion;
 
-public record ResultadoVotacion(
+/** Resultados de votacion agregados por Sesion */
+public record VotacionAgregada(
     int si,
     int no,
     int abstenciones,
@@ -9,9 +10,9 @@ public record ResultadoVotacion(
     int licencias,
     int otros,
     int total) {
-  public static ResultadoVotacion create(
+  public static VotacionAgregada create(
       int si, int no, int abstenciones, int sinResp, int ausentes, int licencias, int otros) {
-    return new ResultadoVotacion(
+    return new VotacionAgregada(
         si,
         no,
         abstenciones,
@@ -32,14 +33,14 @@ public record ResultadoVotacion(
     int ausentes = 0;
     int licencias = 0;
     int otros = 0;
-    int sinResp = 0;
+    int sinRespuesta = 0;
 
     public void with(Votacion votacion, int resultado) {
       switch (votacion) {
         case SI -> this.si = resultado;
         case NO -> this.no = resultado;
         case ABSTENCION -> this.abstenciones = resultado;
-        case SIN_RESPONDER -> this.sinResp = resultado;
+        case SIN_RESPONDER -> this.sinRespuesta = resultado;
         case AUSENTE -> this.ausentes = resultado;
         case LICENCIA_OFICIAL, LICENCIA_PERSONAL, LICENCIA_POR_ENFERMEDAD -> this.licencias =
             this.licencias + resultado;
@@ -47,16 +48,16 @@ public record ResultadoVotacion(
       }
     }
 
-    public ResultadoVotacion build() {
-      return new ResultadoVotacion(
+    public VotacionAgregada build() {
+      return new VotacionAgregada(
           si,
           no,
           abstenciones,
-          sinResp,
+          sinRespuesta,
           ausentes,
           licencias,
           otros,
-          si + no + abstenciones + sinResp + ausentes + licencias + otros);
+          si + no + abstenciones + sinRespuesta + ausentes + licencias + otros);
     }
 
     public Builder increase(Votacion votacion) {
@@ -64,7 +65,7 @@ public record ResultadoVotacion(
         case SI -> this.si = this.si + 1;
         case NO -> this.no = this.no + 1;
         case ABSTENCION -> this.abstenciones = this.abstenciones + 1;
-        case SIN_RESPONDER -> this.sinResp = this.sinResp + 1;
+        case SIN_RESPONDER -> this.sinRespuesta = this.sinRespuesta + 1;
         case AUSENTE -> this.ausentes = this.ausentes + 1;
         case LICENCIA_OFICIAL, LICENCIA_PERSONAL, LICENCIA_POR_ENFERMEDAD -> this.licencias =
             this.licencias + 1;

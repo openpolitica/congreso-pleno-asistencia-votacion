@@ -18,23 +18,17 @@ prepare:
 carga_plenos:
 	./mvnw clean compile exec:java -Dexec.mainClass="op.congreso.pleno.app.LoadDetallePlenosAndSave" -T1C
 
-extraer_csv:
-	./mvnw clean compile exec:java -Dexec.mainClass="op.congreso.pleno.util.ExtraeCsvs" -Dexec.args="${HOME}/Downloads/"
-
 registro_plenos:
-	./mvnw exec:java -Dexec.mainClass="op.congreso.pleno.app.LoadRegitroPlenoDocuments"
+	./mvnw exec:java -Dexec.mainClass="op.congreso.pleno.app.LoadRegistroPlenoDocuments"
 
 serve:
 	datasette *.db
 
 prepare_registro_plenos:
 	rm -f plenos.db
-	csvs-to-sqlite plenos.csv plenos.db
+	csvs-to-sqlite data/2021-2026/plenos.csv plenos.db
 
 new_pleno:
-	git add plenos.csv
-	git commit -m 'update plenos'
-	git push origin main
 	BRANCH=$(cat pr-branch.txt) && git checkout -b ${BRANCH}
 	git add data
 	COMMIT=$(cat pr-title.txt) && git commit -m ${COMMIT}

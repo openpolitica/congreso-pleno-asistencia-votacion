@@ -5,8 +5,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
-import op.congreso.pleno.asistencia.RegistroAsistencia;
-import op.congreso.pleno.votacion.RegistroVotacion;
+import op.congreso.pleno.asistencia.AsistenciaSesion;
+import op.congreso.pleno.votacion.VotacionSesion;
 
 // TODO add provisional flag and test new PDFs
 public record RegistroPleno(
@@ -16,11 +16,11 @@ public record RegistroPleno(
     String url,
     Map<String, String> gruposParlamentarios,
     List<LocalDateTime> sesiones,
-    Map<LocalDateTime, RegistroAsistencia> asistencias,
-    Map<LocalDateTime, RegistroVotacion> votaciones,
+    Map<LocalDateTime, AsistenciaSesion> asistencias,
+    Map<LocalDateTime, VotacionSesion> votaciones,
     int potentialErrors,
     List<String> comments) {
-  public static Builder newBuilder(RegistroPlenoDocument document) {
+  public static Builder newBuilder(DocumentoPleno document) {
     return new Builder(document);
   }
 
@@ -75,12 +75,12 @@ public record RegistroPleno(
     final String url;
     Map<String, String> gruposParlamentarios = new HashMap<>();
     List<LocalDateTime> sesiones = new ArrayList<>();
-    Map<LocalDateTime, RegistroAsistencia> asistencias = new LinkedHashMap<>();
-    Map<LocalDateTime, RegistroVotacion> votaciones = new LinkedHashMap<>();
+    Map<LocalDateTime, AsistenciaSesion> asistencias = new LinkedHashMap<>();
+    Map<LocalDateTime, VotacionSesion> votaciones = new LinkedHashMap<>();
     int potentialErrors = 0;
     List<String> comments = new ArrayList<>();
 
-    public Builder(RegistroPlenoDocument document) {
+    public Builder(DocumentoPleno document) {
       this.periodoParlamentario = document.periodo().periodoParlamentario();
       this.periodoAnual = document.periodo().periodoAnual();
       this.legislatura = document.periodo().legislatura();
@@ -104,14 +104,14 @@ public record RegistroPleno(
       this.url = url;
     }
 
-    public void addAsistencia(RegistroAsistencia asistencia) {
-      sesiones.add(asistencia.fechaHora());
-      asistencias.put(asistencia.fechaHora(), asistencia);
+    public void addAsistencia(AsistenciaSesion asistencia) {
+      sesiones.add(asistencia.sesion().fechaHora());
+      asistencias.put(asistencia.sesion().fechaHora(), asistencia);
     }
 
-    public void addVotacion(RegistroVotacion votacion) {
-      sesiones.add(votacion.fechaHora());
-      votaciones.put(votacion.fechaHora(), votacion);
+    public void addVotacion(VotacionSesion votacion) {
+      sesiones.add(votacion.sesion().fechaHora());
+      votaciones.put(votacion.sesion().fechaHora(), votacion);
     }
 
     public RegistroPleno build() {

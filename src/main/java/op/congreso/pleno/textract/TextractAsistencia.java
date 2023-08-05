@@ -1,6 +1,7 @@
 package op.congreso.pleno.textract;
 
-import static op.congreso.pleno.Constantes.FECHA_HORA_PATTERN;
+import static java.util.Locale.UK;
+import static op.congreso.pleno.Rutas.FECHA_HORA_PATTERN;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -10,26 +11,28 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import op.congreso.pleno.Constantes;
 import op.congreso.pleno.GrupoParlamentario;
 import op.congreso.pleno.Pleno;
 import op.congreso.pleno.ResultadoCongresista;
 import op.congreso.pleno.asistencia.Asistencia;
-import op.congreso.pleno.asistencia.RegistroAsistencia;
-import op.congreso.pleno.asistencia.ResultadoAsistencia;
+import op.congreso.pleno.asistencia.AsistenciaAgregada;
+import op.congreso.pleno.asistencia.AsistenciaSesion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class TextractAsistencia {
 
   public static Logger LOG = LoggerFactory.getLogger(TextractAsistencia.class);
-  public static final Pattern ASISTENCIA_GROUP = Pattern.compile("(\\w+)");
+  public static final String ASISTENCIA = "ASISTENCIA:";
 
   public static void main(String[] args) throws IOException {
     try {
-      var lines = Files.readAllLines(Path.of("./out/Asis_vot_OFICIAL_07-07-22/page_8.txt"));
+      var lines =
+          Files.readAllLines(
+              Path.of(
+                  "./out/pdf/2021-2026/2021-2022/Segunda Legislatura Ordinaria/Asis_vot_OFICIAL_14-07-22/page_26.txt"));
 
       var registro = load(clean(lines));
 
@@ -39,210 +42,101 @@ public class TextractAsistencia {
     }
   }
 
-  static RegistroAsistencia load(List<String> lines) {
-    var registroBuilder = RegistroAsistencia.newBuilder();
+  static AsistenciaSesion load(List<String> lines) throws IOException {
+    lines =
+        lines.stream()
+            .map(
+                s ->
+                    s.replace("GLADYS M.", "GLADYS MARGOT")
+                        // Wrong GP
+                        .replace("AP PIS", "AP-PIS")
+                        .replace("AP-PI5", "AP-PIS")
+                        .replace("AP -PIS", "AP-PIS")
+                        .replace("P-PIS", "AP-PIS")
+                        .replace("CD- JPP", "CD-JPP")
+                        .replace("D-JPP", "CD-JPP")
+                        .replace("CD -JPP", "CD-JPP")
+                        .replace("CD JPP", "CD-JPP")
+                        .replace("CD-JPF", "CD-JPP")
+                        .replace("CD-JPI", "CD-JPP")
+                        .replace("ID-JPP", "CD-JPP")
+                        .trim())
+            .map(
+                s -> {
+                  if (s.endsWith(" EP")) return s.replace("EP", "FP");
+                  if (s.equals("EP")) return "FP";
+                  return s;
+                })
+            .map(
+                s -> {
+                  if (s.contains("CD-J") && !s.contains("CD-JPP"))
+                    return s.replace("CD-J", "CD-JPP");
+                  else return s;
+                })
+            .map(
+                s -> {
+                  if (s.contains("-JPP") && !s.contains("CD-JPP"))
+                    return s.replace("-JPP", "CD-JPP");
+                  else return s;
+                })
+            .map(s -> s.replace("L0", "LO"))
+            .toList();
+
+    var registroBuilder = AsistenciaSesion.newBuilder();
     var plenoBuilder = Pleno.newBuilder();
-    var resultadosBuilder = ResultadoAsistencia.newBuilder();
+    var resultadosBuilder = AsistenciaAgregada.newBuilder();
     var asistencias = new ArrayList<ResultadoCongresista<Asistencia>>();
-    var grupos = new HashMap<String, String>();
-    var resultadosGrupos = new HashMap<GrupoParlamentario, ResultadoAsistencia>();
+    var resultadosGrupos = new HashMap<GrupoParlamentario, AsistenciaAgregada>();
 
     int i = 0;
-    int errors = 0;
-    var titulo = "";
-    var type = "";
-    LocalDateTime fechaHora = null;
-    boolean headersReady = false;
-    var previous = "";
+    LocalDateTime fechaHora;
+
+    var current = ResultadoCongresista.<Asistencia>newBuilder();
+    var congresistasCompletados = false;
 
     while (i < lines.size()) {
       final var text = lines.get(i);
       try {
         if (i < 4) { // Process headers metadata
           switch (i) {
-            case 0 -> titulo = text;
+            case 0 -> {}
             case 1 -> plenoBuilder.withLegislatura(text);
             case 2 -> plenoBuilder.withTitulo(text);
             case 3 -> {
-              if (text.equals(Constantes.ASISTENCIA)) {
-                type = text;
+              if (text.equals(ASISTENCIA)) {
                 i++;
-                fechaHora = LocalDateTime.parse(lines.get(i), FECHA_HORA_PATTERN);
+                fechaHora = LocalDateTime.parse(lines.get(i).toLowerCase(), FECHA_HORA_PATTERN);
                 registroBuilder.withFechaHora(fechaHora);
                 plenoBuilder.withFecha(fechaHora.toLocalDate());
-              } else if (text.startsWith(Constantes.ASISTENCIA)) {
-                type = Constantes.ASISTENCIA;
-                var fechaText = text.substring(Constantes.ASISTENCIA.length() + 1);
-                fechaHora = LocalDateTime.parse(fechaText, FECHA_HORA_PATTERN);
+              } else if (text.startsWith(ASISTENCIA)) {
+                var fechaText = text.substring(ASISTENCIA.length() + 1);
+                fechaHora = LocalDateTime.parse(fechaText.toLowerCase(UK), FECHA_HORA_PATTERN);
                 registroBuilder.withFechaHora(fechaHora);
                 plenoBuilder.withFecha(fechaHora.toLocalDate());
               }
             }
           }
-        } else if (asistencias.size() < 130) { // Process asistencia per congresistas
-          // Process GP + Congresista + Asistencia
-          if (GrupoParlamentario.isSimilar(text.trim())) { // GP found, process next line
-            i++;
-            var congresista = lines.get(i);
-            // Check Congresista text does not contain Asistencia
-            if (Asistencia.is(
-                congresista.substring(
-                    congresista.lastIndexOf(" ") + 1))) { // if it contains Asistencia
-              var asistencia =
-                  congresista.substring(congresista.lastIndexOf(" ")); // get asistencia
-              // and build resultado
-              asistencias.add(
-                  new ResultadoCongresista<>(
-                      GrupoParlamentario.findSimilar(text.trim()),
-                      congresista.substring(0, congresista.lastIndexOf(" ")),
-                      Asistencia.of(asistencia)));
-            } else { // if it does not contain asistencia
-              i++;
-              var asistencia = lines.get(i); // get asistencia from next line
-              // and build resultado
-              asistencias.add(
-                  new ResultadoCongresista<>(
-                      GrupoParlamentario.findSimilar(text.trim()),
-                      congresista,
-                      Asistencia.of(asistencia)));
-            }
-          } else { // else GP is in the same line as congresista
-            var gp = text.substring(0, text.indexOf(" ")); // get GP from first work
-            // Check Congresista text does not contain Asistencia
-            var congresista = text.substring(text.indexOf(" ") + 1);
-            if (Asistencia.is(
-                congresista.substring(
-                    congresista.lastIndexOf(" ") + 1))) { // if it contains asistencia
-              var asistencia =
-                  congresista.substring(congresista.lastIndexOf(" ")); // get asistencia
-              // and build resultado
-              asistencias.add(
-                  new ResultadoCongresista<>(
-                      gp,
-                      congresista.substring(0, congresista.lastIndexOf(" ")),
-                      Asistencia.of(asistencia)));
-            } else { // if it does not contain asistencia
-              i++;
-              var asistencia = lines.get(i); // get asistencia from next line
-              // and build resultado
-              asistencias.add(
-                  new ResultadoCongresista<>(gp, congresista, Asistencia.of(asistencia)));
+        } else if (asistencias.size() < 130
+            && !congresistasCompletados) { // Process asistencia per congresistas
+          if (text.equals("Resultados de la ASISTENCIA")) {
+            LOG.warn("Faltan congresistas");
+            congresistasCompletados = true;
+          } else {
+            var b = new StringBuilder(text);
+            current.processAsistenciaLine(b);
+            if (current.isReady()) {
+              asistencias.add(current.build());
+              current = ResultadoCongresista.newBuilder();
+              if (!b.isEmpty()) current.processAsistenciaLine(b);
             }
           }
         } else { // Process resultados
-          // First: get resultado headers:
-          // Resultados de la ASISTENCIA
-          // Grupo Parlamentario
-          // Presente Ausente Licencias Susp.
-          // Otros
-          if (text.equals("Resultados de la ASISTENCIA")) {
+          if (text.equals("Asistencia para Quórum")
+              || text.equals("Asistencia para Quorum")) { // Finally get quorum
             i++;
-            if (lines.get(i).equals("Grupo Parlamentario")) {
-              i++;
-              var headers = lines.get(i);
-              if (headers.equals("Presente Ausente Licencias Susp. Otros")) {
-                headersReady = true;
-              } else if (headers.equals("Presente Ausente Licencias Susp.")) {
-                i++;
-                if (lines.get(i).equals("Otros")) headersReady = true;
-              }
-            }
-          } else { // Then once headers ready:
-            if (headersReady) {
-              if (Asistencia.isDescripcion(text)) { // Get Resultado per Asistencia type
-                i++;
-                var asistencia = lines.get(i);
-                var matcher = ASISTENCIA_GROUP.matcher(asistencia);
-                if (matcher.find()) {
-                  var asis = matcher.group();
-                  i++;
-                  var result = lines.get(i);
-                  if (result.contains(" ")) {
-                    previous = result.substring(result.indexOf(" ") + 1);
-                    result = result.substring(0, result.indexOf(" "));
-                  }
-                  resultadosBuilder.with(
-                      Asistencia.of(asis), Integer.parseInt(result.replace(".", "")));
-                }
-              } else if (text.contains("(")
-                  && text.contains(")")) { // Or get Asistencia from within ()
-                if (Asistencia.isDescripcion(text.substring(0, text.lastIndexOf("(") - 1))) {
-                  var matcher = ASISTENCIA_GROUP.matcher(text.substring(text.lastIndexOf("(")));
-                  if (matcher.find()) {
-                    var asis = matcher.group();
-                    i++;
-                    var result = lines.get(i);
-                    if (result.contains(" ")) {
-                      previous = result.substring(result.indexOf(" ") + 1);
-                      result = result.substring(0, result.indexOf(" "));
-                    }
-                    resultadosBuilder.with(
-                        Asistencia.of(asis), Integer.parseInt(result.replace(".", "")));
-                  }
-                }
-              } else { // Or get resulados per GP
-                if (GrupoParlamentario.isSimilar(previous)) {
-                  //                i++;
-                  grupos.put(GrupoParlamentario.findSimilar(previous), text);
-                  i++;
-                  var presentes = Integer.parseInt(lines.get(i).replace(".", ""));
-                  i++;
-                  var ausentes = Integer.parseInt(lines.get(i).replace(".", ""));
-                  i++;
-                  var licencias = Integer.parseInt(lines.get(i).replace(".", ""));
-                  i++;
-                  var suspendidos = Integer.parseInt(lines.get(i).replace(".", ""));
-                  i++;
-                  var otros = Integer.parseInt(lines.get(i).replace(".", ""));
-                  resultadosGrupos.put(
-                      new GrupoParlamentario(text, grupos.get(text)),
-                      ResultadoAsistencia.create(
-                          presentes, ausentes, licencias, suspendidos, otros));
-                  previous = "";
-                } else if (GrupoParlamentario.isSimilar(text)) {
-                  i++;
-                  grupos.put(GrupoParlamentario.findSimilar(text), lines.get(i));
-                  i++;
-                  var presentes = Integer.parseInt(lines.get(i).replace(".", ""));
-                  i++;
-                  var ausentes = Integer.parseInt(lines.get(i).replace(".", ""));
-                  i++;
-                  var licencias = Integer.parseInt(lines.get(i).replace(".", ""));
-                  i++;
-                  var suspendidos = Integer.parseInt(lines.get(i).replace(".", ""));
-                  i++;
-                  var otros = Integer.parseInt(lines.get(i).replace(".", ""));
-                  resultadosGrupos.put(
-                      new GrupoParlamentario(text, grupos.get(text)),
-                      ResultadoAsistencia.create(
-                          presentes, ausentes, licencias, suspendidos, otros));
-                } else if (!text.isBlank() && text.contains(" ")) {
-                  if (GrupoParlamentario.isSimilar(text.substring(0, text.indexOf(" ")))) {
-                    String grupo = text.substring(0, text.indexOf(" "));
-                    grupos.put(
-                        GrupoParlamentario.findSimilar(grupo),
-                        text.substring(text.indexOf(" ") + 1));
-                    i++;
-                    var presentes = Integer.parseInt(lines.get(i));
-                    i++;
-                    var ausentes = Integer.parseInt(lines.get(i));
-                    i++;
-                    var licencias = Integer.parseInt(lines.get(i));
-                    i++;
-                    var suspendidos = Integer.parseInt(lines.get(i));
-                    i++;
-                    var otros = Integer.parseInt(lines.get(i));
-                    resultadosGrupos.put(
-                        new GrupoParlamentario(grupo, grupos.get(grupo)),
-                        ResultadoAsistencia.create(
-                            presentes, ausentes, licencias, suspendidos, otros));
-                  } else if (text.equals("Asistencia para Quórum")) { // Finally get quorum
-                    i++;
-                    registroBuilder.withQuorum(Integer.parseInt(lines.get(i)));
-                  }
-                }
-              }
-            }
+            var s = lines.get(i);
+            if (s.contains(" ")) s = s.substring(0, s.indexOf(" "));
+            registroBuilder.withQuorum(Integer.parseInt(s));
           }
         }
       } catch (Exception e) {
@@ -252,7 +146,12 @@ public class TextractAsistencia {
       i++;
     }
 
-    if (fechaHora == null) errors++;
+    //    if (fechaHora == null) errors++;
+
+    var allGrupos = GrupoParlamentario.all();
+
+    var gp = asistencias.stream().map(ResultadoCongresista::grupoParlamentario).distinct().toList();
+    var grupos = gp.stream().collect(Collectors.toMap(a -> a, allGrupos::get));
 
     return registroBuilder
         .withPleno(plenoBuilder.withGruposParlamentarios(grupos).build())
@@ -266,13 +165,9 @@ public class TextractAsistencia {
     return list.stream()
         .map(
             s ->
-                s.replace("+++ ", "")
-                    .replace("+++", "")
-                    .replace(" +++", "")
-                    .replace("***", "")
-                    .replace("NO---", "NO")
-                    .replace("NO-", "NO")
+                s.replace("GLADYS M.", "GLADYS MARGOT")
                     // Wrong GP
+                    .replace("AP PIS", "AP-PIS")
                     .trim())
         .flatMap(
             s -> {
