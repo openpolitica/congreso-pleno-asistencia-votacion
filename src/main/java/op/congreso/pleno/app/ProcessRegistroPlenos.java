@@ -120,9 +120,9 @@ public class ProcessRegistroPlenos {
           registroPleno
               .asistencias()
               .forEach(
-                  (fechaHora, registroVotacion) -> {
+                  (fechaHora, registroAsistencia) -> {
                     final List<ResultadoCongresista<Asistencia>> asistencias =
-                        registroVotacion.asistencias();
+                        registroAsistencia.asistencias();
                     final int asistenciaTotal = asistencias.size();
                     if (asistenciaTotal != asistenciasPrimeraSesion.size()) {
                       var congresistas =
@@ -133,6 +133,10 @@ public class ProcessRegistroPlenos {
                           LOG.error("[A] {}: Congresista faltante: {}", fechaHora, c);
                         }
                       }
+                    }
+
+                    if (registroAsistencia.sesion().quorum() == 0) {
+                      LOG.warn("[A] {}: quorum = 0", fechaHora);
                     }
 
                     asistencias.forEach(
@@ -183,6 +187,10 @@ public class ProcessRegistroPlenos {
                           LOG.error("[V] {}: Congresista faltante: {}", fechaHora, c);
                         }
                       }
+                    }
+
+                    if (registroVotacion.sesion().quorum() == 0) {
+                      LOG.warn("[V] {}: quorum = 0", fechaHora);
                     }
 
                     votaciones.forEach(
