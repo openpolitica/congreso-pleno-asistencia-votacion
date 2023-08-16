@@ -16,10 +16,10 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
           java-version: 17
           distribution: 'zulu'
@@ -36,20 +36,22 @@ jobs:
             datasette
             sqlite-utils
 
-      - name: Install vercel plugin
-        run: |
-          datasette install datasette-publish-vercel
+#      - name: Install vercel plugin
+#        run: |
+#          datasette install datasette-publish-vercel
 
       # Disabling to reduce the size of the image
-      #- name: Enable FTS
-      #  run: |
-      #    sqlite-utils enable-fts *.db votacion_resultado asunto etiquetas
-      #    sqlite-utils enable-fts *.db votacion_grupo_parlamentario asunto etiquetas
-      #    sqlite-utils enable-fts *.db votacion_congresista asunto etiquetas
+      - name: Enable FTS
+        run: |
+          sqlite-utils enable-fts *.db votacion_resultado asunto etiquetas
+          sqlite-utils enable-fts *.db votacion_grupo_parlamentario asunto etiquetas
+          sqlite-utils enable-fts *.db votacion_congresista asunto etiquetas
+
       - name: View context attributes
         uses: actions/github-script@v5
         with:
           script: console.log(context)
+
 #      - name: Deploy Datasette using Vercel
 #        id: deploy-datasette
 #        env:
