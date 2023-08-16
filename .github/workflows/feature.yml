@@ -28,9 +28,6 @@ jobs:
       - name: Build project with Maven
         run: mvn -B clean compile
 
-      - name: Run extraction
-        run: mvn -B exec:java
-
       - uses: actions/setup-python@v1
       - name: publishes to datasette
         uses: BSFishy/pip-action@v1

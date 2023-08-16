@@ -140,9 +140,28 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.1.0</version>
-                <configuration>
-                    <mainClass>op.congreso.pleno.app.ProcessRegistroPlenos</mainClass>
-                </configuration>
+                <executions>
+                    <execution>
+                        <id>load-docs</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>op.congreso.pleno.app.LoadPlenoDocs</mainClass>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>load-detalle-and-save</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>op.congreso.pleno.app.ProcessRegistroPlenos</mainClass>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
@@ -157,18 +176,23 @@
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>exec-maven-plugin</artifactId>
                         <version>3.1.0</version>
-                        <configuration>
-                            <mainClass>op.congreso.pleno.app.ProcessRegistroPlenos</mainClass>
-                        </configuration>
                         <executions>
                             <execution>
                                 <id>load-docs</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>java</goal>
+                                </goals>
                                 <configuration>
                                     <mainClass>op.congreso.pleno.app.LoadPlenoDocs</mainClass>
                                 </configuration>
                             </execution>
                             <execution>
                                 <id>load-detalle-and-save</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>java</goal>
+                                </goals>
                                 <configuration>
                                     <mainClass>op.congreso.pleno.app.ProcessRegistroPlenos</mainClass>
                                 </configuration>
