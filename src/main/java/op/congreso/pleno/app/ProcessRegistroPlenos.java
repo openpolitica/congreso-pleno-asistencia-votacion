@@ -124,7 +124,8 @@ public class ProcessRegistroPlenos {
                     final List<ResultadoCongresista<Asistencia>> asistencias =
                         registroAsistencia.asistencias();
                     final int asistenciaTotal = asistencias.size();
-                    if (asistenciaTotal != 130 && asistenciaTotal != asistenciasPrimeraSesion.size()) {
+                    if (asistenciaTotal != 130
+                        && asistenciaTotal != asistenciasPrimeraSesion.size()) {
                       var congresistas =
                           asistencias.stream().map(ResultadoCongresista::congresista).toList();
                       LOG.error("[A] {}: Asistencia incompleta {}", fechaHora, asistenciaTotal);
@@ -149,7 +150,7 @@ public class ProcessRegistroPlenos {
                               for (final var map : cambios.get(registroPleno.fecha())) {
                                 if (map.get("congresista").equals(asistencia.congresista())
                                     && map.get("grupo_nuevo")
-                                    .equals(asistencia.grupoParlamentario())) {
+                                        .equals(asistencia.grupoParlamentario())) {
                                   found = true;
                                 }
                               }
@@ -190,7 +191,8 @@ public class ProcessRegistroPlenos {
                     final List<ResultadoCongresista<Votacion>> votaciones =
                         registroVotacion.votaciones();
                     final int votacionesTotal = votaciones.size();
-                    if (votacionesTotal != 130 && votacionesTotal != asistenciasPrimeraSesion.size()) {
+                    if (votacionesTotal != 130
+                        && votacionesTotal != asistenciasPrimeraSesion.size()) {
                       var congresistas =
                           votaciones.stream().map(ResultadoCongresista::congresista).toList();
                       LOG.error("[V] {}: Votacion incompleta {}", fechaHora, votacionesTotal);
@@ -214,7 +216,7 @@ public class ProcessRegistroPlenos {
                               for (final var map : cambios.get(registroPleno.fecha())) {
                                 if (map.get("congresista").equals(votacion.congresista())
                                     && map.get("grupo_nuevo")
-                                    .equals(votacion.grupoParlamentario())) {
+                                        .equals(votacion.grupoParlamentario())) {
                                   found = true;
                                 }
                               }
