@@ -124,10 +124,10 @@ public class ProcessRegistroPlenos {
                     final List<ResultadoCongresista<Asistencia>> asistencias =
                         registroAsistencia.asistencias();
                     final int asistenciaTotal = asistencias.size();
-                    if (asistenciaTotal != asistenciasPrimeraSesion.size()) {
+                    if (asistenciaTotal != 130 && asistenciaTotal != asistenciasPrimeraSesion.size()) {
                       var congresistas =
                           asistencias.stream().map(ResultadoCongresista::congresista).toList();
-                      LOG.error("[A] {}: Votacion incompleta {}", fechaHora, asistenciaTotal);
+                      LOG.error("[A] {}: Asistencia incompleta {}", fechaHora, asistenciaTotal);
                       for (var c : asistenciasPrimeraSesion.keySet()) {
                         if (!congresistas.contains(c)) {
                           LOG.error("[A] {}: Congresista faltante: {}", fechaHora, c);
@@ -144,11 +144,23 @@ public class ProcessRegistroPlenos {
                           final String grupo =
                               asistenciasPrimeraSesion.get(asistencia.congresista());
                           if (grupo == null) {
-                            LOG.warn(
-                                "[A] {}: Votacion de Congresista {} Grupo {} no coincide con Asistencia",
-                                fechaHora,
-                                asistencia.congresista(),
-                                asistencia.grupoParlamentario());
+                            var found = false;
+                            if (cambios.containsKey(registroPleno.fecha())) {
+                              for (final var map : cambios.get(registroPleno.fecha())) {
+                                if (map.get("congresista").equals(asistencia.congresista())
+                                    && map.get("grupo_nuevo")
+                                    .equals(asistencia.grupoParlamentario())) {
+                                  found = true;
+                                }
+                              }
+                            }
+                            if (!found) {
+                              LOG.warn(
+                                  "[A] {}: Grupo {} de Congresista {} no figura en primera Asistencia",
+                                  fechaHora,
+                                  asistencia.grupoParlamentario(),
+                                  asistencia.congresista());
+                            }
                           } else if (!grupo.equals(asistencia.grupoParlamentario())) {
                             var found = false;
                             if (cambios.containsKey(registroPleno.fecha())) {
@@ -178,7 +190,7 @@ public class ProcessRegistroPlenos {
                     final List<ResultadoCongresista<Votacion>> votaciones =
                         registroVotacion.votaciones();
                     final int votacionesTotal = votaciones.size();
-                    if (votacionesTotal != asistenciasPrimeraSesion.size()) {
+                    if (votacionesTotal != 130 && votacionesTotal != asistenciasPrimeraSesion.size()) {
                       var congresistas =
                           votaciones.stream().map(ResultadoCongresista::congresista).toList();
                       LOG.error("[V] {}: Votacion incompleta {}", fechaHora, votacionesTotal);
@@ -197,11 +209,23 @@ public class ProcessRegistroPlenos {
                         votacion -> {
                           final String grupo = asistenciasPrimeraSesion.get(votacion.congresista());
                           if (grupo == null) {
-                            LOG.warn(
-                                "[V] {}: Votacion de Congresista {} Grupo {} no coincide con Asistencia",
-                                fechaHora,
-                                votacion.congresista(),
-                                votacion.grupoParlamentario());
+                            var found = false;
+                            if (cambios.containsKey(registroPleno.fecha())) {
+                              for (final var map : cambios.get(registroPleno.fecha())) {
+                                if (map.get("congresista").equals(votacion.congresista())
+                                    && map.get("grupo_nuevo")
+                                    .equals(votacion.grupoParlamentario())) {
+                                  found = true;
+                                }
+                              }
+                            }
+                            if (!found) {
+                              LOG.warn(
+                                  "[V] {}: Grupo {} de Congresista {} no figura en primera Asistencia",
+                                  fechaHora,
+                                  votacion.grupoParlamentario(),
+                                  votacion.congresista());
+                            }
                           } else if (!grupo.equals(votacion.grupoParlamentario())) {
                             var found = false;
                             if (cambios.containsKey(registroPleno.fecha())) {
