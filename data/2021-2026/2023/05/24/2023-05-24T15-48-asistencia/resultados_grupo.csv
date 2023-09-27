@@ -1,0 +1,14 @@
+grupo_parlamentario,numero_legal,presentes,ausentes,licencias,suspendidos,otros
+AP,14,9,4,1,0,0
+AP-PIS,9,8,0,1,0,0
+APP,11,8,3,0,0,0
+BM,10,8,0,2,0,0
+CD-JPP,9,8,1,0,0,0
+FP,23,21,1,1,0,0
+NA,9,8,0,1,0,0
+PB,6,6,0,0,0,0
+PL,16,9,6,1,0,0
+PP,8,6,1,0,1,0
+RP,9,7,2,0,0,0
+SP,6,5,1,0,0,0
+TOTAL,130,103,19,7,1,0
