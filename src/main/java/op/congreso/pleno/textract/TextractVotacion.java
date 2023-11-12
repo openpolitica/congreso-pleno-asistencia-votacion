@@ -127,9 +127,7 @@ public class TextractVotacion {
                 .filter(r -> r.congresista().equals(build.congresista()))
                 .findAny()
                 .ifPresent(
-                    votacionResultadoCongresista -> {
-                      throw new IllegalStateException("Repeated congresista: " + build);
-                    });
+                    votacionResultadoCongresista -> LOG.warn("Repeated congresista: " + build));
             resultados.add(build);
             current = ResultadoCongresista.newBuilder();
             if (!b.isEmpty()) current.processVotacionLine(b);
