@@ -142,16 +142,6 @@
                 <version>3.1.0</version>
                 <executions>
                     <execution>
-                        <id>load-docs</id>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>java</goal>
-                        </goals>
-                        <configuration>
-                            <mainClass>op.congreso.pleno.app.LoadPlenoDocs</mainClass>
-                        </configuration>
-                    </execution>
-                    <execution>
                         <id>load-detalle-and-save</id>
                         <phase>compile</phase>
                         <goals>
