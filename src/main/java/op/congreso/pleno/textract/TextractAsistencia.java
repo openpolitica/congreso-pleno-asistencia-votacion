@@ -48,6 +48,28 @@ public class TextractAsistencia {
             .map(
                 s ->
                     s.replace("GLADYS M.", "GLADYS MARGOT")
+                        // Sellos
+                        .replace("V°B6", "")
+                        .replace("V°B°", "")
+                        .replace("V°6°", "")
+                        .replace("V°6'", "")
+                        .replace("V°6", "")
+                        .replace("V°B", "")
+                        .replace("V°F", "")
+                        .replace("V.B.", "")
+                        .replace("COMPANY", "")
+                        .replace("STATEMENT", "")
+                        .replace("STATES", "")
+                        .replace("DEPARTMENT", "")
+                        .replace("SANTILLAN MENDEZ", "")
+                        .replace("SANTILLANMENDEZ", "")
+                        .replace("SAMTILLENTHÉNDEZ", "")
+                        .replace("SANTILLANMEN", "")
+                        .replace("SANTILLAN", "")
+                        .replace("SANTILL", "")
+                        .replace("MENDEZ", "")
+                        .replace("CHENDEZ", "")
+                        .replace("KRIENDEZ", "")
                         // Wrong GP
                         .replace("AP PIS", "AP-PIS")
                         .replace("AP-PI5", "AP-PIS")
