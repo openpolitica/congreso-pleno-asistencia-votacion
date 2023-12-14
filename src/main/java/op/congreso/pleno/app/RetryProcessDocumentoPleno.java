@@ -10,7 +10,7 @@ import op.congreso.pleno.db.SaveRegistroPlenoToCsv;
 import op.congreso.pleno.textract.TextractRegistroPleno;
 
 /** Vuelve a procesar el texto bajo {@code Constantes.TMP_DIR} */
-public class RetryProcessRegistroPleno {
+public class RetryProcessDocumentoPleno {
 
   public static void main(String[] args) throws IOException {
     var pleno = TextractRegistroPleno.plenoToRetry(Rutas.TMP_DIR);

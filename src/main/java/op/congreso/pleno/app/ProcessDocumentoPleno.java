@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
  * <p>Si procesos falla, texto extraido esta contenido en {@code Constantes.TMP_DIR}. Datos pueden
  * ser ajustados para reintentar proceso.
  *
- * @see RetryProcessRegistroPleno
+ * @see RetryProcessDocumentoPleno
  */
 public class ProcessDocumentoPleno {
 

@@ -55,6 +55,7 @@ public class TextractVotacion {
                         .replace("V°B", "")
                         .replace("V°F", "")
                         .replace("V.B.", "")
+                        .replace("VoBo", "")
                         .replace("COMPANY", "")
                         .replace("STATEMENT", "")
                         .replace("STATES", "")
