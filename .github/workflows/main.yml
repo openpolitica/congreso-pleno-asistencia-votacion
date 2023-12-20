@@ -55,7 +55,7 @@ jobs:
 
       - name: Prepare Plenos DB
         run: |
-          csvs-to-sqlite data/2021-2026/plenos.csv plenos.db
+          csvs-to-sqlite data/2021-2026/plenos.csv 2021-2026-asistencias-votaciones.db
 
 #      - name: Deploy Datasette using Vercel
 #        env:
@@ -70,10 +70,10 @@ jobs:
 #            --install datasette-block-robots \
 #            --install datasette-pretty-json
 
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v5
-        with:
-          title: Cambios en Registro de Plenos
+      #      - name: Create Pull Request
+      #        uses: peter-evans/create-pull-request@v5
+      #        with:
+      #          title: Cambios en Registro de Plenos
       #- name: Set
       #  id: set-pr
       #  run: |
@@ -87,7 +87,27 @@ jobs:
       #    branch: ${{steps.set-pr.outputs.pr-branch}}
       #    body: ${{steps.set-pr.outputs.pr-content}}
 
-      - uses: actions/upload-artifact@v3
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+      - name: release
+        uses: actions/create-release@v1
+        id: create_release
         with:
-          name: db
-          path: "*.db"
+          draft: false
+          prerelease: false
+          release_name: Base de datos ${{ steps.date.outputs.date }}
+          tag_name: ${{ steps.date.outputs.date }}
+          body: Actualización de Base de Datos
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: upload DB
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: 2021-2026-asistencias-votaciones.db
+          asset_name: 2021-2026-asistencias-votaciones.db
+          asset_content_type:
+            application/octet-stream

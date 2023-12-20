@@ -22,8 +22,7 @@ serve:
 	datasette *.db
 
 prepare_registro_plenos:
-	rm -f plenos.db
-	csvs-to-sqlite data/2021-2026/plenos.csv plenos.db
+	csvs-to-sqlite data/2021-2026/plenos.csv 2021-2026-asistencias-votaciones.db
 
 new_pleno:
 	BRANCH=$(cat pr-branch.txt) && git checkout -b ${BRANCH}
