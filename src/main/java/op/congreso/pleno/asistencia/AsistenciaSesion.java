@@ -37,7 +37,8 @@ public record AsistenciaSesion(
         + sesion.fechaHora().format(DateTimeFormatter.ofPattern("HH:mm"))
         + "\n"
         + "quorum,"
-        + sesion.quorum());
+        + sesion.quorum()
+        + "\n");
   }
 
   public String printAsistenciasAsCsv() {
@@ -47,7 +48,8 @@ public record AsistenciaSesion(
             .map(
                 a ->
                     a.grupoParlamentario() + ",\"" + a.congresista() + "\"," + a.resultado().name())
-            .collect(Collectors.joining("\n")));
+            .collect(Collectors.joining("\n"))
+        + "\n");
   }
 
   public String printResultadosAsCsv() {
@@ -75,7 +77,8 @@ public record AsistenciaSesion(
         + resultados.suspendidos()
         + "\n"
         + "otros,"
-        + resultados.otros());
+        + resultados.otros()
+        + "\n");
   }
 
   public String printResultadosPorGrupoAsCsv() {
@@ -122,7 +125,8 @@ public record AsistenciaSesion(
         + ","
         + resultados.suspendidos()
         + ","
-        + resultados.otros());
+        + resultados.otros()
+        + "\n");
   }
 
   public String printLog() {

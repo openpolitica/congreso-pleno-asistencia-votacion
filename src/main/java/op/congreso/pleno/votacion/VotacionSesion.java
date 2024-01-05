@@ -47,7 +47,8 @@ public record VotacionSesion(
         + presidente
         + "\"\n"
         + "quorum,"
-        + sesion.quorum());
+        + sesion.quorum()
+        + "\n");
   }
 
   public String printVotacionesAsCsv() {
@@ -58,7 +59,8 @@ public record VotacionSesion(
             .map(
                 v ->
                     v.grupoParlamentario() + ",\"" + v.congresista() + "\"," + v.resultado().name())
-            .collect(Collectors.joining("\n")));
+            .collect(Collectors.joining("\n"))
+        + "\n");
   }
 
   public String printResultadosPorGrupoAsCsv() {
@@ -101,7 +103,8 @@ public record VotacionSesion(
         + ","
         + resultados.licencias()
         + ","
-        + resultados.otros());
+        + resultados.otros()
+        + "\n");
   }
 
   public String printResultadosAsCsv() {
@@ -128,7 +131,8 @@ public record VotacionSesion(
         + resultados.licencias()
         + "\n"
         + "otros,"
-        + resultados.otros());
+        + resultados.otros()
+        + "\n");
   }
 
   public String printEtiquetasAsCsv() {
