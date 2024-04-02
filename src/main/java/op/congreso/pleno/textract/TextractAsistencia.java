@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 public class TextractAsistencia {
 
   public static Logger LOG = LoggerFactory.getLogger(TextractAsistencia.class);
-  public static final String ASISTENCIA = "ASISTENCIA:";
+  public static final String ASISTENCIA = "ASISTENCIA";
 
   public static void main(String[] args) throws IOException {
     try {
@@ -126,7 +126,7 @@ public class TextractAsistencia {
             case 1 -> plenoBuilder.withLegislatura(text);
             case 2 -> plenoBuilder.withTitulo(text);
             case 3 -> {
-              if (text.equals(ASISTENCIA)) {
+              if (text.equals(ASISTENCIA + ":")) {
                 i++;
                 fechaHora = LocalDateTime.parse(lines.get(i).toLowerCase(), FECHA_HORA_PATTERN);
                 registroBuilder.withFechaHora(fechaHora);

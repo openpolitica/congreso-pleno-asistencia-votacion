@@ -171,11 +171,11 @@ public class TextractRegistroPleno {
       LOG.info("Processing page: {}", key);
       try {
         var lines = list.get(key);
-        if (lines.contains(ASISTENCIA) || lines.get(3).startsWith(ASISTENCIA)) {
+        if (lines.contains(ASISTENCIA + ":") || lines.get(3).startsWith(ASISTENCIA)) {
           var asistencia = TextractAsistencia.load(lines);
           builder.addAsistencia(asistencia);
           latestAsistencia = asistencia;
-        } else if (lines.contains(VOTACION)) {
+        } else if (lines.contains(VOTACION + ":") || lines.get(4).startsWith(VOTACION)) {
           var quorum = -1;
           if (latestAsistencia != null) {
             // TODO potential error

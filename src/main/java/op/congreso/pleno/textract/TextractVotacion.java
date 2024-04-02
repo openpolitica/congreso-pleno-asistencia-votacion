@@ -23,7 +23,7 @@ public class TextractVotacion {
 
   public static Logger LOG = LoggerFactory.getLogger(TextractVotacion.class);
 
-  public static final String VOTACION = "VOTACIÓN:";
+  public static final String VOTACION = "VOTACIÓN";
 
   public static void main(String[] args) throws IOException {
     try {

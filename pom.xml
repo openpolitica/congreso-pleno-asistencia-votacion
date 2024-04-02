@@ -14,7 +14,7 @@
 
         <java.version>17</java.version>
         <jackson.version>2.15.2</jackson.version>
-        <aws.version>2.20.38</aws.version>
+        <aws.version>2.25.22</aws.version>
         <sqlite.version>3.41.2.2</sqlite.version>
         <jsoup.version>1.16.1</jsoup.version>
     </properties>
