@@ -133,7 +133,8 @@ public class TextractAsistencia {
                 plenoBuilder.withFecha(fechaHora.toLocalDate());
               } else if (text.startsWith(ASISTENCIA)) {
                 var fechaText = text.substring(ASISTENCIA.length() + 1);
-                fechaHora = LocalDateTime.parse(fechaText.toLowerCase(UK), FECHA_HORA_PATTERN);
+                var preparedFechaText = fechaText.toLowerCase(UK).trim();
+                fechaHora = LocalDateTime.parse(preparedFechaText, FECHA_HORA_PATTERN);
                 registroBuilder.withFechaHora(fechaHora);
                 plenoBuilder.withFecha(fechaHora.toLocalDate());
               }
